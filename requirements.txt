@@ -1,0 +1,23 @@
+# Django core
+Django>=4.2,<5.0
+
+# REST framework
+djangorestframework
+djangorestframework-simplejwt
+
+# CORS headers for React/React Native communication
+django-cors-headers
+
+# PostgreSQL database driver
+psycopg2-binary
+
+# Environment variable loading
+python-dotenv
+
+# JWT library (used internally by simplejwt, but ok to include)
+PyJWT
+
+# Already included by Django (don't need to specify unless version-pinning):
+# asgiref
+# pytz
+# sqlparse
