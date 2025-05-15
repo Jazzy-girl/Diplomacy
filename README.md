@@ -14,7 +14,7 @@ pip install -r backend/requirements.txt
 
 # Best Practice
 **Branch Naming**
-- feature/\<\s\>
+- feature/<\s\>
 
 # Goals (in no particular order)
 - Colorblind settings
