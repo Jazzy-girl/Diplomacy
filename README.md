@@ -6,7 +6,7 @@ Frontend will be React (web) and ReactNative (mobile)
 Backend will be Django
 
 ## Contributors
-Ryanne Wilsons
+Ryanne Wilson
 
 ## Setup
 For the backend installs, run:
