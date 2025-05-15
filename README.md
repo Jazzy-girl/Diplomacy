@@ -5,6 +5,13 @@ So far:
 Frontend will be React (web) and ReactNative (mobile)
 Backend will be Django
 
+## Contributors
+Ryanne Wilson
+
+## Setup
+For the backend installs, run:
+pip install -r backend/requirements.txt
+
 # Goals (in no particular order)
 - Colorblind settings
 - AJAX updates for press/notifications
