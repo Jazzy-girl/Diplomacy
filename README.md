@@ -12,6 +12,10 @@ Ryanne Wilson
 For the backend installs, run:
 pip install -r backend/requirements.txt
 
+# Best Practice
+**Branch Naming**
+- feature/<feature type>
+
 # Goals (in no particular order)
 - Colorblind settings
 - AJAX updates for press/notifications
