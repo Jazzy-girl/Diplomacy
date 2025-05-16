@@ -12,9 +12,12 @@ Ryanne Wilson
 For the backend installs, run:
 pip install -r backend/requirements.txt
 
+You will need a virtual environment.
+python3 -m venv venv
+source venv/bin/activate
+
 # Good Practices
-**Branches**
-Should be short-lived for small features.
+**Branches** should be short-lived for small features.
 Merge changes through pull requests & code reviews.
 Naming Conventions:
 - feature/initials-feature-name
