@@ -17,6 +17,9 @@ python-dotenv
 # JWT library (used internally by simplejwt, but ok to include)
 PyJWT
 
+#Email authentication
+django-allauth
+
 # Already included by Django (don't need to specify unless version-pinning):
 # asgiref
 # pytz
