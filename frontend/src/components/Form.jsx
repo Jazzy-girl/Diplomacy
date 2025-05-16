@@ -39,20 +39,25 @@ function Form({route, method}){
         <h1>{name}</h1>
         {method==="register" && <p>Already have an account? <Link to="/login">Login Here</Link></p>}
         {method==="login" && <p>Don't have an account? <Link to="/register">Register Here</Link></p>}
-        <input className="form-input"
+        <label htmlFor="emailInput" className="label-input">Email</label>
+        <input id="emailInput"className="form-input"
         type="email"
         value={email}
         onChange={(e)=>setEmail(e.target.value)}
         placeholder="email"
         />
         {method !=="login" && (
-                <input className="form-input"
+            <>
+            <label htmlFor="" className="label-input">Username</label>
+            <input className="form-input"
             type="text"
             value={username}
             onChange={(e)=>setUsername(e.target.value)}
             placeholder="username"
             />
+            </>
         )}
+        <label htmlFor="" className="label-input">Password</label>
         <input className="form-input"
         type="password"
         value={password}
