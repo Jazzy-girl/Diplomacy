@@ -40,11 +40,13 @@ function Form({route, method}){
         {method==="register" && <p>Already have an account? <Link to="/login">Login Here</Link></p>}
         {method==="login" && <p>Don't have an account? <Link to="/register">Register Here</Link></p>}
         <label htmlFor="emailInput" className="label-input">Email</label>
-        <input id="emailInput"className="form-input"
+        <input id="emailInput"
+        className="form-input"
         type="email"
         value={email}
         onChange={(e)=>setEmail(e.target.value)}
         placeholder="email"
+        required
         />
         {method !=="login" && (
             <>
@@ -54,6 +56,7 @@ function Form({route, method}){
             value={username}
             onChange={(e)=>setUsername(e.target.value)}
             placeholder="username"
+            required
             />
             </>
         )}
@@ -63,8 +66,9 @@ function Form({route, method}){
         value={password}
         onChange={(e)=>setPassword(e.target.value)}
         placeholder="Password"
+        required
         />
-        <button className="form-button" type="submit">{name}</button>
+        <button className="form-button" type="submit" >{name}</button>
         
     </form>
 }
