@@ -5,16 +5,23 @@ So far:
 Frontend will be React (web) and ReactNative (mobile)
 Backend will be Django
 
+Using local databases for development
+
 ## Contributors
 Ryanne Wilson
 
-## Setup
-For the backend installs, run:
-pip install -r backend/requirements.txt
+## Requirements
+- Django
+- PostgreSQL
+- Python
 
-You will need a virtual environment.
-python3 -m venv venv
-source venv/bin/activate
+## Setup
+- Move to the ```backend``` directory
+- run ```pip install -r backend/requirements.txt```
+- Copy ```.env.example``` to ```.env``` and modify values to your desired values.
+- Make a PostgreSQL username and password same as DB_USER and DB_PASSWORD
+- Create a PostgreSQL database with the same name as DB_DATABASE (diplomacy)
+- run ```python manage.py makemigrations``` and ```python manage.py migrate```
 
 # Good Practices
 **Branches** should be short-lived for small features.
