@@ -27,7 +27,7 @@ Ryanne Wilson
 **Branches** should be short-lived for small features.
 Merge changes through pull requests & code reviews.
 Naming Conventions:
-- feature/initials-feature-name
+- feature/your-name/feature-name
 - bugfix/bug-to-fix
 - release/v#.#.#
 
