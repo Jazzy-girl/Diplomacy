@@ -12,9 +12,14 @@ Ryanne Wilson
 For the backend installs, run:
 pip install -r backend/requirements.txt
 
-# Best Practice
-**Branch Naming**
-- feature/<\s\>
+# Good Practices
+**Branches**
+Should be short-lived for small features.
+Merge changes through pull requests & code reviews.
+Naming Conventions:
+- feature/initials-feature-name
+- bugfix/bug-to-fix
+- release/v#.#.#
 
 # Goals (in no particular order)
 - Colorblind settings
