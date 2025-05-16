@@ -30,6 +30,8 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+AUTH_USER_MODEL = 'api.CustomUser'
+
 ALLOWED_HOSTS = ["*"]
 
 REST_FRAMEWORK = {
