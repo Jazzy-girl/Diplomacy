@@ -17,11 +17,14 @@ Ryanne Wilson
 
 ## Setup
 - Move to the ```backend``` directory
-- run ```pip install -r backend/requirements.txt```
-- Copy ```.env.example``` to ```.env``` and modify values to your desired values.
+- run ```pip install -r backend/requirements.txt``` for backend dependencies
+- run ```npm install``` for frontend dependencies
+- Copy ```.env.example``` to ```.env``` and modify values to your desired values (backend)
 - Make a PostgreSQL username and password same as DB_USER and DB_PASSWORD
 - Create a PostgreSQL database with the same name as DB_DATABASE (diplomacy)
 - run ```python manage.py makemigrations``` and ```python manage.py migrate```
+- Move to the ```frontend``` directory
+- Copy ```.env.example``` to ```.env``` and keep it the same (frontend)
 
 # Good Practices
 **Branches** should be short-lived for small features.
