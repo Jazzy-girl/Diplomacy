@@ -1,6 +1,6 @@
 import { useState } from "react";
 import api from "../api"
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import "../styles/Form.css"
 
@@ -37,6 +37,8 @@ function Form({route, method}){
 
     return <form onSubmit={handleSubmit} className="form-container">
         <h1>{name}</h1>
+        {method==="register" && <p>Already have an account? <Link to="/login">Login Here</Link></p>}
+        {method==="login" && <p>Don't have an account? <Link to="/register">Register Here</Link></p>}
         <input className="form-input"
         type="email"
         value={email}
