@@ -23,6 +23,16 @@ def current_user(request):
             'pronouns': user.pronouns,
         })
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_user(request):
+    user = request.user
+    serializer = UserSerializer(user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=400)
+
 class ReactConfirmEmailView(ConfirmEmailView):
     def get(self, *args, **kwargs):
         self.object = self.get_object()

@@ -6,6 +6,7 @@ import Home from "./pages/Home"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 import VerifyEmail from "./pages/VerifyEmail"
+import UserSettings from "./pages/UserSettings"
 
 function Logout(){
   localStorage.clear();
@@ -33,6 +34,8 @@ function App() {
           <Route path="/logout" element={<Logout/>}/>
           <Route path="/register" element={<Register/>}/>
           <Route path="/verify-email" element={<VerifyEmail/>}/>
+
+          <Route path="/settings" element={<ProtectedRoute><UserSettings/></ProtectedRoute>}/>
           <Route path="*" element={<NotFound/>}></Route>
           
         </Routes>

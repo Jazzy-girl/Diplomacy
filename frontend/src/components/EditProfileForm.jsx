@@ -9,32 +9,46 @@ function EditProfileForm({route, method}){
         - pronouns (can be null)
     */
 
-        const [username, setUsername] = useState("");
+    const [username, setUsername] = useState("");
+    const [pronouns, setPronouns] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    useEffect(()=>{
         const token = localStorage.getItem(ACCESS_TOKEN);
-        useEffect(()=>{
-            if(token){
-                try{
-                    const decodedToken = jwtDecode(token);
-                    const user = decodedToken.username;
-                    setUsername(user);
-                    
-                }catch (error){
-                    if (error.response) {
-                        console.error("Registration error:", error.response.data);
-                        alert(JSON.stringify(error.response.data));
-                    } else {
-                        console.error("Unknown error", error);
-                        alert("Something went wrong.");
-                    }
-                }
-            }else{
-                alert("No token");
-            }});
 
+        if(!token){
+            alert("No token!!");
+            return;
+        }
 
-        return <>
-            <label htmlFor="">{username}</label>
-        </>;
+        fetch("http://localhost:8000/api/user/",
+            {
+                headers:{
+                    "Authorization": `Bearer ${token}`,
+                },
+            }
+        ).then((res)=>{
+            if(!res.ok){
+                alert("Failed to fetch user")
+            }
+            return res.json();
+        }).then((data)=>{setUsername(data.username);setPronouns(data.pronouns);})
+        .catch((error)=>alert(error.message));
+    }, []);
+
+    const handleSubmit = async (e) => {
+        setLoading(true);
+        e.preventDefault();
+        //Submit new
+    }
+
+    return <>
+        <h1>User Info</h1>
+        <label>Displayed name</label>
+        <input type="text" value={username} onChange={(e)=>setUsername(e.target.value)} placeholder={username}/>
+        <label htmlFor="">Pronouns</label>
+        <input type="text" value={pronouns} onChange={(e)=>setPronouns(e.target.value)} placeholder={pronouns}/>
+    </>
 }
 
 export default EditProfileForm;
