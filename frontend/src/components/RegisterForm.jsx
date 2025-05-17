@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import "../styles/Form.css"
 
-function Form({route, method}){
+function RegisterForm({route, method}){
     const [email, setEmail] = useState()
     const [username, setUsername] = useState()
     const [password1, setPassword1] = useState()
@@ -94,4 +94,4 @@ function Form({route, method}){
     </form>
 }
 
-export default Form
+export default RegisterForm
