@@ -21,7 +21,7 @@ function Form({route, method}){
         try{
             const res = await api.post(
                 route, 
-                method === "login" ? {email, password1, password1: password2} : {email, username, password1, password2}
+                method === "login" ? {email, password: password1} : {email, username, password1, password2}
             );
             if (method === "login"){
                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
