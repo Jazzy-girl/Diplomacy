@@ -1,5 +1,5 @@
-export default function VerifyEmail() {
-  return (
+function VerifyEmail() {
+  return ( //Temporary and should be changed to be prettier
     <div style={{ padding: "1rem" }}>
       <h1>Verify Your Email!</h1>
       <p>
@@ -8,3 +8,5 @@ export default function VerifyEmail() {
     </div>
   );
 }
+
+export default VerifyEmail
