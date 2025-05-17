@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { ACCESS_TOKEN } from "../constants";
 import {jwtDecode} from "jwt-decode";
+import api from "../api";
 
-function EditProfileForm({route, method}){
+function EditProfileForm({route}){
     /*
         Things to edit (currently):
         - username
@@ -12,9 +13,9 @@ function EditProfileForm({route, method}){
     const [username, setUsername] = useState("");
     const [pronouns, setPronouns] = useState("");
     const [loading, setLoading] = useState(false);
-
+    const token = localStorage.getItem(ACCESS_TOKEN);
     useEffect(()=>{
-        const token = localStorage.getItem(ACCESS_TOKEN);
+        
 
         if(!token){
             alert("No token!!");
@@ -39,16 +40,30 @@ function EditProfileForm({route, method}){
     const handleSubmit = async (e) => {
         setLoading(true);
         e.preventDefault();
-        //Submit new
+
+        //Alter data
+        try{
+            const res = await api.put('api/user/update', {username, pronouns},{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+                },
+            );
+            alert(`Data updated successfully`);
+            window.location.reload();
+        }catch (error){
+            alert(error.message);
+        }
     }
 
-    return <>
+    return <form onSubmit={handleSubmit}>
         <h1>User Info</h1>
         <label>Displayed name</label>
         <input type="text" value={username} onChange={(e)=>setUsername(e.target.value)} placeholder={username}/>
         <label htmlFor="">Pronouns</label>
         <input type="text" value={pronouns} onChange={(e)=>setPronouns(e.target.value)} placeholder={pronouns}/>
-    </>
+        <button type="submit">Submit Changes</button>
+    </form>
 }
 
 export default EditProfileForm;
