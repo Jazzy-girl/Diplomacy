@@ -42,7 +42,6 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'      # Sends verification email
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'  # or None if you removed it
-
 LOGIN_REDIRECT_URL = '/'                      # Where to redirect after login
 
 # Email auth
@@ -91,6 +90,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "allauth",
     "allauth.account",
+    "allauth.socialaccount",
     "dj_rest_auth",
     "dj_rest_auth.registration",
 ]

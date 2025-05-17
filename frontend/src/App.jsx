@@ -5,16 +5,17 @@ import Register from "./pages/Register"
 import Home from "./pages/Home"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
+import VerifyEmail from "./pages/VerifyEmail"
 
 function Logout(){
   localStorage.clear();
   return <Navigate to="/login"/>
 }
 
-function RegisterAndLogout(){
-  localStorage.clear();
-  return <Register />
-}
+// function RegisterAndLogout(){
+//   localStorage.clear();
+//   return <Register />
+// }
 
 function App() {
   return (
@@ -30,8 +31,10 @@ function App() {
 
           <Route path="/login" element={<Login/>}/>
           <Route path="/logout" element={<Logout/>}/>
-          <Route path="/register" element={<RegisterAndLogout/>}/>
+          <Route path="/register" element={<Register/>}/>
+          <Route path="/verify-email" element={<VerifyEmail/>}/>
           <Route path="*" element={<NotFound/>}></Route>
+          
         </Routes>
       </BrowserRouter>
   )

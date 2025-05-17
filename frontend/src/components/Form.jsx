@@ -7,7 +7,8 @@ import "../styles/Form.css"
 function Form({route, method}){
     const [email, setEmail] = useState()
     const [username, setUsername] = useState()
-    const [password, setPassword] = useState()
+    const [password1, setPassword1] = useState()
+    const [password2, setPassword2] = useState()
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
@@ -18,18 +19,28 @@ function Form({route, method}){
         e.preventDefault();
         //Submit the user and password
         try{
-            const res = await api.post(route, 
-                method === "login" ? {email, password} : {email, username, password});
-            if (method==="login"){
+            const res = await api.post(
+                route, 
+                method === "login" ? {email, password1} : {email, username, password1, password2}
+            );
+            if (method === "login"){
                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
                 navigate("/");
             }else{
-                navigate("/login");
+                //alert("Registration successful. Please check your email to verify your accout.")
+                //navigate("/login");
+                navigate("/verify-email");
             }
 
         }catch(error){
-            alert(error);
+            if (error.response) {
+            console.error("Registration error:", error.response.data);
+            alert(JSON.stringify(error.response.data));
+            } else {
+            console.error("Unknown error", error);
+            alert("Something went wrong.");
+            }
         }finally{
             setLoading(false)
         }
@@ -63,11 +74,22 @@ function Form({route, method}){
         <label htmlFor="" className="label-input">Password</label>
         <input className="form-input"
         type="password"
-        value={password}
-        onChange={(e)=>setPassword(e.target.value)}
+        value={password1}
+        onChange={(e)=>setPassword1(e.target.value)}
         placeholder="Password"
         required
         />
+        {method !=="login"&&
+        <>
+            <label htmlFor="" className="label-input">Password (again)</label>
+            <input className="form-input"
+            type="password"
+            value={password2}
+            onChange={(e)=>setPassword2(e.target.value)}
+            placeholder="Password"
+            required
+            />
+        </>}
         <button className="form-button" type="submit" >{name}</button>
         
     </form>
