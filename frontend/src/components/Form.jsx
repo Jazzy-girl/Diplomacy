@@ -28,12 +28,11 @@ function Form({route, method}){
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
                 navigate("/");
             }else{
-                //alert("Registration successful. Please check your email to verify your accout.")
-                //navigate("/login");
                 navigate("/verify-email");
             }
 
         }catch(error){
+            //For Debugging
             if (error.response) {
             console.error("Registration error:", error.response.data);
             alert(JSON.stringify(error.response.data));
@@ -81,7 +80,7 @@ function Form({route, method}){
         />
         {method !=="login"&&
         <>
-            <label htmlFor="" className="label-input">Password (again)</label>
+            <label htmlFor="" className="label-input">Password again.</label>
             <input className="form-input"
             type="password"
             value={password2}
