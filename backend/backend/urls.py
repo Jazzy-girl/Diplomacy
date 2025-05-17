@@ -17,10 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 # from requests import Response
-from api.views import CreateUserView, ReactConfirmEmailView
+from api.views import CreateUserView, ReactConfirmEmailView, current_user
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
 # class EmailVerificationSentAPIView(APIView):
 #     def get(self, request):
 #         return Response({"detail": "Verification email sent."})
@@ -39,6 +40,7 @@ urlpatterns = [
     ),
     path("dj-rest-auth/", include("dj_rest_auth.urls")),
     path("dj-rest-auth/registration/", include("dj_rest_auth.registration.urls")),
+    path('api/current-user/', current_user, name='current_user')
     # path("dj-rest-auth/registration/account-email-verification-sent/", 
     #      ReactConfirmEmailView.as_view(), name='account_confirm_email'),
 ]
