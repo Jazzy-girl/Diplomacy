@@ -27,4 +27,4 @@ class ReactConfirmEmailView(ConfirmEmailView):
     def get(self, *args, **kwargs):
         self.object = self.get_object()
         self.object.confirm(self.request)
-        return redirect("http://localhost:5173/login") # Replace with actual website later. Assuming Vite using 5173
+        return redirect("http://localhost:5174/login") # Replace with actual website later. Assuming Vite using 5173

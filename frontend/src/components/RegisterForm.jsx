@@ -21,7 +21,12 @@ function RegisterForm({route, method}){
         try{
             const res = await api.post(
                 route, 
-                method === "login" ? {email, password: password1} : {email, username, password1, password2}
+                method === "login" ? {email, password: password1} : {email, username, password1, password2},
+                {
+                    headers:{
+                        Authorization: undefined,
+                    }
+                },
             );
             if (method === "login"){
                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
