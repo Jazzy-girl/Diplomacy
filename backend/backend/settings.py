@@ -37,11 +37,11 @@ ALLOWED_HOSTS = ["*"]
 # django-allauth
 SITE_ID = 1
 
-ACCOUNT_LOGIN_METHODS = {'email'}      # Use email to log in
+ACCOUNT_LOGIN_METHOD = 'email'      # Use email to log in
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'      # Sends verification email
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'  # or None if you removed it
 LOGIN_REDIRECT_URL = '/'                      # Where to redirect after login
 
 # Email auth
