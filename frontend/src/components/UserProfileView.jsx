@@ -10,12 +10,7 @@ function UserProfileView({userId}){
 
     const token = localStorage.getItem(ACCESS_TOKEN);
     useEffect(()=>{
-        fetch(`http://localhost:8000/api/user/${userId}/`,
-            {
-                headers:{
-                    "Authorization": `Bearer ${token}`,
-                },
-            }
+        fetch(`http://localhost:8000/api/user/${userId}/`
         ).then((res)=>{
             if(!res.ok){
                 alert("Failed to fetch user");

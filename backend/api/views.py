@@ -5,7 +5,7 @@ from .models import CustomUser
 from .serializers import UserSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from allauth.account.views import ConfirmEmailView
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
 # Create your views here.
 class CreateUserView(generics.CreateAPIView):
@@ -24,7 +24,8 @@ def current_user(request):
         })
 
 @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
+@authentication_classes([])
 def get_user_by_id(request, pk):
     user = get_object_or_404(CustomUser, pk=pk)
     return Response({
