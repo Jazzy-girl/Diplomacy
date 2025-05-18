@@ -43,7 +43,7 @@ function EditProfileForm({route}){
 
         //Alter data
         try{
-            const res = await api.put('api/user/update', {username, pronouns},{
+            const res = await api.put('api/user/update/', {username, pronouns},{
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }
