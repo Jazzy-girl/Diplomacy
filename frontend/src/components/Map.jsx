@@ -1,0 +1,35 @@
+import react, { useState } from "react"
+import territories from "../assets/territories.json"
+import '../styles/Map.css';
+
+function Map(){
+    const [hover, setHover] = useState("");
+    return <svg viewBox="0 0 947 873">
+        {Object.entries(territories).map(([id, territory])=>
+            (<g key={id}>
+                <path
+                key={id}
+                d={territory.path}
+                fill={hover===id ? "#BA8E23" : "#ff0"}
+                stroke="#333"
+                strokeWidth={1}
+                onMouseEnter={()=>setHover(id)}
+                onMouseLeave={()=>setHover("")}
+                onClick={()=>alert(`Territory: ${id}`)}
+                />
+                {territory.labelPos && (
+                    <text
+                    x={territory.labelPos[0]}
+                    y={territory.labelPos[1]}
+                    fontSize="10"
+                    fill="#000"
+                    textAnchor="middle"
+                    pointerEvents="none"
+                    >{id}</text>
+                )}
+                </g>
+            ))}
+            </svg>;
+}
+
+export default Map

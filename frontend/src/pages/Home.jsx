@@ -7,6 +7,7 @@ function Home(){
     return <>
     <div>Home</div>
     <p><Link to="/settings">Your Settings</Link></p>
+    <p><Link to="/game">Game Map</Link></p>
     </>
 }
 
