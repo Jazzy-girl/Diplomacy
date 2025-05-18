@@ -24,8 +24,9 @@ def current_user(request):
         })
 
 @api_view(['GET'])
-def get_user_by_id(pk):
-    user = get_object_or_404(CustomUser, pk)
+# @permission_classes([IsAuthenticated])
+def get_user_by_id(request, pk):
+    user = get_object_or_404(CustomUser, pk=pk)
     return Response({
             'username': user.username,
             'email': user.email,

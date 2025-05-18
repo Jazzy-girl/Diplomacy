@@ -41,6 +41,6 @@ urlpatterns = [
     path("dj-rest-auth/", include("dj_rest_auth.urls")),
     path("dj-rest-auth/registration/", include("dj_rest_auth.registration.urls")),
     path('api/user/', current_user, name='current_user'),
-    path('api/user/update', update_user, name='update_user'),
-    path('api/user/<int:pk>', get_user_by_id, name='get_user_by_id')
+    path('api/user/update/', update_user, name='update_user'),
+    path('api/user/<int:pk>/', get_user_by_id, name='get_user_by_id'),
 ]
