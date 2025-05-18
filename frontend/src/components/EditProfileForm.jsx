@@ -35,7 +35,7 @@ function EditProfileForm({route}){
             return res.json();
         }).then((data)=>{setUsername(data.username);setPronouns(data.pronouns);})
         .catch((error)=>alert(error.message));
-    }, []);
+    }, [token]);
 
     const handleSubmit = async (e) => {
         setLoading(true);
