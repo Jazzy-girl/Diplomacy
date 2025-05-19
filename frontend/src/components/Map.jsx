@@ -1,10 +1,9 @@
 import react, { useState } from "react"
 import territories from "../assets/territories.json"
-import '../styles/Map.css';
 
 function Map(){
     const [hover, setHover] = useState("");
-    return <svg viewBox="0 0 947 873">
+    return <div className="flex justify-end p-4"><svg viewBox="0 0 947 873" className="w-[800px] h-auto border shadow-md">
         {Object.entries(territories).map(([id, territory])=>
             (<g key={id}>
                 <path
@@ -29,7 +28,7 @@ function Map(){
                 )}
                 </g>
             ))}
-            </svg>;
+            </svg></div>;
 }
 
 export default Map
