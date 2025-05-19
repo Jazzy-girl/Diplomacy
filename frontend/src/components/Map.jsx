@@ -3,7 +3,7 @@ import territories from "../assets/territories.json"
 
 function Map(){
     const [hover, setHover] = useState("");
-    return <div className="flex justify-end p-4"><svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/2}`} className="w-[800px] h-auto border shadow-md">
+    return <div className="flex justify-end p-4"><svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
         {Object.entries(territories).map(([id, territory])=>
             (<g key={id}>
                 <path
@@ -14,7 +14,7 @@ function Map(){
                 strokeWidth={1}
                 onMouseEnter={()=>setHover(id)}
                 onMouseLeave={()=>setHover("")}
-                onClick={()=>alert(`Territory: ${window.innerWidth}`)}
+                onClick={()=>alert(`Territory: ${id}`)}
                 />
                 {territory.labelPos && (
                     <text
