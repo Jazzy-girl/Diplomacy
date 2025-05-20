@@ -13,14 +13,15 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
-
+class Game(models.Model):
+    pass
 class Territory(models.Model):
-    #game id FK
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
     name = models.CharField(max_length=20)
     sc_exists = models.BooleanField(default=False)
     retreating_unit = models.ForeignKey("Unit", null=True, on_delete=models.SET_NULL)
 class Unit(models.Model):
-    #game id FK
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
     #player id FK
     location = models.ForeignKey(Territory, null=True, on_delete=models.SET_NULL)
     type = models.CharField(choices=[('A', 'Army'), ('F', 'Fleet')], max_length=1)
