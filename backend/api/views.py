@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
 from rest_framework import generics
-from .models import CustomUser
-from .serializers import UserSerializer
+from .models import CustomUser, Game
+from .serializers import UserSerializer, GameSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from allauth.account.views import ConfirmEmailView
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -12,6 +12,10 @@ class CreateUserView(generics.CreateAPIView):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+
+class GameList(generics.ListAPIView):
+    queryset = Game.objects.all()
+    serializer_class = GameSerializer
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

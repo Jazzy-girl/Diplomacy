@@ -15,8 +15,7 @@ Does this work? Is there a better way to do this?
 Would it be better for the "Units" table to have a column for game_id, and either owner_player_id foreign key, or country_owner (TEXT) where the PlayersGames table has game_id, player_id, and assigned country (TEXT)
 
 */
-function Map(){
-
+function Map({game_id}){
     const [hover, setHover] = useState("");
     return <div className="flex justify-end p-4"><svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
         {Object.entries(territories).map(([id, territory])=>

@@ -14,7 +14,7 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 class Game(models.Model):
-    pass
+    name = models.CharField(max_length=50)
 class Territory(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     name = models.CharField(max_length=20)
