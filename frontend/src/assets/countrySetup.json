@@ -1,9 +1,10 @@
 {
     "Turkey":{
-        "Units": ["Ank"]
+        "Ank": "F"
     },
 
     "Russia":{
-        "Units": ["Sev", "Mos"]
+        "Sev": "F",
+        "Mos": "A"
     }
 }
