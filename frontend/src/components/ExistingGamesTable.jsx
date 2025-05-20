@@ -44,12 +44,12 @@ function ExistingGamesTable() {
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((item)=>{
+                    {data.map((item)=>{return(
                         <tr key={item.id}>
                             <td>{item.id}</td>
                             <td>{item.name}</td>
                         </tr>
-                    })}
+                    )})}
                 </tbody>
             </table>
         ):(<p>No data available.</p>)}
