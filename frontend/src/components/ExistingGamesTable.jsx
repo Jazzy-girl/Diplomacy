@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Map from "./Map";
-
+import { Link } from "react-router-dom";
 function ExistingGamesTable() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -42,7 +42,7 @@ function ExistingGamesTable() {
                     <tr>
                         <th>Game Id</th>
                         <th>Game Name</th>
-                        <th>Link to Game</th>
+                        <th>Link to View Game</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -50,7 +50,7 @@ function ExistingGamesTable() {
                         <tr key={item.id}>
                             <td>{item.id}</td>
                             <td>{item.name}</td>
-                            <td><Map game_id={item.id}/></td>
+                            <th><Link to={`/game/ID/${item.id}`}>View Game</Link></th>
                         </tr>
                     )})}
                 </tbody>

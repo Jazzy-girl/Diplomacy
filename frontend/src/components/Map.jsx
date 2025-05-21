@@ -1,7 +1,7 @@
 import React from "react";
 import react, { useState, useEffect } from "react"
 import territories from "../assets/territories.json"
-import 
+
 /*
 Planned Method:
 Use JSON to store:
@@ -27,8 +27,7 @@ function Map({game_id}){
     useEffect(()=>{
         async function fetchData() {
             try{
-                const res = await fetch('http://localhost:8000/api/units/list')
-                .then((res)=>{
+                const res = await fetch('http://localhost:8000/api/units/list/').then((res)=>{
                     if(!res.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     return res.json();
                 }).then((data)=>{setUnitData(data)});
@@ -39,6 +38,8 @@ function Map({game_id}){
             }
         }
         fetchData();
+
+        
     }, []);
 
     if(loading){
@@ -49,7 +50,7 @@ function Map({game_id}){
         return <p>Error: {error.message}</p>;
     }
 
-    const map = <div className="flex justify-end p-4"><svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
+    return (<div className="relative w-[800px] h-auto"><svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
         {Object.entries(territories).map(([id, territory])=>
             (<g key={id}>
                 <path
@@ -74,13 +75,13 @@ function Map({game_id}){
                 )}
                 </g>
             ))}
-            </svg></div>;
-    
-    const units = <svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
-        {unitData.filter((item)=> item.game === game_id).map((unit)=>{
-            const territory = territories[unit.territory];
+
+        {unitData.filter((u) => u.game === Number(game_id)).map((unit)=>{
+            console.log("Rendering unit at:", unit.location);
+            const territory = territories[unit.location];
             if(!territory || !territory.unitPos) return null;
             const [cx, cy] = territory.unitPos;
+            return(
            <circle
            key={unit.id}
            cx={cx}
@@ -88,11 +89,14 @@ function Map({game_id}){
            r="6"
            stroke="black"
            strokeWidth="4"
-           fill={unit.owner==="T"? "red" : "blue"}/>;
+           pointerEvents="none"
+           
+           fill={unit.owner==="T"? "red" : "blue"}/>
+            );
         })}
         </svg>
-    
-    return<>{map}{units}</>
+        </div>
+    );
 }
 
 export default Map

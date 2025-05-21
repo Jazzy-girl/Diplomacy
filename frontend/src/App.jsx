@@ -37,7 +37,7 @@ function App() {
           <Route path="/register" element={<Register/>}/>
           <Route path="/verify-email" element={<VerifyEmail/>}/>
           <Route path="/user/ID/:id" element={<ViewProfile/>}/>
-          <Route path="/game" element={<PlayGame/>}/>
+          <Route path="/game/ID/:id" element={<PlayGame/>}/>
 
           <Route path="/settings" element={<ProtectedRoute><UserSettings/></ProtectedRoute>}/>
           <Route path="*" element={<NotFound/>}></Route>

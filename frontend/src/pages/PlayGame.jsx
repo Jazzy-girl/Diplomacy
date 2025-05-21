@@ -1,7 +1,9 @@
 import Map from "../components/Map";
+import { useParams } from "react-router-dom"
 
 function PlayGame(){
-    return <Map/>
+    const {id} = useParams();
+    return <Map game_id={id}/>
 }
 
 export default PlayGame
