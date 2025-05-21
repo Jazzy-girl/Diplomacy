@@ -67,7 +67,7 @@ function Map({game_id}){
                     <text
                     x={territory.labelPos[0]}
                     y={territory.labelPos[1]}
-                    fontSize="10"
+                    fontSize="5"
                     fill="#000"
                     textAnchor="middle"
                     pointerEvents="none"
@@ -86,11 +86,10 @@ function Map({game_id}){
            key={unit.id}
            cx={cx}
            cy={cy}
-           r="6"
+           r="3"
            stroke="black"
-           strokeWidth="4"
+           strokeWidth="1"
            pointerEvents="none"
-           
            fill={unit.owner==="T"? "red" : "blue"}/>
             );
         })}
