@@ -13,9 +13,11 @@ class CreateUserView(generics.CreateAPIView):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# @authentication_classes([])
+
+class CreateGameView(generics.CreateAPIView):
+    queryset = Game.objects.all()
+    serializer_class=GameSerializer
+    permission_classes = [AllowAny]
 class GameList(generics.ListAPIView):
     queryset = Game.objects.all()
     serializer_class = GameSerializer

@@ -9,7 +9,7 @@ import VerifyEmail from "./pages/VerifyEmail"
 import UserSettings from "./pages/UserSettings"
 import ViewProfile from "./pages/ViewProfile"
 import PlayGame from "./pages/PlayGame"
-
+import MakeGame from "./pages/MakeGame"
 function Logout(){
   localStorage.clear();
   return <Navigate to="/login"/>
@@ -38,6 +38,13 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmail/>}/>
           <Route path="/user/ID/:id" element={<ViewProfile/>}/>
           <Route path="/game/ID/:id" element={<PlayGame/>}/>
+          <Route
+          path="/create"
+          element={
+            <ProtectedRoute>
+              <MakeGame/>
+            </ProtectedRoute>
+          }/>
 
           <Route path="/settings" element={<ProtectedRoute><UserSettings/></ProtectedRoute>}/>
           <Route path="*" element={<NotFound/>}></Route>

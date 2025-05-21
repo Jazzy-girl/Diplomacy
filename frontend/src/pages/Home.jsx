@@ -8,7 +8,7 @@ function Home(){
     return <>
     <div className="py-8 text-red-100">Home</div>
     <p><Link to="/settings">Your Settings</Link></p>
-    <p><Link to="/game">Game Map</Link></p>
+    <p><Link to="/create">Make a New Game</Link></p>
     <ExistingGamesTable/>
     </>
 }

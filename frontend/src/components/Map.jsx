@@ -2,21 +2,7 @@ import React from "react";
 import react, { useState, useEffect } from "react"
 import territories from "../assets/territories.json"
 
-/*
-Planned Method:
-Use JSON to store:
-- static map data
-- default unit locations and country owners
 
-When starting a game:
-- Read the JSON file, make an entry into the "Territories" table for each territory including the territory name and if it has a supply center, default owner
-- and make an entry into the "Units" table for each unit
-
-Does this work? Is there a better way to do this?
-
-Would it be better for the "Units" table to have a column for game_id, and either owner_player_id foreign key, or country_owner (TEXT) where the PlayersGames table has game_id, player_id, and assigned country (TEXT)
-
-*/
 function Map({game_id}){
     const [hover, setHover] = useState("");
     const [loading, setLoading] = useState(true);
