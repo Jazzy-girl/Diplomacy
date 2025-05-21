@@ -3,10 +3,11 @@ from django.dispatch import receiver
 from .models import Game, Territory, Unit
 import json
 
-TERRITORIES_FILE = '/home/rywilson/DipProject/Diplomacy/frontend/src/assets/countrySetup.json'
+TERRITORIES_FILE = '/home/rywilson/DipProject/Diplomacy/frontend/src/assets/territories.json'
 UNITS_FILE = '/home/rywilson/DipProject/Diplomacy/frontend/src/assets/countrySetup.json'
 @receiver(post_save, sender=Game)
 def create_territories_and_units_on_game_save(sender, instance, created, **kwargs):
+    print("signal triggered!") #Debug
     if created:
         # First make the Territories
         with open(TERRITORIES_FILE, 'r') as fTerrs:
@@ -19,5 +20,4 @@ def create_territories_and_units_on_game_save(sender, instance, created, **kwarg
             data = json.load(fUnits)
             for country, territories in data.items():
                 for territory, type in territories.items():
-                    location = Territory.objects.get(name=territory, game=instance)
-                    Unit.objects.create(game=instance, location=location, type=type,owner=country[0])
+                    Unit.objects.create(game=instance, location=territory, type=type, owner=country[0])

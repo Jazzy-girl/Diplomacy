@@ -4,7 +4,7 @@
     "type": "l",
     "labelPos": [203, 195],
     "neighbors": ["Arm"],
-    "unit_center": null,
+    "unitPos": [],
     "sc": true
   },
   "Arm": {
@@ -12,7 +12,7 @@
     "type": "l",
     "labelPos": [240, 190],
     "neighbors": ["Ank", "Sev", "Syr"],
-    "unit_center": null,
+    "unitPos": [240, 180],
     "sc": false
   },
   "Syr": {
@@ -20,7 +20,7 @@
     "type": "l",
     "labelPos": [240, 220],
     "neighbors": ["Arm"],
-    "unit_center": null,
+    "unitPos": [240, 210],
     "sc": false
   },
   "Sev": {
@@ -28,7 +28,7 @@
     "type": "l",
     "labelPos": [234, 160],
     "neighbors": ["Arm", "Mos"],
-    "unit_center": null,
+    "unitPos": [234, 150],
     "sc": true
   },
   "Mos": {
@@ -36,7 +36,7 @@
     "type": "l",
     "labelPos": [190, 120],
     "neighbors": ["Sev"],
-    "unit_center": null,
+    "unitPos": [190, 110],
     "sc": true
   }
 }

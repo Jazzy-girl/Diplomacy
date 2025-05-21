@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Map from "./Map";
 
 function ExistingGamesTable() {
     const [data, setData] = useState([]);
@@ -41,6 +42,7 @@ function ExistingGamesTable() {
                     <tr>
                         <th>Game Id</th>
                         <th>Game Name</th>
+                        <th>Link to Game</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -48,6 +50,7 @@ function ExistingGamesTable() {
                         <tr key={item.id}>
                             <td>{item.id}</td>
                             <td>{item.name}</td>
+                            <td><Map game_id={item.id}/></td>
                         </tr>
                     )})}
                 </tbody>

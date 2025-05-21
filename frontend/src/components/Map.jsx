@@ -1,5 +1,7 @@
-import react, { useState } from "react"
+import React from "react";
+import react, { useState, useEffect } from "react"
 import territories from "../assets/territories.json"
+import 
 /*
 Planned Method:
 Use JSON to store:
@@ -17,7 +19,37 @@ Would it be better for the "Units" table to have a column for game_id, and eithe
 */
 function Map({game_id}){
     const [hover, setHover] = useState("");
-    return <div className="flex justify-end p-4"><svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [unitData, setUnitData] = useState([]);
+    const [terrData, setTerrData] = useState([])
+
+    useEffect(()=>{
+        async function fetchData() {
+            try{
+                const res = await fetch('http://localhost:8000/api/units/list')
+                .then((res)=>{
+                    if(!res.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return res.json();
+                }).then((data)=>{setUnitData(data)});
+            }catch(e){
+                setError(e);
+            }finally{
+                setLoading(false);
+            }
+        }
+        fetchData();
+    }, []);
+
+    if(loading){
+        return <p>Loading data...</p>;
+    }
+
+    if(error){
+        return <p>Error: {error.message}</p>;
+    }
+
+    const map = <div className="flex justify-end p-4"><svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
         {Object.entries(territories).map(([id, territory])=>
             (<g key={id}>
                 <path
@@ -43,6 +75,24 @@ function Map({game_id}){
                 </g>
             ))}
             </svg></div>;
+    
+    const units = <svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
+        {unitData.filter((item)=> item.game === game_id).map((unit)=>{
+            const territory = territories[unit.territory];
+            if(!territory || !territory.unitPos) return null;
+            const [cx, cy] = territory.unitPos;
+           <circle
+           key={unit.id}
+           cx={cx}
+           cy={cy}
+           r="6"
+           stroke="black"
+           strokeWidth="4"
+           fill={unit.owner==="T"? "red" : "blue"}/>;
+        })}
+        </svg>
+    
+    return<>{map}{units}</>
 }
 
 export default Map

@@ -25,6 +25,7 @@ class Territory(models.Model):
 class Unit(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     #player id FK
-    location = models.ForeignKey(Territory, null=True, on_delete=models.SET_NULL)
+    # location = models.ForeignKey(Territory, null=True, on_delete=models.SET_NULL)
+    location = models.CharField(max_length=20, null=True)
     type = models.CharField(choices=[('A', 'Army'), ('F', 'Fleet')], max_length=1)
     owner = models.CharField(choices=[('T', 'Turkey'), ('R', 'Russia')], max_length=1)
