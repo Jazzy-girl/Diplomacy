@@ -98,8 +98,8 @@ function Map({game, id}){
             ))}
 
         {unitData.filter((u) => {if(game==true) return u.game === Number(id); else return u.sandbox === (Number.id);}).map((unit)=>{
-            console.log("Rendering unit at:", unit.location);
-            const territory = territories[unit.location];
+            console.log("Rendering unit at:", unit.territory);
+            const territory = territories[unit.territory];
             if(!territory || !territory.unitPos) return null;
             const [cx, cy] = territory.unitPos;
             return(

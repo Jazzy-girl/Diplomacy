@@ -36,20 +36,20 @@ class Territory(models.Model):
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
     name = models.CharField(max_length=20)
     sc_exists = models.BooleanField(default=False)
-    retreating_unit = models.ForeignKey("Unit", default=None, null=True, on_delete=models.SET_NULL)
+
 class Unit(models.Model):
     class UnitType(models.TextChoices):
         ARMY = 'A', _('Army')
         FLEET = 'F', _('Fleet')
     
     def __str__(self):
-        return f"{self.location} {self.type}"
+        return f"{self.territory} {self.type}"
         
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
     #player id FK
-    # location = models.ForeignKey(Territory, null=True, on_delete=models.SET_NULL)
-    location = models.CharField(max_length=20, null=True)
+    # territory = models.ForeignKey(Territory, null=True, on_delete=models.SET_NULL)
+    territory = models.CharField(max_length=20, null=True)
     type = models.CharField(choices=UnitType.choices)
     owner = models.CharField(choices=[('T', 'Turkey'), ('R', 'Russia')], max_length=1)
 

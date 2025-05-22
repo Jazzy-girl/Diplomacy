@@ -20,7 +20,7 @@ def create_territories_and_units_on_game_save(sender, instance, created, **kwarg
             data = json.load(fUnits)
             for country, territories in data.items():
                 for territory, type in territories.items():
-                    unit = Unit.objects.create(game=instance, location=territory, type=type, owner=country[0])
+                    unit = Unit.objects.create(game=instance, territory=territory, type=type, owner=country[0])
                     Order.objects.create(game=instance,unit=unit,
                                          country=country[0],
                                          origin_territory=territory,
@@ -42,7 +42,7 @@ def create_territories_and_units_on_sandbox_save(sender, instance, created, **kw
             data = json.load(fUnits)
             for country, territories in data.items():
                 for territory, type in territories.items():
-                    unit = Unit.objects.create(sandbox=instance, location=territory, type=type, owner=country[0])
+                    unit = Unit.objects.create(sandbox=instance, territory=territory, type=type, owner=country[0])
                     Order.objects.create(sandbox=instance,unit=unit,
                                          country=country[0],
                                          origin_territory=territory,
