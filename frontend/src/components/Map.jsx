@@ -41,6 +41,7 @@ function Map({game_id}){
         return <p>Error: {error.message}</p>;
     }
 
+    //Basic implementation as a naive example. Must be changed.
     const handleClick = (territory)=>{
         const [cx, cy] = territories[territory].unitPos;
 
