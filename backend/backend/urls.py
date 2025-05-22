@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 # from requests import Response
-from api.views import CreateUserView, ReactConfirmEmailView, current_user, get_user_by_id, update_user
+from api.views import CreateUserView, ReactConfirmEmailView, current_user, get_user_by_id, update_user, GameList, TerritoryList, UnitList, CreateGameView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -43,4 +43,10 @@ urlpatterns = [
     path('api/user/', current_user, name='current_user'),
     path('api/user/update/', update_user, name='update_user'),
     path('api/user/<int:pk>/', get_user_by_id, name='get_user_by_id'),
+    # Game related
+    path('api/games/list/', GameList.as_view(), name="game-list"),
+    path('api/games/create/', CreateGameView.as_view(), name="game-create"),
+    path('api/territories/list/', TerritoryList.as_view(), name="territory-list"),
+    path('api/units/list/', UnitList.as_view(), name="unit-list"),
+    
 ]
