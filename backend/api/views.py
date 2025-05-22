@@ -56,6 +56,18 @@ def current_user(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 @authentication_classes([])
+def get_sandbox_by_id(request, pk):
+    sandbox = get_object_or_404(Sandbox, pk=pk)
+    return Response({
+        'id': sandbox.id,
+        'creator': sandbox.creator.id,
+        'year': sandbox.year,
+        'season': sandbox.season
+    })
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+@authentication_classes([])
 def get_user_by_id(request, pk):
     user = get_object_or_404(CustomUser, pk=pk)
     return Response({

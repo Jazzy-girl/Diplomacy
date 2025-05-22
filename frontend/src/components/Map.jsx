@@ -15,6 +15,8 @@ function Map({game, id}){
     const [secondTerr, setSecondTerr] = useState(null);
     const [linePoints, setLinePoints] = useState(null);
 
+    const [date, setDate] = useState([]);
+
     useEffect(()=>{
         async function fetchData() {
             try{
@@ -29,8 +31,20 @@ function Map({game, id}){
             }
         }
         fetchData();
+    }, []);
 
-        
+    useEffect(()=>{
+        let gameOrSandbox = 'game';
+        if(!game) gameOrSandbox = 'sandbox';
+        fetch(`http://localhost:8000/api/list/${gameOrSandbox}/${id}/`
+        ).then((res)=>{
+            if(!res.ok){
+                alert("Failed to fetch sandbox");
+            }
+            return res.json();
+        }).then((data)=>{
+            setDate({year: data.year, season: data.season})
+        }).catch((error)=>alert(`THIS IS AN ERROR HERE: ${error.message}`));
     }, []);
 
     if(loading){
@@ -71,7 +85,9 @@ function Map({game, id}){
     };
     
     
-    return (<div className="relative w-[800px] h-auto"><svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
+    return (<div className="relative w-[800px] h-auto">
+        <label >{date.season} {date.year}</label>
+        <svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
         {Object.entries(territories).map(([id, territory])=>
             (<g key={id}>
                 <path
