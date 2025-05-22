@@ -13,12 +13,26 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+class Seasons(models.TextChoices):
+    FALL = 'fall', _('Fall')
+    SPRING = 'spring', _('Spring')
+    WINTER = 'winter', _('Winter')
 class Game(models.Model):
     name = models.CharField(max_length=50)
     def __str__(self):
         return f"{self.id} {self.name}"
+
+class Sandbox(models.Model):
+    name = models.CharField(max_length=50)
+    created_date = models.DateField("date created")
+    year = models.PositiveSmallIntegerField()
+    season = models.CharField(choices=Seasons.choices)
+    def __str__(self):
+        return f"{self.id} {self.name}"
+    
 class Territory(models.Model):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
     name = models.CharField(max_length=20)
     sc_exists = models.BooleanField(default=False)
     retreating_unit = models.ForeignKey("Unit", default=None, null=True, on_delete=models.SET_NULL)
@@ -27,7 +41,8 @@ class Unit(models.Model):
         ARMY = 'A', _('Army')
         FLEET = 'F', _('Fleet')
         
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
     #player id FK
     # location = models.ForeignKey(Territory, null=True, on_delete=models.SET_NULL)
     location = models.CharField(max_length=20, null=True)
@@ -43,13 +58,11 @@ class MoveTypes(models.TextChoices):
     BUILD = 'B', _('Build')
     DISBAND = 'D', _('Disband')
 
-class Seasons(models.TextChoices):
-    FALL = 'fall', _('Fall')
-    SPRING = 'spring', _('Spring')
-    WINTER = 'winter', _('Winter')
+
 
 class Order(models.Model):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="orders_as_unit")
     country = models.CharField(choices=[('T', 'Turkey'), ('R', 'Russia')], max_length=1)
     origin_territory = models.CharField(max_length=20) # start territory

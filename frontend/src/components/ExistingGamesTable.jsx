@@ -9,7 +9,7 @@ function ExistingGamesTable() {
     useEffect(()=>{
         async function fetchData(){
             try{
-                const res = await fetch('http://localhost:8000/api/games/list/').then((res)=>{
+                const res = await fetch('http://localhost:8000/api/list/game/').then((res)=>{
                         if(!res.ok){
                             throw new Error(`HTTP error! status: ${response.status}`);
                         }

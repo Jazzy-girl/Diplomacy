@@ -18,7 +18,7 @@ function Map({game_id}){
     useEffect(()=>{
         async function fetchData() {
             try{
-                const res = await fetch('http://localhost:8000/api/units/list/').then((res)=>{
+                const res = await fetch('http://localhost:8000/api/list/unit/').then((res)=>{
                     if(!res.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     return res.json();
                 }).then((data)=>{setUnitData(data)});
