@@ -8,7 +8,12 @@ function Map({game_id}){
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [unitData, setUnitData] = useState([]);
-    const [terrData, setTerrData] = useState([])
+    const [terrData, setTerrData] = useState([]);
+
+    const [selectedTerr, setSelectedTerr] = useState(null);
+    const [firstTerr, setFirstTerr] = useState(null);
+    const [secondTerr, setSecondTerr] = useState(null);
+    const [linePoints, setLinePoints] = useState(null);
 
     useEffect(()=>{
         async function fetchData() {
@@ -36,6 +41,35 @@ function Map({game_id}){
         return <p>Error: {error.message}</p>;
     }
 
+    const handleClick = (territory)=>{
+        const [cx, cy] = territories[territory].unitPos;
+
+        if(selectedTerr===null){
+            setSelectedTerr(territory);
+            setFirstTerr({x: cx, y: cy});
+            alert("first click!")
+        }else if(selectedTerr === territory){
+            setSelectedTerr(null);
+            setFirstTerr(null);
+            setSecondTerr(null);
+            alert("clicked same spot!")
+        }else{
+            alert("second click:" + territory)
+            setSecondTerr({x: cx, y: cy});
+            setLinePoints({
+                x1: firstTerr.x,
+                y1: firstTerr.y,
+                x2: cx,
+                y2: cy
+            });
+            setSelectedTerr(null);
+            setFirstTerr(null);
+            setSecondTerr(null);
+            
+        }
+    };
+    
+    
     return (<div className="relative w-[800px] h-auto"><svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
         {Object.entries(territories).map(([id, territory])=>
             (<g key={id}>
@@ -47,7 +81,7 @@ function Map({game_id}){
                 strokeWidth={1}
                 onMouseEnter={()=>setHover(id)}
                 onMouseLeave={()=>setHover("")}
-                onClick={()=>alert(`Territory: ${id}`)}
+                onClick={()=>handleClick(id)}
                 />
                 {territory.labelPos && (
                     <text
@@ -79,6 +113,16 @@ function Map({game_id}){
            fill={unit.owner==="T"? "red" : "blue"}/>
             );
         })}
+
+        {linePoints!==null && (
+            <line
+            x1={linePoints.x1}
+            y1={linePoints.y1}
+            x2={linePoints.x2}
+            y2={linePoints.y2}
+            stroke="black"
+            strokeWidth="2"/>
+        )}
         </svg>
         </div>
     );
