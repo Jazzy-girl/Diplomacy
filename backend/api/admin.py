@@ -8,13 +8,13 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('pk', 'username', 'email', 'pronouns')
 
 class GameAdmin(admin.ModelAdmin):
-    list_display = ("id", "name")
+    list_display = [field.name for field in Game._meta.fields]
 
 class TerritoryAdmin(admin.ModelAdmin):
-    list_display = ("id", "game", "name", "sc_exists")
+    list_display = [field.name for field in Territory._meta.fields]
 
 class UnitAdmin(admin.ModelAdmin):
-    list_display = ("id", "game", "location", "type", "owner")
+    list_display = [field.name for field in Unit._meta.fields]
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = [field.name for field in Order._meta.fields]

@@ -40,17 +40,24 @@ class MoveTypes(models.TextChoices):
     HOLD = 'H', _('Hold')
     CONVOY = 'C', _('Convoy')
     RETREAT = 'R', _('Retreat')
+    BUILD = 'B', _('Build')
+    DISBAND = 'D', _('Disband')
+
+class Seasons(models.TextChoices):
+    FALL = 'fall', _('Fall')
+    SPRING = 'spring', _('Spring')
+    WINTER = 'winter', _('Winter')
 
 class Order(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="orders_as_unit")
     country = models.CharField(choices=[('T', 'Turkey'), ('R', 'Russia')], max_length=1)
     origin_territory = models.CharField(max_length=20) # start territory
-    target_territory = models.CharField(max_length=20) # target territory
-    supported_territory = models.CharField(max_length=20, null=True, default=None)
-    supported_unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, default=None, blank=True, related_name="orders_as_supported_unit")
-    convoyed_unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, default=None, blank=True, related_name="orders_as_convoyed_unit")
-    convoyed_territory = models.CharField(max_length=20, null=True, default=None)
+    target_territory = models.CharField(max_length=20,null=True,blank=True,default=None) # target territory
+    other_territory = models.CharField(max_length=20, null=True, blank=True, default=None) # territory for support/convoy
+    # other_unit for support/convoy unit ID
+    other_unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, default=None, blank=True, related_name="orders_as_other_unit")
     move_type = models.CharField(choices=MoveTypes.choices, max_length=1)
-    turn = models.PositiveSmallIntegerField()
+    year = models.PositiveSmallIntegerField()
+    season = models.CharField(choices=Seasons.choices)
     submitted = models.BooleanField(default=False)

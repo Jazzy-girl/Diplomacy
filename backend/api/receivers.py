@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Game, Territory, Unit, Order
+from .models import Game, Territory, Unit, Order, MoveTypes
 import json
 
 TERRITORIES_FILE = '/home/rywilson/DipProject/Diplomacy/frontend/src/assets/territories.json'
@@ -20,4 +20,9 @@ def create_territories_and_units_on_game_save(sender, instance, created, **kwarg
             data = json.load(fUnits)
             for country, territories in data.items():
                 for territory, type in territories.items():
-                    Unit.objects.create(game=instance, location=territory, type=type, owner=country[0])
+                    unit = Unit.objects.create(game=instance, location=territory, type=type, owner=country[0])
+                    Order.objects.create(game=instance,unit=unit,
+                                         country=country[0],
+                                         origin_territory=territory,
+                                         move_type=MoveTypes.HOLD,
+                                         year=1901, season='spring')
