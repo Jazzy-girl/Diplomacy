@@ -24,9 +24,10 @@ class Game(models.Model):
 
 class Sandbox(models.Model):
     name = models.CharField(max_length=50)
-    created_date = models.DateField("date created")
-    year = models.PositiveSmallIntegerField()
-    season = models.CharField(choices=Seasons.choices)
+    creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_date = models.DateField("date created", auto_now_add=True)
+    year = models.PositiveSmallIntegerField(default=1901)
+    season = models.CharField(choices=Seasons.choices, default=Seasons.SPRING)
     def __str__(self):
         return f"{self.id} {self.name}"
     
@@ -40,6 +41,9 @@ class Unit(models.Model):
     class UnitType(models.TextChoices):
         ARMY = 'A', _('Army')
         FLEET = 'F', _('Fleet')
+    
+    def __str__(self):
+        return f"{self.location} {self.type}"
         
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)

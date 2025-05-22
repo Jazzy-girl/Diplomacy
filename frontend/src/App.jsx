@@ -10,6 +10,9 @@ import UserSettings from "./pages/UserSettings"
 import ViewProfile from "./pages/ViewProfile"
 import PlayGame from "./pages/PlayGame"
 import MakeGame from "./pages/MakeGame"
+import Sandbox from "./pages/Sandbox"
+import MakeSandbox from "./pages/MakeSandbox"
+
 function Logout(){
   localStorage.clear();
   return <Navigate to="/login"/>
@@ -38,11 +41,20 @@ function App() {
           <Route path="/verify-email" element={<VerifyEmail/>}/>
           <Route path="/user/ID/:id" element={<ViewProfile/>}/>
           <Route path="/game/ID/:id" element={<PlayGame/>}/>
+          <Route path="/sandbox/ID/:id" element={<Sandbox/>}/>
           <Route
-          path="/create"
+          path="/create/game"
           element={
             <ProtectedRoute>
               <MakeGame/>
+            </ProtectedRoute>
+          }/>
+
+          <Route
+          path="/create/sandbox"
+          element={
+            <ProtectedRoute>
+              <MakeSandbox/>
             </ProtectedRoute>
           }/>
 

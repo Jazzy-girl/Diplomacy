@@ -3,7 +3,7 @@ import react, { useState, useEffect } from "react"
 import territories from "../assets/territories.json"
 
 
-function Map({game_id}){
+function Map({game, id}){
     const [hover, setHover] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -97,7 +97,7 @@ function Map({game_id}){
                 </g>
             ))}
 
-        {unitData.filter((u) => u.game === Number(game_id)).map((unit)=>{
+        {unitData.filter((u) => {if(game==true) return u.game === Number(id); else return u.sandbox === (Number.id);}).map((unit)=>{
             console.log("Rendering unit at:", unit.location);
             const territory = territories[unit.location];
             if(!territory || !territory.unitPos) return null;
