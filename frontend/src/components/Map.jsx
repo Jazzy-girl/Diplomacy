@@ -19,7 +19,7 @@ function Map({game, id}){
         async function fetchData() {
             try{
                 const res = await fetch('http://localhost:8000/api/list/unit/').then((res)=>{
-                    if(!res.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    if(!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                     return res.json();
                 }).then((data)=>{setUnitData(data)});
             }catch(e){
@@ -97,7 +97,7 @@ function Map({game, id}){
                 </g>
             ))}
 
-        {unitData.filter((u) => {if(game==true) return u.game === Number(id); else return u.sandbox === (Number.id);}).map((unit)=>{
+        {unitData.filter((u) => {if(game==true) return u.game === Number(id); else return u.sandbox === Number(id);}).map((unit)=>{
             console.log("Rendering unit at:", unit.territory);
             const territory = territories[unit.territory];
             if(!territory || !territory.unitPos) return null;

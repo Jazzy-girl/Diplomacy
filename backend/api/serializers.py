@@ -28,7 +28,6 @@ class TerritorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class UnitSerializer(serializers.ModelSerializer):
-    territory = serializers.SlugRelatedField(slug_field='name', read_only=True)
     class Meta:
         model = Unit
         fields = '__all__'

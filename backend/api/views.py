@@ -47,6 +47,7 @@ class UnitList(generics.ListAPIView):
 def current_user(request):
     user = request.user
     return Response({
+            'id': user.id,
             'username': user.username,
             'email': user.email,
             'pronouns': user.pronouns,
