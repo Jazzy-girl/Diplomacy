@@ -14,6 +14,10 @@ function Map({game, id}){
     const [firstTerr, setFirstTerr] = useState(null);
     const [secondTerr, setSecondTerr] = useState(null);
     const [linePoints, setLinePoints] = useState(null);
+    const [lines, setLines] = useState([]);
+
+    const [orders, setOrders] = useState([]);
+    const [order, setOrder] = useState({});
 
     const [date, setDate] = useState([]);
 
@@ -57,19 +61,31 @@ function Map({game, id}){
 
     //Basic implementation as a naive example. Must be changed.
     const handleClick = (territory)=>{
+        // x y for lines
         const [cx, cy] = territories[territory].unitPos;
-
+        // The unit selected
+        const unit = unitData.filter((u) => {
+            if(game==true) {return u.game === Number(id) && u.territory===territory;}
+            else {return u.sandbox === Number(id)  && u.territory===territory;}}); 
         if(selectedTerr===null){
-            setSelectedTerr(territory);
-            setFirstTerr({x: cx, y: cy});
-            alert("first click!")
+            if(unit.length == 1){ // you clicked a territory with a unit!
+                    setSelectedTerr(territory);
+                    unit.map((un)=>setOrder({unit_type: un.type, unit: un.territory}))
+                    
+                    setFirstTerr({x: cx, y: cy});
+                }
         }else if(selectedTerr === territory){
+            if(!secondTerr){
+                const newOrder = {...order, move: "Hold"}
+                //Update with setOrders()-----!
+                setOrders([...orders, newOrder])
+                setOrder({})
+            }
             setSelectedTerr(null);
             setFirstTerr(null);
             setSecondTerr(null);
-            alert("clicked same spot!")
         }else{
-            alert("second click:" + territory)
+            const newOrder = {...order, move: "-", target: territory};
             setSecondTerr({x: cx, y: cy});
             setLinePoints({
                 x1: firstTerr.x,
@@ -80,6 +96,7 @@ function Map({game, id}){
             setSelectedTerr(null);
             setFirstTerr(null);
             setSecondTerr(null);
+            setOrders([...orders, newOrder])
             
         }
     };
@@ -87,6 +104,16 @@ function Map({game, id}){
     
     return (<div className="relative w-[800px] h-auto">
         <label >{date.season} {date.year}</label>
+        <br />
+        {orders.map((order, index)=>(
+            <div key={index}>
+                {/* {Object.entries(order).map(([key, value])=>(
+                    <label key={key}>{key} {value}</label>
+                ))} */
+                <label key={order}>{Object.values(order).join(' ')}</label>
+                }
+            </div>
+        ))}
         <svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
         {Object.entries(territories).map(([id, territory])=>
             (<g key={id}>
@@ -131,6 +158,7 @@ function Map({game, id}){
             );
         })}
 
+        {lines.map((line)=>{})}
         {linePoints!==null && (
             <line
             x1={linePoints.x1}
@@ -140,6 +168,10 @@ function Map({game, id}){
             stroke="black"
             strokeWidth="2"/>
         )}
+        </svg>
+        
+        <svg width={window.innerWidth} height={window.innerHeight} viewBox={`${window.innerWidth/3} ${window.innerHeight/3} ${window.innerWidth} ${window.innerHeight}`} className="w-[800px] h-auto border shadow-md">
+            
         </svg>
         </div>
     );
