@@ -77,7 +77,6 @@ function Map({game, id}){
         }else if(selectedTerr === territory){
             if(!secondTerr){
                 const newOrder = {...order, move: "Hold"}
-                //Update with setOrders()-----!
                 setOrders([...orders, newOrder])
                 setOrder({})
             }

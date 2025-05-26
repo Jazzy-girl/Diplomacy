@@ -30,12 +30,19 @@ class Sandbox(models.Model):
     season = models.CharField(choices=Seasons.choices, default=Seasons.SPRING)
     def __str__(self):
         return f"{self.id} {self.name}"
-    
+
+class Coasts(models.TextChoices):
+    NC = "nc"
+    SC = "sc"
+    EC = "ec"
+    WC = "wc"
+
 class Territory(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
     name = models.CharField(max_length=20)
     sc_exists = models.BooleanField(default=False)
+    has_coast = models.BooleanField(default=False)
 
 class Unit(models.Model):
     class UnitType(models.TextChoices):
@@ -52,6 +59,7 @@ class Unit(models.Model):
     territory = models.CharField(max_length=20, null=True)
     type = models.CharField(choices=UnitType.choices)
     owner = models.CharField(choices=[('T', 'Turkey'), ('R', 'Russia')], max_length=1)
+    coast = models.CharField(max_length=2, choices=Coasts.choices, null=True, blank=True)
 
 class MoveTypes(models.TextChoices):
     MOVE = 'M', _('Move')
@@ -69,8 +77,10 @@ class Order(models.Model):
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="orders_as_unit")
     country = models.CharField(choices=[('T', 'Turkey'), ('R', 'Russia')], max_length=1)
+    origin_coast = models.CharField(max_length=2, choices=Coasts.choices, null=True, blank=True) # start coast
     origin_territory = models.CharField(max_length=20) # start territory
     target_territory = models.CharField(max_length=20,null=True,blank=True,default=None) # target territory
+    target_coast = models.CharField(max_length=2, choices=Coasts.choices, null=True, blank=True) # target coast
     other_territory = models.CharField(max_length=20, null=True, blank=True, default=None) # territory for support/convoy
     # other_unit for support/convoy unit ID
     other_unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, default=None, blank=True, related_name="orders_as_other_unit")
