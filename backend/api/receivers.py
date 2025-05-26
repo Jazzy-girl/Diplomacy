@@ -14,6 +14,7 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
             data = json.load(fTerrs)
             for name, territory in data.items():
                 sc_exists = territory["sc"]
+                # add check for coasts
                 if isinstance(instance, Game):
                     Territory.objects.create(game=instance, name=name, sc_exists=sc_exists)
                 else:
