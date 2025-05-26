@@ -11,6 +11,13 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 
 # Create your views here.
+class ReactConfirmEmailView(ConfirmEmailView):
+    def get(self, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.confirm(self.request)
+        # Replace with actual website later. Assuming Vite using port 5173 but may be a diff port!!!!!!
+        return redirect("http://localhost:5173/login") 
+
 class CreateUserView(generics.CreateAPIView):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
@@ -117,8 +124,3 @@ def update_user(request):
         return Response(serializer.data)
     return Response(serializer.errors, status=400)
 
-class ReactConfirmEmailView(ConfirmEmailView):
-    def get(self, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.confirm(self.request)
-        return redirect("http://localhost:5174/login") # Replace with actual website later. Assuming Vite using 5173

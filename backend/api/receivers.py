@@ -5,8 +5,8 @@ import json
 
 TERRITORIES_FILE = '/home/rywilson/DipProject/Diplomacy/frontend/src/assets/territories.json'
 UNITS_FILE = '/home/rywilson/DipProject/Diplomacy/frontend/src/assets/countrySetup.json'
-@receiver(post_save, sender=Game)
-def create_territories_and_units_on_game_save(sender, instance, created, **kwargs):
+# @receiver(post_save, sender=[Game, Sandbox])
+def create_territories_and_units_on_game_or_sandbox_save(sender, instance, created, **kwargs):
     print("signal triggered!") #Debug
     if created:
         # First make the Territories
@@ -14,37 +14,28 @@ def create_territories_and_units_on_game_save(sender, instance, created, **kwarg
             data = json.load(fTerrs)
             for name, territory in data.items():
                 sc_exists = territory["sc"]
-                Territory.objects.create(game=instance, name=name, sc_exists=sc_exists)
+                if isinstance(instance, Game):
+                    Territory.objects.create(game=instance, name=name, sc_exists=sc_exists)
+                else:
+                    Territory.objects.create(sandbox=instance, name=name, sc_exists=sc_exists)
         # Then make the Units
         with open(UNITS_FILE, 'r') as fUnits:
             data = json.load(fUnits)
             for country, territories in data.items():
                 for territory, type in territories.items():
-                    unit = Unit.objects.create(game=instance, territory=territory, type=type, owner=country[0])
-                    Order.objects.create(game=instance,unit=unit,
-                                         country=country[0],
-                                         origin_territory=territory,
-                                         move_type=MoveTypes.HOLD,
-                                         year=1901, season='spring')
-                    
-@receiver(post_save, sender=Sandbox)
-def create_territories_and_units_on_sandbox_save(sender, instance, created, **kwargs):
-    print("signal triggered!") #Debug
-    if created:
-        # First make the Territories
-        with open(TERRITORIES_FILE, 'r') as fTerrs:
-            data = json.load(fTerrs)
-            for name, territory in data.items():
-                sc_exists = territory["sc"]
-                Territory.objects.create(sandbox=instance, name=name, sc_exists=sc_exists)
-        # Then make the Units
-        with open(UNITS_FILE, 'r') as fUnits:
-            data = json.load(fUnits)
-            for country, territories in data.items():
-                for territory, type in territories.items():
-                    unit = Unit.objects.create(sandbox=instance, territory=territory, type=type, owner=country[0])
-                    Order.objects.create(sandbox=instance,unit=unit,
-                                         country=country[0],
-                                         origin_territory=territory,
-                                         move_type=MoveTypes.HOLD,
-                                         year=1901, season='spring')
+                    if isinstance(instance, Game):
+                        unit = Unit.objects.create(game=instance, territory=territory, type=type, owner=country[0])
+                        Order.objects.create(game=instance,unit=unit,
+                                            country=country[0],
+                                            origin_territory=territory,
+                                            move_type=MoveTypes.HOLD,
+                                            year=1901, season='spring')
+                    else:
+                        unit = Unit.objects.create(sandbox=instance, territory=territory, type=type, owner=country[0])
+                        Order.objects.create(sandbox=instance,unit=unit,
+                                            country=country[0],
+                                            origin_territory=territory,
+                                            move_type=MoveTypes.HOLD,
+                                            year=1901, season='spring')   
+post_save.connect(create_territories_and_units_on_game_or_sandbox_save, sender=Game)
+post_save.connect(create_territories_and_units_on_game_or_sandbox_save, sender=Sandbox)
