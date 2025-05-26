@@ -1,13 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
 from rest_framework import generics
-from .models import CustomUser, Game, Territory, Unit, Sandbox
-from .serializers import TerritorySerializer, UserSerializer, GameSerializer, UnitSerializer, SandboxSerializer
+from .models import CustomUser, Game, Territory, Unit, Sandbox, Order
+from .serializers import OrderSerializer, TerritorySerializer, UserSerializer, GameSerializer, UnitSerializer, SandboxSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from allauth.account.views import ConfirmEmailView
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.views import APIView
+
 # Create your views here.
 class CreateUserView(generics.CreateAPIView):
     queryset = get_user_model().objects.all()
@@ -41,6 +43,35 @@ class UnitList(generics.ListAPIView):
     queryset = Unit.objects.all()
     serializer_class = UnitSerializer
     permission_classes = [AllowAny]
+
+class BulkUpdateOrdersView(APIView):
+    def patch(self, request, *args, **kwargs):
+        updates = request.data
+
+        if not isinstance(updates, list):
+            return Response({'error' : 'Expected a list of order updates'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        updated_orders = []
+
+        for order_data in updates:
+            order_id = order_data.get('id')
+            if not order_id:
+                continue
+
+            try:
+                order = Order.objects.get(id=order_id)
+            except Order.DoesNotExist:
+                continue # something bad happened
+
+            serializer = OrderSerializer(order, data=order_data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                updated_orders.append(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        return Response(updated_orders, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
