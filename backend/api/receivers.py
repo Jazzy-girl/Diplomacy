@@ -5,8 +5,8 @@ import json
 
 TERRITORIES_FILE = '/home/rywilson/DipProject/Diplomacy/frontend/src/assets/territories.json'
 UNITS_FILE = '/home/rywilson/DipProject/Diplomacy/frontend/src/assets/countrySetup.json'
-# @receiver(post_save, sender=[Game, Sandbox])
-def create_territories_and_units_on_game_or_sandbox_save(sender, instance, created, **kwargs):
+
+def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, created, **kwargs):
     print("signal triggered!") #Debug
     if created:
         # First make the Territories
@@ -37,5 +37,5 @@ def create_territories_and_units_on_game_or_sandbox_save(sender, instance, creat
                                             origin_territory=territory,
                                             move_type=MoveTypes.HOLD,
                                             year=1901, season='spring')   
-post_save.connect(create_territories_and_units_on_game_or_sandbox_save, sender=Game)
-post_save.connect(create_territories_and_units_on_game_or_sandbox_save, sender=Sandbox)
+post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Game)
+post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Sandbox)
