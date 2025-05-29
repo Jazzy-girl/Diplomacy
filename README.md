@@ -26,6 +26,13 @@ Ryanne Wilson
 - Move to the ```frontend``` directory
 - Copy ```.env.example``` to ```.env``` and keep it the same (frontend)
 
+# Import Project Info
+## Frontend
+
+- Map.jsx uses territories.json (in frontend/src/assets) to generate the map display.
+## Backend
+
+
 # Good Practices
 **Branches** should be short-lived for small features.
 Merge changes through pull requests & code reviews.

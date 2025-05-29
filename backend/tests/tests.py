@@ -33,7 +33,25 @@ class GameInitializationTest(TestCase):
         self.assertEqual(units.count(), 1)
 
 class BulkUpdateOrdersTest(TestCase):
-    def setUp(self):
+    @patch("api.receivers.open", new_callable=mock_open)
+    def setUp(self, mock_open_fn):
+        #Mock Data
+        territory_json = json.dumps({
+            "Ank": {"sc": True},
+            "Arm": {"sc": False},
+            "Sev": {"sc": True},
+            "Syr": {"sc": False},
+            "Mos": {"sc": False}
+        })
+        units_json = json.dumps({
+            "Turkey":{
+                "Ank": "F",
+                "Sev": "F"
+            },
+        })
+        mock_territory = mock_open(read_data=territory_json).return_value
+        mock_units = mock_open(read_data=units_json).return_value
+        mock_open_fn.side_effect = [mock_territory, mock_units]
         self.client = APIClient()
         User = get_user_model()
         self.user = User.objects.create_user(username="tester",email="test@example.com", password="123456789!")
