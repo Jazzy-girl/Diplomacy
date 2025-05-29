@@ -1,10 +1,13 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Game, Territory, Unit, Order, MoveTypes, Sandbox
+from django.conf import settings
+import os
+
 import json
 
-TERRITORIES_FILE = '/home/rywilson/DipProject/Diplomacy/frontend/src/assets/territories.json'
-UNITS_FILE = '/home/rywilson/DipProject/Diplomacy/frontend/src/assets/countrySetup.json'
+TERRITORIES_FILE = os.path.join(settings.BASE_DIR.parent, 'frontend', 'src', 'assets', 'territories.json')
+UNITS_FILE = os.path.join(settings.BASE_DIR.parent, 'frontend', 'src', 'assets', 'countrySetup.json')
 
 def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, created, **kwargs):
     print("signal triggered!") #Debug

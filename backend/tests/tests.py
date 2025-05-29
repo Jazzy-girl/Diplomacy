@@ -8,7 +8,12 @@ import json
 from rest_framework.test import APIClient
 
 from api.models import Game, Territory, Unit, Order, Sandbox
-
+"""
+For unit tests involving game / sandbox creation,
+use mock data for territories.json and countrySetup.json as they are subject to change.
+Both of these files are used to generate entries in the Territories, Units, and Orders model.
+Examples of how to use mock data are below.
+"""
 class GameInitializationTest(TestCase):
     @patch("api.receivers.open", new_callable=mock_open)
     def test_territories_and_units_created(self, mock_open_fn):
