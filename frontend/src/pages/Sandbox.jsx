@@ -1,9 +1,9 @@
 import Map from "../components/Map";
 import { useParams } from "react-router-dom"
 
-function PlayGame(){
+function Sandbox(){
     const {id} = useParams();
-    return <Map game={true} id={id}/>
+    return <Map game={false} id={id}/>
 }
 
-export default PlayGame
+export default Sandbox

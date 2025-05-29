@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Map from "./Map";
 import { Link } from "react-router-dom";
-function ExistingGamesTable() {
+function YourSandboxesTable() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -9,7 +9,7 @@ function ExistingGamesTable() {
     useEffect(()=>{
         async function fetchData(){
             try{
-                const res = await fetch('http://localhost:8000/api/list/game/').then((res)=>{
+                const res = await fetch('http://localhost:8000/api/list/sandbox/').then((res)=>{
                         if(!res.ok){
                             throw new Error(`HTTP error! status: ${response.status}`);
                         }
@@ -37,12 +37,14 @@ function ExistingGamesTable() {
     return(
         <>
         {data.length > 0 ? (            <table>
-                <caption>Existing Games</caption>
+                <caption>Your Sandboxes</caption>
                 <thead>
                     <tr>
-                        <th>Game Id</th>
-                        <th>Game Name</th>
-                        <th>Link to View Game</th>
+                        <th>Sandbox Id</th>
+                        <th>Sandbox Name</th>
+                        <th>Date Created</th>
+                        <th>Current Year/Season</th>
+                        <th>Link to View Sandbox</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -50,7 +52,9 @@ function ExistingGamesTable() {
                         <tr key={item.id}>
                             <td>{item.id}</td>
                             <td>{item.name}</td>
-                            <th><Link to={`/game/ID/${item.id}`}>View Game</Link></th>
+                            <td>{item.created_date}</td>
+                            <td>{`${item.season} ${item.year}`}</td>
+                            <th><Link to={`/sandbox/ID/${item.id}`}>View Sandbox</Link></th>
                         </tr>
                     )})}
                 </tbody>
@@ -60,4 +64,4 @@ function ExistingGamesTable() {
     );
 }
 
-export default ExistingGamesTable
+export default YourSandboxesTable

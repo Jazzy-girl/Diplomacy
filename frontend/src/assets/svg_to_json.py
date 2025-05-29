@@ -27,7 +27,7 @@ def parse_svg_to_json(svg_path):
     return territories
 
 # Example usage
-svg_file = 'map.svg'
+svg_file = 'MapOptimized.svg'
 output_json = 'territories.json'
 
 territories = parse_svg_to_json(svg_file)

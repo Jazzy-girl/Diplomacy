@@ -1,12 +1,15 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Game, Territory, Unit
+from .models import Game, Territory, Unit, Order, MoveTypes, Sandbox
+from django.conf import settings
+import os
+
 import json
 
-TERRITORIES_FILE = '/home/rywilson/DipProject/Diplomacy/frontend/src/assets/territories.json'
-UNITS_FILE = '/home/rywilson/DipProject/Diplomacy/frontend/src/assets/countrySetup.json'
-@receiver(post_save, sender=Game)
-def create_territories_and_units_on_game_save(sender, instance, created, **kwargs):
+TERRITORIES_FILE = os.path.join(settings.BASE_DIR.parent, 'frontend', 'src', 'assets', 'territories.json')
+UNITS_FILE = os.path.join(settings.BASE_DIR.parent, 'frontend', 'src', 'assets', 'countrySetup.json')
+
+def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, created, **kwargs):
     print("signal triggered!") #Debug
     if created:
         # First make the Territories
@@ -14,10 +17,29 @@ def create_territories_and_units_on_game_save(sender, instance, created, **kwarg
             data = json.load(fTerrs)
             for name, territory in data.items():
                 sc_exists = territory["sc"]
-                Territory.objects.create(game=instance, name=name, sc_exists=sc_exists)
+                # add check for coasts
+                if isinstance(instance, Game):
+                    Territory.objects.create(game=instance, name=name, sc_exists=sc_exists)
+                else:
+                    Territory.objects.create(sandbox=instance, name=name, sc_exists=sc_exists)
         # Then make the Units
         with open(UNITS_FILE, 'r') as fUnits:
             data = json.load(fUnits)
             for country, territories in data.items():
                 for territory, type in territories.items():
-                    Unit.objects.create(game=instance, location=territory, type=type, owner=country[0])
+                    if isinstance(instance, Game):
+                        unit = Unit.objects.create(game=instance, territory=territory, type=type, owner=country[0])
+                        Order.objects.create(game=instance,unit=unit,
+                                            country=country[0],
+                                            origin_territory=territory,
+                                            move_type=MoveTypes.HOLD,
+                                            year=1901, season='spring')
+                    else:
+                        unit = Unit.objects.create(sandbox=instance, territory=territory, type=type, owner=country[0])
+                        Order.objects.create(sandbox=instance,unit=unit,
+                                            country=country[0],
+                                            origin_territory=territory,
+                                            move_type=MoveTypes.HOLD,
+                                            year=1901, season='spring')   
+post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Game)
+post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Sandbox)

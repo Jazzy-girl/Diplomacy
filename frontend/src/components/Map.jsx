@@ -3,7 +3,7 @@ import react, { useState, useEffect } from "react"
 import territories from "../assets/territories.json"
 
 
-function Map({game_id}){
+function Map({game, id}){
     const [hover, setHover] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -14,12 +14,18 @@ function Map({game_id}){
     const [firstTerr, setFirstTerr] = useState(null);
     const [secondTerr, setSecondTerr] = useState(null);
     const [linePoints, setLinePoints] = useState(null);
+    const [lines, setLines] = useState([]);
+
+    const [orders, setOrders] = useState([]);
+    const [order, setOrder] = useState({});
+
+    const [date, setDate] = useState([]);
 
     useEffect(()=>{
         async function fetchData() {
             try{
-                const res = await fetch('http://localhost:8000/api/units/list/').then((res)=>{
-                    if(!res.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const res = await fetch('http://localhost:8000/api/list/unit/').then((res)=>{
+                    if(!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                     return res.json();
                 }).then((data)=>{setUnitData(data)});
             }catch(e){
@@ -29,8 +35,20 @@ function Map({game_id}){
             }
         }
         fetchData();
+    }, []);
 
-        
+    useEffect(()=>{
+        let gameOrSandbox = 'game';
+        if(!game) gameOrSandbox = 'sandbox';
+        fetch(`http://localhost:8000/api/list/${gameOrSandbox}/${id}/`
+        ).then((res)=>{
+            if(!res.ok){
+                alert("Failed to fetch sandbox");
+            }
+            return res.json();
+        }).then((data)=>{
+            setDate({year: data.year, season: data.season})
+        }).catch((error)=>alert(`THIS IS AN ERROR HERE: ${error.message}`));
     }, []);
 
     if(loading){
@@ -43,19 +61,30 @@ function Map({game_id}){
 
     //Basic implementation as a naive example. Must be changed.
     const handleClick = (territory)=>{
+        // x y for lines
         const [cx, cy] = territories[territory].unitPos;
-
+        // The unit selected
+        const unit = unitData.filter((u) => {
+            if(game==true) {return u.game === Number(id) && u.territory===territory;}
+            else {return u.sandbox === Number(id)  && u.territory===territory;}}); 
         if(selectedTerr===null){
-            setSelectedTerr(territory);
-            setFirstTerr({x: cx, y: cy});
-            alert("first click!")
+            if(unit.length == 1){ // you clicked a territory with a unit!
+                    setSelectedTerr(territory);
+                    unit.map((un)=>setOrder({unit_type: un.type, unit: un.territory}))
+                    
+                    setFirstTerr({x: cx, y: cy});
+                }
         }else if(selectedTerr === territory){
+            if(!secondTerr){
+                const newOrder = {...order, move: "Hold"}
+                setOrders([...orders, newOrder])
+                setOrder({})
+            }
             setSelectedTerr(null);
             setFirstTerr(null);
             setSecondTerr(null);
-            alert("clicked same spot!")
         }else{
-            alert("second click:" + territory)
+            const newOrder = {...order, move: "-", target: territory};
             setSecondTerr({x: cx, y: cy});
             setLinePoints({
                 x1: firstTerr.x,
@@ -66,14 +95,28 @@ function Map({game_id}){
             setSelectedTerr(null);
             setFirstTerr(null);
             setSecondTerr(null);
+            setOrders([...orders, newOrder])
             
         }
     };
     
     
-    return (<div className="relative w-[800px] h-auto"><svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
+    return (<div className="relative w-[800px] h-auto">
+        <label >{date.season} {date.year}</label>
+        <br />
+        {orders.map((order, index)=>(
+            <div key={index}>
+                {/* {Object.entries(order).map(([key, value])=>(
+                    <label key={key}>{key} {value}</label>
+                ))} */
+                <label key={order}>{Object.values(order).join(' ')}</label>
+                }
+            </div>
+        ))}
+        <svg width={window.innerWidth} height={window.innerHeight} viewBox={`0 0 ${window.innerWidth/3} ${window.innerHeight/3}`} className="w-[800px] h-auto border shadow-md">
         {Object.entries(territories).map(([id, territory])=>
-            (<g key={id}>
+            (
+            <g key={id}>
                 <path
                 key={id}
                 d={territory.path}
@@ -97,9 +140,9 @@ function Map({game_id}){
                 </g>
             ))}
 
-        {unitData.filter((u) => u.game === Number(game_id)).map((unit)=>{
-            console.log("Rendering unit at:", unit.location);
-            const territory = territories[unit.location];
+        {unitData.filter((u) => {if(game==true) return u.game === Number(id); else return u.sandbox === Number(id);}).map((unit)=>{
+            console.log("Rendering unit at:", unit.territory);
+            const territory = territories[unit.territory];
             if(!territory || !territory.unitPos) return null;
             const [cx, cy] = territory.unitPos;
             return(
@@ -115,6 +158,7 @@ function Map({game_id}){
             );
         })}
 
+        {lines.map((line)=>{})}
         {linePoints!==null && (
             <line
             x1={linePoints.x1}
@@ -124,6 +168,10 @@ function Map({game_id}){
             stroke="black"
             strokeWidth="2"/>
         )}
+        </svg>
+        
+        <svg width={window.innerWidth} height={window.innerHeight} viewBox={`${window.innerWidth/3} ${window.innerHeight/3} ${window.innerWidth} ${window.innerHeight}`} className="w-[800px] h-auto border shadow-md">
+            
         </svg>
         </div>
     );

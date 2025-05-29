@@ -1,6 +1,14 @@
 {
     "Turkey":{
-        "Ank": "F"
+        "Ank": "F",
+        "Arm": "A",
+        "Syr": "A",
+        "Smy": "A",
+        "Con": "A",
+        "Bul": "A",
+        "AEG": "A",
+        "BLA": "A",
+        "Stp": "A"
     },
 
     "Russia":{

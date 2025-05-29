@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import Game, Territory, Unit
+from .models import Game, Territory, Unit, Order, Sandbox
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,13 +17,22 @@ class GameSerializer(serializers.ModelSerializer):
         model = Game
         fields = '__all__'
 
+class SandboxSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sandbox
+        fields = '__all__'
+
 class TerritorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Territory
         fields = '__all__'
 
 class UnitSerializer(serializers.ModelSerializer):
-    territory = serializers.SlugRelatedField(slug_field='name', read_only=True)
     class Meta:
         model = Unit
+        fields = '__all__'
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
         fields = '__all__'

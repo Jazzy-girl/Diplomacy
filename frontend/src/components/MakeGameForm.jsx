@@ -9,7 +9,7 @@ function MakeGameForm(){
         e.preventDefault();
         const newGame = {name};
         try{
-            const res = await fetch('http://localhost:8000/api/games/create/',{
+            const res = await fetch('http://localhost:8000/api/create/game/',{
                 method: 'POST',
                 headers:{
                     'Content-Type': 'application/json'
