@@ -33,13 +33,13 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
                                             country=country[0],
                                             origin_territory=territory,
                                             move_type=MoveTypes.HOLD,
-                                            year=1901, season='spring')
+                                            turn=1)
                     else:
                         unit = Unit.objects.create(sandbox=instance, territory=territory, type=type, owner=country[0])
                         Order.objects.create(sandbox=instance,unit=unit,
                                             country=country[0],
                                             origin_territory=territory,
                                             move_type=MoveTypes.HOLD,
-                                            year=1901, season='spring')   
+                                            turn=1)   
 post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Game)
 post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Sandbox)

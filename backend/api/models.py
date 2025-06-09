@@ -26,8 +26,8 @@ class Sandbox(models.Model):
     name = models.CharField(max_length=50)
     creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_date = models.DateField("date created", auto_now_add=True)
-    year = models.PositiveSmallIntegerField(default=1901)
-    season = models.CharField(choices=Seasons.choices, default=Seasons.SPRING)
+    turn = models.PositiveSmallIntegerField(default=1)
+    # season = models.CharField(choices=Seasons.choices, default=Seasons.SPRING)
     def __str__(self):
         return f"{self.id} {self.name}"
 
@@ -63,14 +63,13 @@ class Unit(models.Model):
 
 class MoveTypes(models.TextChoices):
     MOVE = 'M', _('Move')
+    MOVE_VIA_CONVOY = 'V', _('Move via Convoy')
     SUPPORT = 'S', _('Support')
     HOLD = 'H', _('Hold')
     CONVOY = 'C', _('Convoy')
     RETREAT = 'R', _('Retreat')
     BUILD = 'B', _('Build')
     DISBAND = 'D', _('Disband')
-
-
 
 class Order(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
@@ -81,10 +80,10 @@ class Order(models.Model):
     origin_territory = models.CharField(max_length=20) # start territory
     target_territory = models.CharField(max_length=20,null=True,blank=True,default=None) # target territory
     target_coast = models.CharField(max_length=2, choices=Coasts.choices, null=True, blank=True) # target coast
-    other_territory = models.CharField(max_length=20, null=True, blank=True, default=None) # territory for support/convoy
-    # other_unit for support/convoy unit ID
-    other_unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, default=None, blank=True, related_name="orders_as_other_unit")
+    supported_territory = models.CharField(max_length=20, null=True, blank=True, default=None) # territory for support
+    convoyed_territory = models.CharField(max_length=20, null=True, blank=True, default=None) # territory for convoy
+    supported_unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, default=None, blank=True, related_name="orders_as_supported_unit")
+    convoyed_unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, default=None, blank=True, related_name="orders_as_convoyed_unit")
     move_type = models.CharField(choices=MoveTypes.choices, max_length=1)
-    year = models.PositiveSmallIntegerField()
-    season = models.CharField(choices=Seasons.choices)
+    turn = models.PositiveSmallIntegerField(default=1)
     submitted = models.BooleanField(default=False)
