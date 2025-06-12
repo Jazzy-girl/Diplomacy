@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Game, Territory, Unit, Order, MoveTypes, Sandbox
+from .models import Game, Territory, Unit, Order, Sandbox
 from django.conf import settings
 import os
 
@@ -32,14 +32,14 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
                         Order.objects.create(game=instance,unit=unit,
                                             country=country[0],
                                             origin_territory=territory,
-                                            move_type=MoveTypes.HOLD,
+                                            move_type=Order.MoveTypes.HOLD,
                                             turn=1)
                     else:
                         unit = Unit.objects.create(sandbox=instance, territory=territory, type=type, owner=country[0])
                         Order.objects.create(sandbox=instance,unit=unit,
                                             country=country[0],
                                             origin_territory=territory,
-                                            move_type=MoveTypes.HOLD,
+                                            move_type=Order.MoveTypes.HOLD,
                                             turn=1)   
 post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Game)
 post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Sandbox)

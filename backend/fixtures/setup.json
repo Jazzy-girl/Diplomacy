@@ -1,0 +1,13 @@
+[
+  {
+    "model": "api.territorytemplate",
+    "pk": 1,
+    "fields":{
+        "name": "tes",
+        "full_name": "tester",
+        "sc_exists": false,
+        "territory_type": "S",
+        "has_coasts": false
+    }
+  }
+]

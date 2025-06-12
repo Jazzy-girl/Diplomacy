@@ -37,12 +37,32 @@ class Coasts(models.TextChoices):
     EC = "ec"
     WC = "wc"
 
+
+class Country(models.Model):
+    name = models.CharField(max_length=3)
+    full_name = models.CharField(max_length=80)
+class TerritoryTemplate(models.Model):
+    class TerritoryTypes(models.TextChoices):
+        SEA = 'S', _('sea')
+        LAND = 'L', _('land')
+        COAST = 'C', _('coast')
+    name = models.CharField(max_length=3)
+    full_name = models.CharField(max_length=80)
+    sc_exists = models.BooleanField(default=False)
+    territory_type = models.CharField(choices=TerritoryTypes.choices)
+    has_coasts = models.BooleanField(default=False)
+class TerritoryCoastTemplate(models.Model):
+    """
+    One to Many relationship table connecting coasts to territories.
+    """
+    territory = models.ForeignKey(TerritoryTemplate, on_delete=models.CASCADE, related_name='template_as_territory')
+    coast = models.ForeignKey(TerritoryTemplate, on_delete=models.CASCADE, related_name='template_as_coast')
+
 class Territory(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    name = models.CharField(max_length=20)
-    sc_exists = models.BooleanField(default=False)
-    has_coast = models.BooleanField(default=False)
+    territory_template = models.ForeignKey(TerritoryTemplate, on_delete=models.CASCADE, null=True)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, default=None)
 
 class Unit(models.Model):
     class UnitType(models.TextChoices):
@@ -54,36 +74,53 @@ class Unit(models.Model):
         
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    #player id FK
+    disbanded = models.BooleanField(default=False)
     # territory = models.ForeignKey(Territory, null=True, on_delete=models.SET_NULL)
     territory = models.CharField(max_length=20, null=True)
     type = models.CharField(choices=UnitType.choices)
     owner = models.CharField(choices=[('T', 'Turkey'), ('R', 'Russia')], max_length=1)
     coast = models.CharField(max_length=2, choices=Coasts.choices, null=True, blank=True)
 
-class MoveTypes(models.TextChoices):
-    MOVE = 'M', _('Move')
-    MOVE_VIA_CONVOY = 'V', _('Move via Convoy')
-    SUPPORT = 'S', _('Support')
-    HOLD = 'H', _('Hold')
-    CONVOY = 'C', _('Convoy')
-    RETREAT = 'R', _('Retreat')
-    BUILD = 'B', _('Build')
-    DISBAND = 'D', _('Disband')
+class FailureReason(models.Model):
+    reason = models.TextField()
 
 class Order(models.Model):
+    class MoveTypes(models.TextChoices):
+        MOVE = 'M', _('Move')
+        MOVE_VIA_CONVOY = 'V', _('Move via Convoy')
+        SUPPORT = 'S', _('Support')
+        HOLD = 'H', _('Hold')
+        CONVOY = 'C', _('Convoy')
+
+    class OrderResult(models.TextChoices):
+        PENDING = 'PENDING'
+        SUCCEEDS = 'SUCCEEDS'
+        FAILS = 'FAILS'
+
+    class RetreatResult(models.TextChoices):
+        RETREAT = 'R', _('Retreat')
+        DISBAND = 'D', _('Disband')
+    
+    class WinterMoveTypes(models.TextChoices):
+        BUILD = 'B', _('Build')
+        DISBAND = 'D', _('Disband')
+
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="orders_as_unit")
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="orders_as_unit", null=True, default=None)
     country = models.CharField(choices=[('T', 'Turkey'), ('R', 'Russia')], max_length=1)
-    origin_coast = models.CharField(max_length=2, choices=Coasts.choices, null=True, blank=True) # start coast
     origin_territory = models.CharField(max_length=20) # start territory
     target_territory = models.CharField(max_length=20,null=True,blank=True,default=None) # target territory
-    target_coast = models.CharField(max_length=2, choices=Coasts.choices, null=True, blank=True) # target coast
     supported_territory = models.CharField(max_length=20, null=True, blank=True, default=None) # territory for support
     convoyed_territory = models.CharField(max_length=20, null=True, blank=True, default=None) # territory for convoy
-    supported_unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, default=None, blank=True, related_name="orders_as_supported_unit")
-    convoyed_unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, default=None, blank=True, related_name="orders_as_convoyed_unit")
-    move_type = models.CharField(choices=MoveTypes.choices, max_length=1)
+    move_type = models.CharField(choices=MoveTypes.choices, max_length=1, null=True, blank=True, default=None)
     turn = models.PositiveSmallIntegerField(default=1)
     submitted = models.BooleanField(default=False)
+    result = models.CharField(choices=OrderResult.choices, max_length=10)
+    fail_reason = models.ForeignKey(FailureReason, on_delete=models.SET_NULL, null=True)
+    dislodged = models.BooleanField(default=False)
+    retreat_required = models.BooleanField(default=False)
+    # retreat_territory = models.ForeignKey()
+    retreat_result = models.CharField(RetreatResult.choices, max_length=7, null=True, blank=True, default=None) # RETREAT, DISBAND
+    # build_territory FK opt
+    winter_order = models.CharField(WinterMoveTypes.choices, max_length=7, null=True, blank=True, default=None)
