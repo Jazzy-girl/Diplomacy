@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Game, Territory, Unit, Order, Sandbox, TerritoryTemplate
+from .models import CustomUser, Game, Territory, Unit, Order, Sandbox, TerritoryTemplate, Country
 # Register your models here.
 
 class CustomUserAdmin(UserAdmin):
@@ -22,6 +22,9 @@ class TerritoryTemplateAdmin(admin.ModelAdmin):
 class UnitAdmin(admin.ModelAdmin):
     list_display = [field.name for field in Unit._meta.fields]
 
+class CountryAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in Country._meta.fields]
+
 class OrderAdmin(admin.ModelAdmin):
     list_display = [field.name for field in Order._meta.fields]
 
@@ -30,5 +33,6 @@ admin.site.register(Game, GameAdmin)
 admin.site.register(Territory, TerritoryAdmin)
 admin.site.register(TerritoryTemplate, TerritoryTemplateAdmin)
 admin.site.register(Unit, UnitAdmin)
+admin.site.register(Country, CountryAdmin)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(Sandbox, SandboxAdmin)

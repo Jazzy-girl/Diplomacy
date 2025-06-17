@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Game, Territory, Unit, Order, Sandbox
+from .models import Game, Territory, Unit, Order, Sandbox, TerritoryTemplate
 from django.conf import settings
 import os
 
@@ -13,15 +13,20 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
     print("signal triggered!") #Debug
     if created:
         # First make the Territories
-        with open(TERRITORIES_FILE, 'r') as fTerrs:
-            data = json.load(fTerrs)
-            for name, territory in data.items():
-                sc_exists = territory["sc"]
-                # add check for coasts
-                if isinstance(instance, Game):
-                    Territory.objects.create(game=instance, name=name, sc_exists=sc_exists)
-                else:
-                    Territory.objects.create(sandbox=instance, name=name, sc_exists=sc_exists)
+        # with open(TERRITORIES_FILE, 'r') as fTerrs:
+        #     data = json.load(fTerrs)
+        #     for name, territory in data.items():
+        #         sc_exists = territory["sc"]
+        #         # add check for coasts
+        #         if isinstance(instance, Game):
+        #             Territory.objects.create(game=instance, name=name, sc_exists=sc_exists)
+        #         else:
+        #             Territory.objects.create(sandbox=instance, name=name, sc_exists=sc_exists)
+        # First make the Territories
+        territory_templates = TerritoryTemplate.objects.all()
+        for template in territory_templates:
+            if isinstance(instance, Game):
+                territory = Territory.objects.create(game=instance,template=template.pk,)
         # Then make the Units
         with open(UNITS_FILE, 'r') as fUnits:
             data = json.load(fUnits)
