@@ -124,7 +124,7 @@ class Order(models.Model):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     origin_territory = models.ForeignKey(Territory, on_delete=models.CASCADE, related_name="orders_as_origin_territory") # start territory
     origin_coast = models.ForeignKey(CoastTemplate, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name="orders_as_origin_coast")
-    target_territory = models.ForeignKey(Territory, on_delete=models.CASCADE, related_name="orders_as_target_territory") # target territory
+    target_territory = models.ForeignKey(Territory, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name="orders_as_target_territory") # target territory
     target_coast = models.ForeignKey(CoastTemplate, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name="orders_as_target_coast")
     supported_territory = models.ForeignKey(Territory, on_delete=models.CASCADE,null=True, blank=True, default=None, related_name="orders_as_supported_territory") # territory for support
     supported_coast = models.ForeignKey(CoastTemplate, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name="orders_as_supported_coast")
