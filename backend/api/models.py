@@ -19,6 +19,7 @@ class Seasons(models.TextChoices):
     WINTER = 'winter', _('Winter')
 class Game(models.Model):
     name = models.CharField(max_length=50)
+    current_turn = models.PositiveSmallIntegerField(default=1)
     def __str__(self):
         return f"{self.id} {self.name}"
 
@@ -26,7 +27,7 @@ class Sandbox(models.Model):
     name = models.CharField(max_length=50)
     creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_date = models.DateField("date created", auto_now_add=True)
-    turn = models.PositiveSmallIntegerField(default=1)
+    current_turn = models.PositiveSmallIntegerField(default=1)
     def __str__(self):
         return f"{self.id} {self.name}"
 
