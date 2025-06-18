@@ -42,7 +42,7 @@ territories = [
     ("Smy", "Smyrna", "L", True, True, "T"),
     ("Spa", "Spain", "L", True, True, None),
     ("Swe", "Sweden", "L", True, True, None),
-    ("StP", "St. Petersburg", "L", True, True, "R"),
+    ("Stp", "St. Petersburg", "L", True, True, "R"),
     ("Tri", "Trieste", "L", True, True, "A"),
     ("Tun", "Tunis", "L", True, True, None),
     ("Ven", "Venice", "L", True, True, "I"),
@@ -98,7 +98,7 @@ territories = [
 coast_mapping = {
     "Bul": ["ec", "sc"],
     "Spa": ["nc", "sc"],
-    "StP": ["nc", "sc"]
+    "Stp": ["nc", "sc"]
 }
 
 coast_full_name = {
@@ -126,7 +126,7 @@ units = [
     ("Mos", "R", "A", None),
     ("Sev", "R", "F", None),
     ("War", "R", "A", None),
-    ("StP", "R", "A", "nc"),
+    ("Stp", "R", "A", "nc"),
     ("Con", "T", "A", None),
     ("Smy", "T", "A", None),
     ("Ank", "T", "F", None),

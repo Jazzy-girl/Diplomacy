@@ -346,7 +346,7 @@
     "model": "api.territorytemplate",
     "pk": 29,
     "fields": {
-      "name": "StP",
+      "name": "Stp",
       "full_name": "St. Petersburg",
       "sc_exists": true,
       "territory_type": "L",
@@ -1181,7 +1181,7 @@
     "pk": 106,
     "fields": {
       "territory_template": 29,
-      "name": "StP/nc",
+      "name": "Stp/nc",
       "full_name": "St. Petersburg North Coast"
     }
   },
@@ -1190,7 +1190,7 @@
     "pk": 107,
     "fields": {
       "territory_template": 29,
-      "name": "StP/sc",
+      "name": "Stp/sc",
       "full_name": "St. Petersburg South Coast"
     }
   },

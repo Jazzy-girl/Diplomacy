@@ -8,7 +8,7 @@ from unittest.mock import patch, mock_open
 import json
 from rest_framework.test import APIClient
 
-from api.models import Game, Territory, Unit, Order, Sandbox
+from api.models import Game, Territory, Unit, Order, Sandbox, Country
 """
 For unit tests involving game / sandbox creation,
 use mock data for territories.json and countrySetup.json as they are subject to change.
@@ -20,12 +20,16 @@ class GameInitializationTest(TestCase):
     def setUpTestData(cls):
         call_command('loaddata', 'fixtures/initial_templates.json')
 
-    def test_territories_and_units_created(self,):
+    def test_territories_orders_coutnries_units_created(self,):
         game = Game.objects.create(name="Test Game")
         territories = Territory.objects.all()
         units = Unit.objects.filter(game=game)
+        orders = Order.objects.filter(game=game)
+        countries = Country.objects.filter(game=game)
+        self.assertEqual(countries.count(), 7)
         self.assertEqual(territories.count(), 75)
         self.assertEqual(units.count(), 22)
+        self.assertEqual(orders.count(), 22)
 
 # class BulkUpdateOrdersTest(TestCase):
 #     @patch("api.receivers.open", new_callable=mock_open)
