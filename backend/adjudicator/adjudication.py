@@ -37,7 +37,7 @@ def resolve(instance=Game):
     game_map = vanilla_dip.generate_map()
 
     # game_map = vanilla_map.supply_map.game_map
-    # print(vanilla_map)
+    print(game_map)
 
     # 2: Load Players
     players = {}
@@ -46,54 +46,55 @@ def resolve(instance=Game):
     territories = Territory.objects.filter(game=instance)
     orders = Order.objects.filter(game=instance, turn=instance.current_turn)
     game_units = {}
+    
     """
     NEED:
     - access to player full_name by country id.
     """
     # iterate by country
     # TURN INTO LIST COMPREHENSION LATER like so: starting_config = [dict(territory_name=u.position, unit_type=u.unit_type) for u in units]
-    commands = []
+    # commands = []
 
-    for country in countries:
-        name = CountryTemplate.objects.get(country.country_template).full_name
-        starting_units = []
-        for unit in units.filter(country=country):
-            position = TerritoryTemplate.objects.get(unit.territory.territory_template).full_name
-            unit_type = PyDipUnitTypes.TROOP if unit.type == 'A' else PyDipUnitTypes.FLEET
-            game_unit = Unit(unit_type,position)
-            starting_units.append(game_unit)
-            game_units[position] = game_unit
-            # starting_units.append({'territory_name': position, 'unit_type': unit_type})
+    # for country in countries:
+    #     name = CountryTemplate.objects.get(country.country_template).full_name
+    #     starting_units = []
+    #     for unit in units.filter(country=country):
+    #         position = TerritoryTemplate.objects.get(unit.territory.territory_template).full_name
+    #         unit_type = PyDipUnitTypes.TROOP if unit.type == 'A' else PyDipUnitTypes.FLEET
+    #         game_unit = Unit(unit_type,position)
+    #         starting_units.append(game_unit)
+    #         game_units[position] = game_unit
+    #         # starting_units.append({'territory_name': position, 'unit_type': unit_type})
 
-        player = Player(name, game_map, starting_units)
-        players[name] = player
-        print(players[name])
+    #     player = Player(name, game_map, starting_units)
+    #     players[name] = player
+    #     print(players[name])
 
 
-    for order in orders:
-        player = players[order.country.country_template.full_name]
-        if order.origin_coast:
-            unit = player.find_unit(order.origin_coast.full_name)
-        else:
-            unit = player.find_unit(order.unit.territory.territory_template.full_name)
+    # for order in orders:
+    #     player = players[order.country.country_template.full_name]
+    #     if order.origin_coast:
+    #         unit = player.find_unit(order.origin_coast.full_name)
+    #     else:
+    #         unit = player.find_unit(order.unit.territory.territory_template.full_name)
         
-        if order.target_territory:
-            if order.target_coast:
-                dest = order.target_coast.full_name
-            else:
-                dest = order.target_territory.territory_template.full_name
+    #     if order.target_territory:
+    #         if order.target_coast:
+    #             dest = order.target_coast.full_name
+    #         else:
+    #             dest = order.target_territory.territory_template.full_name
         
-        match order.move_type:
-            case Order.MoveTypes.HOLD:
-                cmd = HoldCommand(player, unit)
-            case Order.MoveTypes.MOVE:
-                cmd = MoveCommand(player, unit, dest)
-            case Order.MoveTypes.SUPPORT:
-                supported_unit = 
-            case Order.MoveTypes.CONVOY:
-            case Order.MoveTypes.MOVE_VIA_CONVOY:
-        print(cmd)
-        commands.append(cmd)
+    #     match order.move_type:
+    #         case Order.MoveTypes.HOLD:
+    #             cmd = HoldCommand(player, unit)
+    #         case Order.MoveTypes.MOVE:
+    #             cmd = MoveCommand(player, unit, dest)
+    #         case Order.MoveTypes.SUPPORT:
+    #             supported_unit = 
+    #         case Order.MoveTypes.CONVOY:
+    #         case Order.MoveTypes.MOVE_VIA_CONVOY:
+    #     print(cmd)
+    #     commands.append(cmd)
                             
 
 
