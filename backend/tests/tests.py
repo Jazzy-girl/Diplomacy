@@ -6,16 +6,11 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from unittest.mock import patch, mock_open
 import json
-from rest_framework.test import APIClient, APITestCase
-from rest_framework.authtoken.models import Token
+from rest_framework.test import APITestCase
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.models import Game, Territory, Unit, Order, Sandbox, Country, CoastTemplate, TerritoryTemplate
-"""
-For unit tests involving game / sandbox creation,
-use mock data for territories.json and countrySetup.json as they are subject to change.
-Both of these files are used to generate entries in the Territories, Units, and Orders model.
-Examples of how to use mock data are below.
-"""
+
 class GameInitializationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -36,20 +31,29 @@ class BulkUpdateOrdersTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
         call_command('loaddata', 'fixtures/initial_templates.json')
-
+        cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
+    
     def test_bulk_patch_orders(self):
+        refresh = RefreshToken.for_user(self.user)
+        access_token = str(refresh.access_token)
+
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         game = Game.objects.create(name="Test Game 2")
+
         smyTemp = TerritoryTemplate.objects.get(name="Smy")
         syrTemp = TerritoryTemplate.objects.get(name="Syr")
         ankTemp = TerritoryTemplate.objects.get(name="Ank")
         armTemp = TerritoryTemplate.objects.get(name="Arm")
+
         smy = Territory.objects.get(game=game,territory_template=smyTemp)
         syr = Territory.objects.get(game=game,territory_template=syrTemp)
         ank = Territory.objects.get(game=game,territory_template=ankTemp)
         ank_coast = CoastTemplate.objects.get(name="Ank")
         arm = Territory.objects.get(game=game,territory_template=armTemp)
+
         order1 = Order.objects.get(game=game, origin_territory=smy)
         order2 = Order.objects.get(game=game, origin_territory=ank, origin_coast=ank_coast)
+
         url = '/api/update/order/bulk/'
         payload = [
             {

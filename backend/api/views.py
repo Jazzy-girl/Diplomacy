@@ -53,7 +53,6 @@ class UnitList(generics.ListAPIView):
 
 
 class BulkUpdateOrdersView(APIView):
-    permission_classes=[AllowAny]
     def patch(self, request, *args, **kwargs):
         updates = request.data
 
