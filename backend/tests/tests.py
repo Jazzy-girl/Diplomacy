@@ -6,9 +6,10 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from unittest.mock import patch, mock_open
 import json
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
+from rest_framework.authtoken.models import Token
 
-from api.models import Game, Territory, Unit, Order, Sandbox, Country
+from api.models import Game, Territory, Unit, Order, Sandbox, Country, CoastTemplate, TerritoryTemplate
 """
 For unit tests involving game / sandbox creation,
 use mock data for territories.json and countrySetup.json as they are subject to change.
@@ -31,59 +32,44 @@ class GameInitializationTest(TestCase):
         self.assertEqual(units.count(), 22)
         self.assertEqual(orders.count(), 22)
 
-# class BulkUpdateOrdersTest(TestCase):
-#     @patch("api.receivers.open", new_callable=mock_open)
-#     def setUp(self, mock_open_fn):
-#         #Mock Data
-#         territory_json = json.dumps({
-#             "Ank": {"sc": True},
-#             "Arm": {"sc": False},
-#             "Sev": {"sc": True},
-#             "Syr": {"sc": False},
-#             "Mos": {"sc": False}
-#         })
-#         units_json = json.dumps({
-#             "Turkey":{
-#                 "Ank": "F",
-#                 "Sev": "F"
-#             },
-#         })
-#         mock_territory = mock_open(read_data=territory_json).return_value
-#         mock_units = mock_open(read_data=units_json).return_value
-#         mock_open_fn.side_effect = [mock_territory, mock_units]
-#         self.client = APIClient()
-#         User = get_user_model()
-#         self.user = User.objects.create_user(username="tester",email="test@example.com", password="123456789!")
-#         self.client.force_authenticate(user=self.user)
-#         self.game = Game.objects.create(name="Test Game")
+class BulkUpdateOrdersTest(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        call_command('loaddata', 'fixtures/initial_templates.json')
 
-#         self.unit1 = Unit.objects.filter(game=self.game, territory="Ank").first()
-#         self.unit2 = Unit.objects.filter(game=self.game, territory="Sev").first()
-#         self.order1 = self.unit1.orders_as_unit.first()
-#         self.order2 = self.unit2.orders_as_unit.first()
+    def test_bulk_patch_orders(self):
+        game = Game.objects.create(name="Test Game 2")
+        smyTemp = TerritoryTemplate.objects.get(name="Smy")
+        syrTemp = TerritoryTemplate.objects.get(name="Syr")
+        ankTemp = TerritoryTemplate.objects.get(name="Ank")
+        armTemp = TerritoryTemplate.objects.get(name="Arm")
+        smy = Territory.objects.get(game=game,territory_template=smyTemp)
+        syr = Territory.objects.get(game=game,territory_template=syrTemp)
+        ank = Territory.objects.get(game=game,territory_template=ankTemp)
+        ank_coast = CoastTemplate.objects.get(name="Ank")
+        arm = Territory.objects.get(game=game,territory_template=armTemp)
+        order1 = Order.objects.get(game=game, origin_territory=smy)
+        order2 = Order.objects.get(game=game, origin_territory=ank, origin_coast=ank_coast)
+        url = '/api/update/order/bulk/'
+        payload = [
+            {
+                "id": order1.id,
+                "target_territory": syr.id,
+                "move_type": "M"
+            },
+            {
+                "id": order2.id,
+                "target_territory": arm.id,
+                "move_type": "M"
+            }
+        ]
 
-#     def test_bulk_patch_orders(self):
-#         url = '/api/update/order/bulk/'
-#         payload = [
-#             {
-#                 "id": self.order1.id,
-#                 "target_territory": "Syr",
-#                 "move_type": "M"
-#             },
-#             {
-#                 "id": self.order2.id,
-#                 "target_territory": "Mos",
-#                 "move_type": "M"
-#             }
-#         ]
+        response = self.client.patch(url, payload, format="json")
+        self.assertEqual(response.status_code, 200)
 
-#         response = self.client.patch(url, payload, format="json")
-#         self.assertEqual(response.status_code, 200)
-
-#         self.order1.refresh_from_db()
-#         self.order2.refresh_from_db()
-
-#         self.assertEqual(self.order1.target_territory, "Syr")
-#         self.assertEqual(self.order1.move_type, "M")
-#         self.assertEqual(self.order2.target_territory, "Mos")
-#         self.assertEqual(self.order2.move_type, "M")
+        order1.refresh_from_db()
+        order2.refresh_from_db()
+        self.assertEqual(order1.target_territory, syr)
+        self.assertEqual(order1.move_type, "M")
+        self.assertEqual(order2.target_territory, arm)
+        self.assertEqual(order2.move_type, "M")

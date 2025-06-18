@@ -18,7 +18,7 @@ territories = [
     ("Bel", "Belgium", "L", True, True, None),
     ("Ber", "Berlin", "L", True, True, "G"),
     ("Bre", "Brest", "L", True, True, "F"),
-    ("Bud", "Budapest", "L", True, False, "A"),
+    ("Bud", "Budapest", "L", False, True, "A"),
     ("Bul", "Bulgaria", "L", True, True, "T"),
     ("Con", "Constantinople", "L", True, True, "T"),
     ("Den", "Denmark", "L", True, True, None),
@@ -29,15 +29,15 @@ territories = [
     ("Lvp", "Liverpool", "L", True, True, "E"),
     ("Lon", "London", "L", True, True, "E"),
     ("Mar", "Marseilles", "L", True, True, "F"),
-    ("Mos", "Moscow", "L", True, False, "R"),
-    ("Mun", "Munich", "L", True, False, "G"),
+    ("Mos", "Moscow", "L", False, True, "R"),
+    ("Mun", "Munich", "L", False, True, "G"),
     ("Nap", "Naples", "L", True, True, "I"),
     ("Nor", "Norway", "L", True, True, None),
-    ("Par", "Paris", "L", True, False, "F"),
+    ("Par", "Paris", "L", False, True, "F"),
     ("Por", "Portugal", "L", True, True, None),
     ("Rom", "Rome", "L", True, True, "I"),
     ("Rum", "Rumania", "L", True, True, None),
-    ("Ser", "Serbia", "L", True, False, None),
+    ("Ser", "Serbia", "L", False, True, None),
     ("Sev", "Sevastopol", "L", True, True, "R"),
     ("Smy", "Smyrna", "L", True, True, "T"),
     ("Spa", "Spain", "L", True, True, None),
@@ -46,32 +46,32 @@ territories = [
     ("Tri", "Trieste", "L", True, True, "A"),
     ("Tun", "Tunis", "L", True, True, None),
     ("Ven", "Venice", "L", True, True, "I"),
-    ("Vie", "Vienna", "L", True, False, "A"),
-    ("War", "Warsaw", "L", True, False, "R"),
+    ("Vie", "Vienna", "L", False, True, "A"),
+    ("War", "Warsaw", "L", False, True, "R"),
 
     # Other Land Territories (22)
-    ("Alb", "Albania", "L", False, True, None),
-    ("Apu", "Apulia", "L", False, True, None),
-    ("Arm", "Armenia", "L", False, True, None),
+    ("Alb", "Albania", "L", True, False, None),
+    ("Apu", "Apulia", "L", True, False, None),
+    ("Arm", "Armenia", "L", True, False, None),
     ("Boh", "Bohemia", "L", False, False, None),
     ("Bur", "Burgundy", "L", False, False, None),
-    ("Cly", "Clyde", "L", False, True, None),
-    ("Fin", "Finland", "L", False, True, None),
+    ("Cly", "Clyde", "L", True, False, None),
+    ("Fin", "Finland", "L", True, False, None),
     ("Gal", "Galicia", "L", False, False, None),
-    ("Gas", "Gascony", "L", False, True, None),
-    ("Lvn", "Livonia", "L", False, True, None),
-    ("NAf", "North Africa", "L", False, True, None),
-    ("Pic", "Picardy", "L", False, True, None),
-    ("Pie", "Piedmont", "L", False, True, None),
-    ("Pru", "Prussia", "L", False, True, None),
+    ("Gas", "Gascony", "L", True, False, None),
+    ("Lvn", "Livonia", "L", True, False, None),
+    ("NAf", "North Africa", "L", True, False, None),
+    ("Pic", "Picardy", "L", True, False, None),
+    ("Pie", "Piedmont", "L", True, False, None),
+    ("Pru", "Prussia", "L", True, False, None),
     ("Ruh", "Ruhr", "L", False, False, None),
     ("Sil", "Silesia", "L", False, False, None),
-    ("Syr", "Syria", "L", False, True, None),
-    ("Tus", "Tuscany", "L", False, True, None),
+    ("Syr", "Syria", "L", True, False, None),
+    ("Tus", "Tuscany", "L", True, False, None),
     ("Tyr", "Tyrolia", "L", False, False, None),
     ("Ukr", "Ukraine", "L", False, False, None),
-    ("Wal", "Wales", "L", False, True, None),
-    ("Yor", "Yorkshire", "L", False, True, None),
+    ("Wal", "Wales", "L", True, False, None),
+    ("Yor", "Yorkshire", "L", True, False, None),
 
    # Sea Territories (19)
     ("ADR", "Adriatic Sea", "S", False, False, None),
@@ -108,31 +108,54 @@ coast_full_name = {
 }
 
 units = [
-    ("Lon", "E", "F", None),
-    ("Edi", "E", "F", None),
+    ("Lon", "E", "F", "Lon"),
+    ("Edi", "E", "F", "Edi"),
     ("Lvp", "E", "A", None),
-    ("Bre", "F", "F", None),
+    ("Bre", "F", "F", "Bre"),
     ("Par", "F", "A", None),
     ("Mar", "F", "A", None),
     ("Ber", "G", "A", None),
     ("Mun", "G", "A", None),
-    ("Kie", "G", "F", None),
+    ("Kie", "G", "F", "Kie"),
     ("Vie", "A", "A", None),
     ("Bud", "A", "A", None),
-    ("Tri", "A", "F", None),
+    ("Tri", "A", "F", "Tri"),
     ("Ven", "I", "A", None),
     ("Rom", "I", "A", None),
-    ("Nap", "I", "F", None),
+    ("Nap", "I", "F", "Nap"),
     ("Mos", "R", "A", None),
-    ("Sev", "R", "F", None),
+    ("Sev", "R", "F", "Sev"),
     ("War", "R", "A", None),
     ("Stp", "R", "A", "nc"),
     ("Con", "T", "A", None),
     ("Smy", "T", "A", None),
-    ("Ank", "T", "F", None),
+    ("Ank", "T", "F", "Ank"),
 ]
 
 data = []
+names = [
+    'England',
+    'France',
+    'Germany',
+    'Russia',
+    'Turkey',
+    'Italy',
+    'Austria'
+]
+
+pk = 1
+for name in names:
+    entry = {
+        'model': 'api.countrytemplate',
+        'pk': pk,
+        'fields':{
+            'name' : name[0],
+            'full_name' : name
+        }
+    }
+    data.append(entry)
+    pk+=1
+
 pk_counter = 1
 territory_pk = {}
 coast_pk = {}
@@ -194,6 +217,12 @@ for name, full_name, ttype, has_coasts, sc, owner in territories:
 
 # Add InitialUnitSetup
 for terr, country, utype, coast in units:
+    coast_name = ''
+    if coast:
+        if len(coast) == 3:
+            coast_name = coast
+        else:
+            coast_name = f"{terr}/{coast}"
     entry = {
         "model": "api.initialunitsetup",
         "pk": pk_counter,
@@ -201,7 +230,7 @@ for terr, country, utype, coast in units:
             "territory_template": territory_pk[terr],
             "country_template": list(countries.keys()).index(country) + 1,
             "unit_type": utype,
-            "coast_template": coast_pk[f"{terr}/{coast}"] if coast else None
+            "coast_template": coast_pk[coast_name] if coast else None
         }
     }
     data.append(entry)

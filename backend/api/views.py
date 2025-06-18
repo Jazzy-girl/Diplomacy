@@ -51,7 +51,9 @@ class UnitList(generics.ListAPIView):
     serializer_class = UnitSerializer
     permission_classes = [AllowAny]
 
+
 class BulkUpdateOrdersView(APIView):
+    permission_classes=[AllowAny]
     def patch(self, request, *args, **kwargs):
         updates = request.data
 

@@ -1,11 +1,60 @@
 [
-  {"model": "api.countrytemplate", "pk": 1, "fields": {"name": "E", "full_name": "England"}},
-  {"model": "api.countrytemplate", "pk": 2, "fields": {"name": "F", "full_name": "France"}},
-  {"model": "api.countrytemplate", "pk": 3, "fields": {"name": "G", "full_name": "Germany"}},
-  {"model": "api.countrytemplate", "pk": 4, "fields": {"name": "R", "full_name": "Russia"}},
-  {"model": "api.countrytemplate", "pk": 5, "fields": {"name": "T", "full_name": "Turkey"}},
-  {"model": "api.countrytemplate", "pk": 6, "fields": {"name": "I", "full_name": "Italy"}},
-  {"model": "api.countrytemplate", "pk": 7, "fields": {"name": "A", "full_name": "Austria"}},
+  {
+    "model": "api.countrytemplate",
+    "pk": 1,
+    "fields": {
+      "name": "E",
+      "full_name": "England"
+    }
+  },
+  {
+    "model": "api.countrytemplate",
+    "pk": 2,
+    "fields": {
+      "name": "F",
+      "full_name": "France"
+    }
+  },
+  {
+    "model": "api.countrytemplate",
+    "pk": 3,
+    "fields": {
+      "name": "G",
+      "full_name": "Germany"
+    }
+  },
+  {
+    "model": "api.countrytemplate",
+    "pk": 4,
+    "fields": {
+      "name": "R",
+      "full_name": "Russia"
+    }
+  },
+  {
+    "model": "api.countrytemplate",
+    "pk": 5,
+    "fields": {
+      "name": "T",
+      "full_name": "Turkey"
+    }
+  },
+  {
+    "model": "api.countrytemplate",
+    "pk": 6,
+    "fields": {
+      "name": "I",
+      "full_name": "Italy"
+    }
+  },
+  {
+    "model": "api.countrytemplate",
+    "pk": 7,
+    "fields": {
+      "name": "A",
+      "full_name": "Austria"
+    }
+  },
   {
     "model": "api.territorytemplate",
     "pk": 1,
@@ -60,9 +109,9 @@
     "fields": {
       "name": "Bud",
       "full_name": "Budapest",
-      "sc_exists": false,
+      "sc_exists": true,
       "territory_type": "L",
-      "has_coasts": true,
+      "has_coasts": false,
       "country_template": 7
     }
   },
@@ -192,9 +241,9 @@
     "fields": {
       "name": "Mos",
       "full_name": "Moscow",
-      "sc_exists": false,
+      "sc_exists": true,
       "territory_type": "L",
-      "has_coasts": true,
+      "has_coasts": false,
       "country_template": 4
     }
   },
@@ -204,9 +253,9 @@
     "fields": {
       "name": "Mun",
       "full_name": "Munich",
-      "sc_exists": false,
+      "sc_exists": true,
       "territory_type": "L",
-      "has_coasts": true,
+      "has_coasts": false,
       "country_template": 3
     }
   },
@@ -240,9 +289,9 @@
     "fields": {
       "name": "Par",
       "full_name": "Paris",
-      "sc_exists": false,
+      "sc_exists": true,
       "territory_type": "L",
-      "has_coasts": true,
+      "has_coasts": false,
       "country_template": 2
     }
   },
@@ -288,9 +337,9 @@
     "fields": {
       "name": "Ser",
       "full_name": "Serbia",
-      "sc_exists": false,
+      "sc_exists": true,
       "territory_type": "L",
-      "has_coasts": true,
+      "has_coasts": false,
       "country_template": null
     }
   },
@@ -396,9 +445,9 @@
     "fields": {
       "name": "Vie",
       "full_name": "Vienna",
-      "sc_exists": false,
+      "sc_exists": true,
       "territory_type": "L",
-      "has_coasts": true,
+      "has_coasts": false,
       "country_template": 7
     }
   },
@@ -408,9 +457,9 @@
     "fields": {
       "name": "War",
       "full_name": "Warsaw",
-      "sc_exists": false,
+      "sc_exists": true,
       "territory_type": "L",
-      "has_coasts": true,
+      "has_coasts": false,
       "country_template": 4
     }
   },
@@ -420,9 +469,9 @@
     "fields": {
       "name": "Alb",
       "full_name": "Albania",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -432,9 +481,9 @@
     "fields": {
       "name": "Apu",
       "full_name": "Apulia",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -444,9 +493,9 @@
     "fields": {
       "name": "Arm",
       "full_name": "Armenia",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -480,9 +529,9 @@
     "fields": {
       "name": "Cly",
       "full_name": "Clyde",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -492,9 +541,9 @@
     "fields": {
       "name": "Fin",
       "full_name": "Finland",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -516,9 +565,9 @@
     "fields": {
       "name": "Gas",
       "full_name": "Gascony",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -528,9 +577,9 @@
     "fields": {
       "name": "Lvn",
       "full_name": "Livonia",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -540,9 +589,9 @@
     "fields": {
       "name": "NAf",
       "full_name": "North Africa",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -552,9 +601,9 @@
     "fields": {
       "name": "Pic",
       "full_name": "Picardy",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -564,9 +613,9 @@
     "fields": {
       "name": "Pie",
       "full_name": "Piedmont",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -576,9 +625,9 @@
     "fields": {
       "name": "Pru",
       "full_name": "Prussia",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -612,9 +661,9 @@
     "fields": {
       "name": "Syr",
       "full_name": "Syria",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -624,9 +673,9 @@
     "fields": {
       "name": "Tus",
       "full_name": "Tuscany",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -660,9 +709,9 @@
     "fields": {
       "name": "Wal",
       "full_name": "Wales",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -672,9 +721,9 @@
     "fields": {
       "name": "Yor",
       "full_name": "Yorkshire",
-      "sc_exists": true,
+      "sc_exists": false,
       "territory_type": "L",
-      "has_coasts": false,
+      "has_coasts": true,
       "country_template": null
     }
   },
@@ -946,15 +995,6 @@
     "model": "api.coasttemplate",
     "pk": 80,
     "fields": {
-      "territory_template": 5,
-      "name": "Bud",
-      "full_name": "Budapest Coast"
-    }
-  },
-  {
-    "model": "api.coasttemplate",
-    "pk": 81,
-    "fields": {
       "territory_template": 6,
       "name": "Bul/ec",
       "full_name": "Bulgaria East Coast"
@@ -962,7 +1002,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 82,
+    "pk": 81,
     "fields": {
       "territory_template": 6,
       "name": "Bul/sc",
@@ -971,7 +1011,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 83,
+    "pk": 82,
     "fields": {
       "territory_template": 7,
       "name": "Con",
@@ -980,7 +1020,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 84,
+    "pk": 83,
     "fields": {
       "territory_template": 8,
       "name": "Den",
@@ -989,7 +1029,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 85,
+    "pk": 84,
     "fields": {
       "territory_template": 9,
       "name": "Edi",
@@ -998,7 +1038,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 86,
+    "pk": 85,
     "fields": {
       "territory_template": 10,
       "name": "Gre",
@@ -1007,7 +1047,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 87,
+    "pk": 86,
     "fields": {
       "territory_template": 11,
       "name": "Hol",
@@ -1016,7 +1056,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 88,
+    "pk": 87,
     "fields": {
       "territory_template": 12,
       "name": "Kie",
@@ -1025,7 +1065,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 89,
+    "pk": 88,
     "fields": {
       "territory_template": 13,
       "name": "Lvp",
@@ -1034,7 +1074,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 90,
+    "pk": 89,
     "fields": {
       "territory_template": 14,
       "name": "Lon",
@@ -1043,7 +1083,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 91,
+    "pk": 90,
     "fields": {
       "territory_template": 15,
       "name": "Mar",
@@ -1052,25 +1092,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 92,
-    "fields": {
-      "territory_template": 16,
-      "name": "Mos",
-      "full_name": "Moscow Coast"
-    }
-  },
-  {
-    "model": "api.coasttemplate",
-    "pk": 93,
-    "fields": {
-      "territory_template": 17,
-      "name": "Mun",
-      "full_name": "Munich Coast"
-    }
-  },
-  {
-    "model": "api.coasttemplate",
-    "pk": 94,
+    "pk": 91,
     "fields": {
       "territory_template": 18,
       "name": "Nap",
@@ -1079,7 +1101,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 95,
+    "pk": 92,
     "fields": {
       "territory_template": 19,
       "name": "Nor",
@@ -1088,16 +1110,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 96,
-    "fields": {
-      "territory_template": 20,
-      "name": "Par",
-      "full_name": "Paris Coast"
-    }
-  },
-  {
-    "model": "api.coasttemplate",
-    "pk": 97,
+    "pk": 93,
     "fields": {
       "territory_template": 21,
       "name": "Por",
@@ -1106,7 +1119,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 98,
+    "pk": 94,
     "fields": {
       "territory_template": 22,
       "name": "Rom",
@@ -1115,7 +1128,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 99,
+    "pk": 95,
     "fields": {
       "territory_template": 23,
       "name": "Rum",
@@ -1124,16 +1137,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 100,
-    "fields": {
-      "territory_template": 24,
-      "name": "Ser",
-      "full_name": "Serbia Coast"
-    }
-  },
-  {
-    "model": "api.coasttemplate",
-    "pk": 101,
+    "pk": 96,
     "fields": {
       "territory_template": 25,
       "name": "Sev",
@@ -1142,7 +1146,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 102,
+    "pk": 97,
     "fields": {
       "territory_template": 26,
       "name": "Smy",
@@ -1151,7 +1155,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 103,
+    "pk": 98,
     "fields": {
       "territory_template": 27,
       "name": "Spa/nc",
@@ -1160,7 +1164,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 104,
+    "pk": 99,
     "fields": {
       "territory_template": 27,
       "name": "Spa/sc",
@@ -1169,7 +1173,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 105,
+    "pk": 100,
     "fields": {
       "territory_template": 28,
       "name": "Swe",
@@ -1178,7 +1182,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 106,
+    "pk": 101,
     "fields": {
       "territory_template": 29,
       "name": "Stp/nc",
@@ -1187,7 +1191,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 107,
+    "pk": 102,
     "fields": {
       "territory_template": 29,
       "name": "Stp/sc",
@@ -1196,7 +1200,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 108,
+    "pk": 103,
     "fields": {
       "territory_template": 30,
       "name": "Tri",
@@ -1205,7 +1209,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 109,
+    "pk": 104,
     "fields": {
       "territory_template": 31,
       "name": "Tun",
@@ -1214,7 +1218,7 @@
   },
   {
     "model": "api.coasttemplate",
-    "pk": 110,
+    "pk": 105,
     "fields": {
       "territory_template": 32,
       "name": "Ven",
@@ -1223,45 +1227,162 @@
   },
   {
     "model": "api.coasttemplate",
+    "pk": 106,
+    "fields": {
+      "territory_template": 35,
+      "name": "Alb",
+      "full_name": "Albania Coast"
+    }
+  },
+  {
+    "model": "api.coasttemplate",
+    "pk": 107,
+    "fields": {
+      "territory_template": 36,
+      "name": "Apu",
+      "full_name": "Apulia Coast"
+    }
+  },
+  {
+    "model": "api.coasttemplate",
+    "pk": 108,
+    "fields": {
+      "territory_template": 37,
+      "name": "Arm",
+      "full_name": "Armenia Coast"
+    }
+  },
+  {
+    "model": "api.coasttemplate",
+    "pk": 109,
+    "fields": {
+      "territory_template": 40,
+      "name": "Cly",
+      "full_name": "Clyde Coast"
+    }
+  },
+  {
+    "model": "api.coasttemplate",
+    "pk": 110,
+    "fields": {
+      "territory_template": 41,
+      "name": "Fin",
+      "full_name": "Finland Coast"
+    }
+  },
+  {
+    "model": "api.coasttemplate",
     "pk": 111,
     "fields": {
-      "territory_template": 33,
-      "name": "Vie",
-      "full_name": "Vienna Coast"
+      "territory_template": 43,
+      "name": "Gas",
+      "full_name": "Gascony Coast"
     }
   },
   {
     "model": "api.coasttemplate",
     "pk": 112,
     "fields": {
-      "territory_template": 34,
-      "name": "War",
-      "full_name": "Warsaw Coast"
+      "territory_template": 44,
+      "name": "Lvn",
+      "full_name": "Livonia Coast"
+    }
+  },
+  {
+    "model": "api.coasttemplate",
+    "pk": 113,
+    "fields": {
+      "territory_template": 45,
+      "name": "NAf",
+      "full_name": "North Africa Coast"
+    }
+  },
+  {
+    "model": "api.coasttemplate",
+    "pk": 114,
+    "fields": {
+      "territory_template": 46,
+      "name": "Pic",
+      "full_name": "Picardy Coast"
+    }
+  },
+  {
+    "model": "api.coasttemplate",
+    "pk": 115,
+    "fields": {
+      "territory_template": 47,
+      "name": "Pie",
+      "full_name": "Piedmont Coast"
+    }
+  },
+  {
+    "model": "api.coasttemplate",
+    "pk": 116,
+    "fields": {
+      "territory_template": 48,
+      "name": "Pru",
+      "full_name": "Prussia Coast"
+    }
+  },
+  {
+    "model": "api.coasttemplate",
+    "pk": 117,
+    "fields": {
+      "territory_template": 51,
+      "name": "Syr",
+      "full_name": "Syria Coast"
+    }
+  },
+  {
+    "model": "api.coasttemplate",
+    "pk": 118,
+    "fields": {
+      "territory_template": 52,
+      "name": "Tus",
+      "full_name": "Tuscany Coast"
+    }
+  },
+  {
+    "model": "api.coasttemplate",
+    "pk": 119,
+    "fields": {
+      "territory_template": 55,
+      "name": "Wal",
+      "full_name": "Wales Coast"
+    }
+  },
+  {
+    "model": "api.coasttemplate",
+    "pk": 120,
+    "fields": {
+      "territory_template": 56,
+      "name": "Yor",
+      "full_name": "Yorkshire Coast"
     }
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 113,
+    "pk": 121,
     "fields": {
       "territory_template": 14,
       "country_template": 1,
       "unit_type": "F",
-      "coast_template": null
+      "coast_template": 89
     }
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 114,
+    "pk": 122,
     "fields": {
       "territory_template": 9,
       "country_template": 1,
       "unit_type": "F",
-      "coast_template": null
+      "coast_template": 84
     }
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 115,
+    "pk": 123,
     "fields": {
       "territory_template": 13,
       "country_template": 1,
@@ -1271,17 +1392,17 @@
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 116,
+    "pk": 124,
     "fields": {
       "territory_template": 4,
       "country_template": 2,
       "unit_type": "F",
-      "coast_template": null
+      "coast_template": 79
     }
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 117,
+    "pk": 125,
     "fields": {
       "territory_template": 20,
       "country_template": 2,
@@ -1291,7 +1412,7 @@
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 118,
+    "pk": 126,
     "fields": {
       "territory_template": 15,
       "country_template": 2,
@@ -1301,7 +1422,7 @@
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 119,
+    "pk": 127,
     "fields": {
       "territory_template": 3,
       "country_template": 3,
@@ -1311,7 +1432,7 @@
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 120,
+    "pk": 128,
     "fields": {
       "territory_template": 17,
       "country_template": 3,
@@ -1321,17 +1442,17 @@
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 121,
+    "pk": 129,
     "fields": {
       "territory_template": 12,
       "country_template": 3,
       "unit_type": "F",
-      "coast_template": null
+      "coast_template": 87
     }
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 122,
+    "pk": 130,
     "fields": {
       "territory_template": 33,
       "country_template": 7,
@@ -1341,7 +1462,7 @@
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 123,
+    "pk": 131,
     "fields": {
       "territory_template": 5,
       "country_template": 7,
@@ -1351,17 +1472,17 @@
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 124,
+    "pk": 132,
     "fields": {
       "territory_template": 30,
       "country_template": 7,
       "unit_type": "F",
-      "coast_template": null
+      "coast_template": 103
     }
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 125,
+    "pk": 133,
     "fields": {
       "territory_template": 32,
       "country_template": 6,
@@ -1371,7 +1492,7 @@
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 126,
+    "pk": 134,
     "fields": {
       "territory_template": 22,
       "country_template": 6,
@@ -1381,17 +1502,17 @@
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 127,
+    "pk": 135,
     "fields": {
       "territory_template": 18,
       "country_template": 6,
       "unit_type": "F",
-      "coast_template": null
+      "coast_template": 91
     }
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 128,
+    "pk": 136,
     "fields": {
       "territory_template": 16,
       "country_template": 4,
@@ -1401,17 +1522,17 @@
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 129,
+    "pk": 137,
     "fields": {
       "territory_template": 25,
       "country_template": 4,
       "unit_type": "F",
-      "coast_template": null
+      "coast_template": 96
     }
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 130,
+    "pk": 138,
     "fields": {
       "territory_template": 34,
       "country_template": 4,
@@ -1421,17 +1542,17 @@
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 131,
+    "pk": 139,
     "fields": {
       "territory_template": 29,
       "country_template": 4,
       "unit_type": "A",
-      "coast_template": 106
+      "coast_template": 101
     }
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 132,
+    "pk": 140,
     "fields": {
       "territory_template": 7,
       "country_template": 5,
@@ -1441,7 +1562,7 @@
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 133,
+    "pk": 141,
     "fields": {
       "territory_template": 26,
       "country_template": 5,
@@ -1451,12 +1572,12 @@
   },
   {
     "model": "api.initialunitsetup",
-    "pk": 134,
+    "pk": 142,
     "fields": {
       "territory_template": 1,
       "country_template": 5,
       "unit_type": "F",
-      "coast_template": null
+      "coast_template": 76
     }
   }
 ]
