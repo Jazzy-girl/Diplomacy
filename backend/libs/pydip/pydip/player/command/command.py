@@ -129,11 +129,11 @@ class SupportCommand(Command):
 
 
 class ConvoyMoveCommand(Command):
+    destination = None
     """
     String -- name of territory convoying to.
       * Must be LandTerritory with at least one coast
     """
-    destination = None
 
     """
     Extra Assertions:

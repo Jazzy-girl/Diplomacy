@@ -51,15 +51,12 @@ state_map       = None
 dependency_list = None
 order_results = None
 """
-order results dict([])
-key: origin territory of an order's unit (string)
-value: list
-indices...
-    0. Success / Fail; Boolean
-    1. New position of unit; String
-    2. Dislodged? Boolean
-    3. Retreat options; String[]
-    4. Failure reason; int or String <...unsure yet...
+territory : [succeeds?, new position, dislodged?, retreat options[], failure reason]
+key: territory
+0: succeeds?
+1: new position
+2: retreat options set() | None; if empty, disband
+3: failure reason
 """
 
 
@@ -71,7 +68,7 @@ def _init_resolution():
     resolution_map = defaultdict(bool)
     state_map      = defaultdict(lambda: ResolutionState.UNRESOLVED)
     dependency_list = list()
-    order_results = defaultdict([False, None, False, [], None])
+    order_results = defaultdict(lambda: [False, None, None, None])
 
 
 def _resolve(game_map, command_map, command):
@@ -82,6 +79,7 @@ def _resolve(game_map, command_map, command):
     command_territory = command.unit.position
 
     if state_map[command_territory] == ResolutionState.RESOLVED:
+        order_results[command_territory][0] = resolution_map[command_territory]
         return resolution_map[command_territory]
 
     if state_map[command_territory] == ResolutionState.GUESSING:
@@ -415,6 +413,7 @@ Possible data structures:
 """
 
 def compute_retreats(game_map, command_map, commands, resolutions):
+    global order_results
     player_results = defaultdict(dict)
     occupied_territories = _get_occupations(game_map, commands, resolutions)
 
@@ -422,9 +421,11 @@ def compute_retreats(game_map, command_map, commands, resolutions):
         current_position = command.unit.position
         if resolutions[current_position]:
             if isinstance(command, MoveCommand) or isinstance(command, ConvoyMoveCommand):
+                order_results[current_position][1] = command.destination
                 moved_unit = Unit(command.unit.unit_type, command.destination)
                 player_results[command.player.name][moved_unit] = None
             else:
+                order_results[current_position][1] = current_position
                 player_results[command.player.name][command.unit] = None
         else:
             direct_attackers = list(filter(
@@ -437,6 +438,7 @@ def compute_retreats(game_map, command_map, commands, resolutions):
             ))
             attackers = direct_attackers + convoy_attackers
             if len(attackers) == 0:
+                order_results[current_position][1] = current_position
                 player_results[command.player.name][command.unit] = None
             else:
                 retreat_options = game_map.adjacency[current_position]
@@ -459,9 +461,12 @@ def compute_retreats(game_map, command_map, commands, resolutions):
                     retreat_options,
                 )
 
+                order_results[current_position][1] = None
+                order_results[current_position][2] = set(retreat_options)
+
                 player_results[command.player.name][command.unit] = set(retreat_options)
 
-    return player_results, resolutions
+    return player_results, order_results
 
 
 def _applicable_territories(game_map, territory_name):

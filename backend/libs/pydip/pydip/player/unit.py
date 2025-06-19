@@ -10,11 +10,11 @@ class UnitTypes(Enum):
 
 
 class Unit:
-    """ UnitType """
     unit_type = None
+    """ UnitType """
 
-    """ String -- Name of occupied territory """
     position = None
+    """ String -- Name of occupied territory """
 
     def __init__(self, unit_type, position):
         self.unit_type = unit_type
