@@ -10,6 +10,7 @@ from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.models import Game, Territory, Unit, Order, Sandbox, Country, CoastTemplate, TerritoryTemplate
+from adjudicator.adjudication import resolve_moves
 
 class GameInitializationTest(TestCase):
     @classmethod
@@ -26,6 +27,15 @@ class GameInitializationTest(TestCase):
         self.assertEqual(territories.count(), 75)
         self.assertEqual(units.count(), 22)
         self.assertEqual(orders.count(), 22)
+
+class AdjudicationTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        return call_command('loaddata', 'fixtures/initial_templates.json')
+    
+    def test_resolve_moves(self):
+        game = Game.objects.create(name="Test Game")
+        resolve_moves(game)
 
 class BulkUpdateOrdersTest(APITestCase):
     @classmethod

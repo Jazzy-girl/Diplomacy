@@ -1,8 +1,10 @@
 from distutils.core import setup
+# from setuptools import setup, find_packages
 from setuptools import find_packages
 setup(
     name = 'pydip',
     packages = find_packages(exclude=['pydip.test', 'pydip.test.*']),
+    # packages = find_packages(),
     version = '0.1.8',
     description = 'Adjudication logic engine for Diplomacy board game',
     author = 'Aric Parkinson',

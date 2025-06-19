@@ -31,8 +31,10 @@ class Player:
         self.starting_territories = set()
         self.units = []
 
-        if len(starting_units) != 0:
-            self.units = starting_units
+        if len(starting_units) > 0:
+            for unit in starting_units:
+                self.units.append(unit)
+                self.starting_territories.add(unit.position)
         else:
             for config in starting_configuration:
                 name = config['territory_name']
@@ -51,7 +53,7 @@ class Player:
 
                 self.units.append(Unit(unit_type, name))
 
-        assert len(self.starting_territories) == len(starting_configuration)
+        assert len(self.starting_territories) == len(starting_configuration) or len(self.starting_territories) == len(starting_units)
 
     def __repr__(self):
         return self.name

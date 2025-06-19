@@ -15,7 +15,12 @@ from pydip.player import Player
 
 from pydip.map.predefined import vanilla_dip
 
-from api.models import Game, Sandbox, Country, Order, Unit, Territory, TerritoryTemplate, CoastTemplate, CountryTemplate, UnitType
+from api.models import Game, Sandbox, Country, Order, Territory, TerritoryTemplate, CoastTemplate, CountryTemplate, UnitType
+from api.models import Unit as DjangoUnit
+
+from collections import defaultdict
+
+from pydip.turn.resolve import resolve_turn
 """
 THE ADJUDICATOR!
 
@@ -30,71 +35,91 @@ Needs
                   the (potential) full name of their coasttemplate,
                   the full name of the country template of their country
 """
-def resolve(instance=Game):
+def resolve_moves(instance=Game):
     # instance is either a Game or Sandbox
     # if isinstance(instance, Game):
     # 1: Load Map
     game_map = vanilla_dip.generate_map()
 
-    # game_map = vanilla_map.supply_map.game_map
-    print(game_map)
-
     # 2: Load Players
     players = {}
-    units = Unit.objects.filter(game=instance)
-    countries = Country.objects.filter(game=instance)
-    territories = Territory.objects.filter(game=instance)
+    units = DjangoUnit.objects.filter(game=instance)
+    # countries = {template.pk : template.full_name for template in CountryTemplate.objects.all()}
+    # territories = {template.pk : template.full_name for template in TerritoryTemplate.objects.all()}
     orders = Order.objects.filter(game=instance, turn=instance.current_turn)
+    # coasts = {template.pk : template.full_name for template in CoastTemplate.objects.all()}
+    player_units = defaultdict(list)
+    """
+    units plan
+    - 
+    """
     game_units = {}
     
     """
     NEED:
     - access to player full_name by country id.
+    - access to a Unit instance by the territory, options:
+        1. make a dict of territory : unit instance pairs
+        2. use the order's supported territory ID to find the order that uses that as a home territory... 
+                   and then use that order's country.country_template.full_name for the player... and then find_unit...
     """
     # iterate by country
     # TURN INTO LIST COMPREHENSION LATER like so: starting_config = [dict(territory_name=u.position, unit_type=u.unit_type) for u in units]
-    # commands = []
+    commands = []
 
-    # for country in countries:
-    #     name = CountryTemplate.objects.get(country.country_template).full_name
-    #     starting_units = []
-    #     for unit in units.filter(country=country):
-    #         position = TerritoryTemplate.objects.get(unit.territory.territory_template).full_name
-    #         unit_type = PyDipUnitTypes.TROOP if unit.type == 'A' else PyDipUnitTypes.FLEET
-    #         game_unit = Unit(unit_type,position)
-    #         starting_units.append(game_unit)
-    #         game_units[position] = game_unit
-    #         # starting_units.append({'territory_name': position, 'unit_type': unit_type})
+    for unit in units:
+        if unit.coast:
+            position = unit.coast.full_name
+        else:
+            position = unit.territory.territory_template.full_name
+        # print(position)
+        unit_type = PyDipUnitTypes.TROOP if unit.type == 'A' else PyDipUnitTypes.FLEET
+        game_unit = PyDipUnit(unit_type,position)
+        game_units[unit.territory.territory_template.full_name] = game_unit
+        player_name = unit.country.country_template.full_name
+        player_units[player_name].append(game_unit)
 
-    #     player = Player(name, game_map, starting_units)
-    #     players[name] = player
-    #     print(players[name])
+    for name in player_units.keys():
+        player = Player(name, game_map, starting_configuration=[], starting_units=player_units[name])
+        players[name] = player
+        print(player)
 
-
-    # for order in orders:
-    #     player = players[order.country.country_template.full_name]
-    #     if order.origin_coast:
-    #         unit = player.find_unit(order.origin_coast.full_name)
-    #     else:
-    #         unit = player.find_unit(order.unit.territory.territory_template.full_name)
+    for order in orders:
+        player = players[order.country.country_template.full_name]
+        if order.origin_coast:
+            unit = player.find_unit(order.origin_coast.full_name)
+        else:
+            unit = player.find_unit(order.origin_territory.territory_template.full_name)
         
-    #     if order.target_territory:
-    #         if order.target_coast:
-    #             dest = order.target_coast.full_name
-    #         else:
-    #             dest = order.target_territory.territory_template.full_name
+        if order.target_territory:
+            if order.target_coast:
+                destination = order.target_coast.full_name
+            else:
+                destination = order.target_territory.territory_template.full_name
         
-    #     match order.move_type:
-    #         case Order.MoveTypes.HOLD:
-    #             cmd = HoldCommand(player, unit)
-    #         case Order.MoveTypes.MOVE:
-    #             cmd = MoveCommand(player, unit, dest)
-    #         case Order.MoveTypes.SUPPORT:
-    #             supported_unit = 
-    #         case Order.MoveTypes.CONVOY:
-    #         case Order.MoveTypes.MOVE_VIA_CONVOY:
-    #     print(cmd)
-    #     commands.append(cmd)
+        match order.move_type:
+            case Order.MoveTypes.HOLD:
+                cmd = HoldCommand(player, unit)
+            case Order.MoveTypes.MOVE:
+                cmd = MoveCommand(player, unit, destination)
+            case Order.MoveTypes.SUPPORT:
+                if order.supported_coast:
+                    supported_unit = game_units[order.supported_coast.full_name]
+                else:
+                    supported_unit = game_units[order.supported_territory.territory_template.full_name]
+                cmd = SupportCommand(player,unit,supported_unit,destination)
+            case Order.MoveTypes.CONVOY:
+                transported_unit = game_units[order.convoyed_territory.territory_template.full_name]
+                cmd = ConvoyTransportCommand(player, unit, transported_unit, destination)
+            case Order.MoveTypes.MOVE_VIA_CONVOY:
+                cmd = ConvoyMoveCommand(player, unit, destination)
+        print(cmd)
+        commands.append(cmd)
+
+        results = resolve_turn(game_map, commands)
+        print(results)
+
+
                             
 
 
