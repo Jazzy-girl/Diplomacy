@@ -43,11 +43,12 @@ def resolve_moves(instance=Game):
 
     # 2: Load Players
     players = {}
-    units = DjangoUnit.objects.filter(game=instance)
-    # countries = {template.pk : template.full_name for template in CountryTemplate.objects.all()}
-    # territories = {template.pk : template.full_name for template in TerritoryTemplate.objects.all()}
-    orders = Order.objects.filter(game=instance, turn=instance.current_turn)
-    # coasts = {template.pk : template.full_name for template in CoastTemplate.objects.all()}
+    if isinstance(instance, Game):
+        units = DjangoUnit.objects.filter(game=instance)
+        orders = Order.objects.filter(game=instance, turn=instance.current_turn)
+    else:
+        units = DjangoUnit.objects.filter(sandbox=instance)
+        orders = Order.objects.filter(sandbox=instance, turn=instance.current_turn)
     player_units = defaultdict(list)
     """
     units plan
