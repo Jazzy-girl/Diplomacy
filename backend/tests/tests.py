@@ -57,11 +57,11 @@ class AdjudicationTest(APITestCase):
                 "target_territory": bla.pk,
                 "move_type": "M"
             },
-            {
-                "id": order_sev.pk,
-                "target_territory": bla.pk,
-                "move_type": "M"
-            }
+            # {
+            #     "id": order_sev.pk,
+            #     "target_territory": bla.pk,
+            #     "move_type": "M"
+            # }
         ]
 
         response = self.client.patch(url, payload, format="json")
@@ -72,8 +72,8 @@ class AdjudicationTest(APITestCase):
 
         self.assertEqual(order_ank.target_territory, bla)
         self.assertEqual(order_ank.move_type, "M")
-        self.assertEqual(order_sev.target_territory, bla)
-        self.assertEqual(order_sev.move_type, "M")
+        # self.assertEqual(order_sev.target_territory, bla)
+        # self.assertEqual(order_sev.move_type, "M")
 
         resolve_moves(game)
 

@@ -114,11 +114,19 @@ def resolve_moves(instance=Game):
                 cmd = ConvoyTransportCommand(player, unit, transported_unit, destination)
             case Order.MoveTypes.MOVE_VIA_CONVOY:
                 cmd = ConvoyMoveCommand(player, unit, destination)
-        print(cmd)
+        # print(cmd)
         commands.append(cmd)
 
         results = resolve_turn(game_map, commands)
-        # print(results)
+        """
+        Currently resolve_turn results player_results which is a dict of dicts
+        player: {unit: retreat_options (None | list), unit: ....},
+        so the only way to tell if an order was successful is if the unit's new position agrees with its order's successful outcome.
+        Sounds annoying
+        Should add a field in the resolve_turn func that returns the resolution data set for each of the orders / units.
+        - but which is faster?
+        """
+        print(results)
 
 
                             

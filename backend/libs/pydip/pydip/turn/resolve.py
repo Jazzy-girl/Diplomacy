@@ -17,7 +17,7 @@ def resolve_turn(game_map, commands):
     If a unit has _not_ been issued a command, you ought to insert a
     HoldCommand for that unit by default.
 
-    map: Map representing game board
+    game_map: Map representing game board
     commands: Command[] representing each command issued for this turn
               Expected to be fully populated for each unit on the board
               (Recommended to default to Hold for units not given orders)
@@ -49,21 +49,36 @@ class ResolutionState(Enum):
 resolution_map  = None
 state_map       = None
 dependency_list = None
+order_results = None
+"""
+order results dict([])
+key: origin territory of an order's unit (string)
+value: list
+indices...
+    0. Success / Fail; Boolean
+    1. New position of unit; String
+    2. Dislodged? Boolean
+    3. Retreat options; String[]
+    4. Failure reason; int or String <...unsure yet...
+"""
 
 
 def _init_resolution():
     global resolution_map
     global state_map
     global dependency_list
+    global order_results
     resolution_map = defaultdict(bool)
     state_map      = defaultdict(lambda: ResolutionState.UNRESOLVED)
     dependency_list = list()
+    order_results = defaultdict([False, None, False, [], None])
 
 
 def _resolve(game_map, command_map, command):
     global resolution_map
     global state_map
     global dependency_list
+    global order_results
     command_territory = command.unit.position
 
     if state_map[command_territory] == ResolutionState.RESOLVED:
@@ -387,6 +402,18 @@ def _same_territory_by_name(game_map, territory_name_1, territory_name_2):
 #----------------------
 # Retreats
 #----------------------
+"""
+Necessary returned data:
+- SUCCESS / FAIL states of orders
+- New locations of units (?)
+- Dislodged units & if they have retreat options or are automatically disbanded
+- Fail reasons for failed orders
+
+Possible data structures:
+- Dict -> { Command (origin territory / coast) "STRING"  : [SUCCESS/FAIL INT or BOOL, new unit position "STRING", dislodged BOOL, retreat options "STRING"[], fail reason INT]}
+
+"""
+
 def compute_retreats(game_map, command_map, commands, resolutions):
     player_results = defaultdict(dict)
     occupied_territories = _get_occupations(game_map, commands, resolutions)
@@ -434,7 +461,7 @@ def compute_retreats(game_map, command_map, commands, resolutions):
 
                 player_results[command.player.name][command.unit] = set(retreat_options)
 
-    return player_results
+    return player_results, resolutions
 
 
 def _applicable_territories(game_map, territory_name):
