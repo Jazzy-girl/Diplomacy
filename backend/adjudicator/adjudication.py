@@ -118,7 +118,7 @@ def resolve_moves(instance=Game):
         commands.append(cmd)
 
         results = resolve_turn(game_map, commands)
-        print(results)
+        # print(results)
 
 
                             

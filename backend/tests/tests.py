@@ -28,13 +28,53 @@ class GameInitializationTest(TestCase):
         self.assertEqual(units.count(), 22)
         self.assertEqual(orders.count(), 22)
 
-class AdjudicationTest(TestCase):
+class AdjudicationTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        return call_command('loaddata', 'fixtures/initial_templates.json')
+        call_command('loaddata', 'fixtures/initial_templates.json')
+        cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
     
     def test_resolve_moves(self):
+        refresh = RefreshToken.for_user(self.user)
+        access_token = str(refresh.access_token)
+
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+
         game = Game.objects.create(name="Test Game")
+        bla = Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="BLA"))
+        ank = Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="Ank"))
+        ank_coast = CoastTemplate.objects.get(name="Ank")
+        sev = Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="Sev"))
+        sev_coast = CoastTemplate.objects.get(name="Sev")
+        order_ank = Order.objects.get(game=game,origin_territory=ank,origin_coast=ank_coast)
+        order_sev = Order.objects.get(game=game,origin_territory=sev,origin_coast=sev_coast)
+
+
+        url = '/api/update/order/bulk/'
+        payload = [
+            {
+                "id": order_ank.pk,
+                "target_territory": bla.pk,
+                "move_type": "M"
+            },
+            {
+                "id": order_sev.pk,
+                "target_territory": bla.pk,
+                "move_type": "M"
+            }
+        ]
+
+        response = self.client.patch(url, payload, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        order_ank.refresh_from_db()
+        order_sev.refresh_from_db()
+
+        self.assertEqual(order_ank.target_territory, bla)
+        self.assertEqual(order_ank.move_type, "M")
+        self.assertEqual(order_sev.target_territory, bla)
+        self.assertEqual(order_sev.move_type, "M")
+
         resolve_moves(game)
 
 class BulkUpdateOrdersTest(APITestCase):

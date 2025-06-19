@@ -1546,7 +1546,7 @@
     "fields": {
       "territory_template": 29,
       "country_template": 4,
-      "unit_type": "A",
+      "unit_type": "F",
       "coast_template": 102
     }
   },

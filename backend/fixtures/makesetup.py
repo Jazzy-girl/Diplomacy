@@ -126,7 +126,7 @@ units = [
     ("Mos", "R", "A", None),
     ("Sev", "R", "F", "Sev"),
     ("War", "R", "A", None),
-    ("Stp", "R", "A", "sc"),
+    ("Stp", "R", "F", "sc"),
     ("Con", "T", "A", None),
     ("Smy", "T", "A", None),
     ("Ank", "T", "F", "Ank"),
