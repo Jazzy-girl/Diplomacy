@@ -3,7 +3,7 @@ from enum import Enum
 from functools import reduce
 
 from pydip.map.territory import CoastTerritory, SeaTerritory, LandTerritory
-from pydip.player.command.command import MoveCommand, ConvoyMoveCommand, ConvoyTransportCommand, SupportCommand
+from pydip.player.command.command import MoveCommand, ConvoyMoveCommand, ConvoyTransportCommand, SupportCommand, HoldCommand
 from pydip.player.unit import Unit
 from pydip.turn.command_map import CommandMap
 
@@ -101,6 +101,7 @@ def _resolve(game_map, command_map, command):
         if state_map[command_territory] != ResolutionState.RESOLVED:
             resolution_map[command_territory] = fail_guess_result
             state_map[command_territory]      = ResolutionState.RESOLVED
+            # order_results[command_territory][0] = fail_guess_result
 
         return fail_guess_result
 
@@ -110,6 +111,7 @@ def _resolve(game_map, command_map, command):
     if command_territory not in dependency_sub_set:
         dependency_list.append(command_territory)
         resolution_map[command_territory] = fail_guess_result
+        # order_results[command_territory][0] = fail_guess_result
         return fail_guess_result
 
     # Otherwise, we depend on our own guess, so we need to clear out dependencies
@@ -130,6 +132,7 @@ def _resolve(game_map, command_map, command):
 
         resolution_map[command_territory] = fail_guess_result
         state_map[command_territory]      = ResolutionState.RESOLVED
+        # order_results[command_territory][0] = fail_guess_result
         return fail_guess_result
 
     # If we got to this point, that means we encountered a paradox that has two
@@ -143,16 +146,22 @@ def _resolve(game_map, command_map, command):
 
 
 def _adjudicate(game_map, command_map, command):
-    if isinstance(command, MoveCommand):
-        return _adjudicate_move(game_map, command_map, command)
+    global order_results
+    result = None
+    if isinstance(command, HoldCommand): # I ADDED THIS
+        result = True
+    elif isinstance(command, MoveCommand):
+        result = _adjudicate_move(game_map, command_map, command)
     elif isinstance(command, ConvoyMoveCommand):
-        return _adjudicate_convoy_move(game_map, command_map, command)
+        result = _adjudicate_convoy_move(game_map, command_map, command)
     elif isinstance(command, ConvoyTransportCommand):
-        return _adjudicate_convoy_transport(game_map, command_map, command)
+        result = _adjudicate_convoy_transport(game_map, command_map, command)
     elif isinstance(command, SupportCommand):
-        return _adjudicate_support(game_map, command_map, command)
+        result = _adjudicate_support(game_map, command_map, command)
     else:
         raise ValueError("Command unexpected type")
+    order_results[command.unit.position][0] = result
+    return result
 
 
 def _backup_rule(command_map, dependency_set):
@@ -172,6 +181,7 @@ def _apply_szykman(command_map, dependency_set):
         dependency = command_map.get_home_command(dependency_territory)
         if isinstance(dependency, ConvoyMoveCommand) or isinstance(dependency, ConvoyTransportCommand):
             resolution_map[dependency_territory] = False
+            order_results[dependency_territory][0] = False
             state_map[dependency_territory] = ResolutionState.RESOLVED
         else:
             state_map[dependency_territory] = ResolutionState.UNRESOLVED
@@ -182,6 +192,7 @@ def _apply_circular_movement(command_map, dependency_set):
         dependency = command_map.get_home_command(dependency_territory)
         if isinstance(dependency, MoveCommand) or isinstance(dependency, ConvoyMoveCommand):
             resolution_map[dependency_territory] = True
+            order_results[dependency_territory][0] = True
             state_map[dependency_territory] = ResolutionState.RESOLVED
         else:
             state_map[dependency_territory] = ResolutionState.UNRESOLVED
@@ -414,11 +425,13 @@ Possible data structures:
 
 def compute_retreats(game_map, command_map, commands, resolutions):
     global order_results
+    global resolution_map
     player_results = defaultdict(dict)
     occupied_territories = _get_occupations(game_map, commands, resolutions)
 
     for command in commands:
         current_position = command.unit.position
+        # order_results[current_position][0] = resolutions[current_position]
         if resolutions[current_position]:
             if isinstance(command, MoveCommand) or isinstance(command, ConvoyMoveCommand):
                 order_results[current_position][1] = command.destination
@@ -466,7 +479,7 @@ def compute_retreats(game_map, command_map, commands, resolutions):
 
                 player_results[command.player.name][command.unit] = set(retreat_options)
 
-    return player_results, order_results
+    return player_results, order_results, resolution_map
 
 
 def _applicable_territories(game_map, territory_name):

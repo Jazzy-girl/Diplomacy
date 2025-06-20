@@ -57,11 +57,11 @@ class AdjudicationTest(APITestCase):
                 "target_territory": bla.pk,
                 "move_type": "M"
             },
-            # {
-            #     "id": order_sev.pk,
-            #     "target_territory": bla.pk,
-            #     "move_type": "M"
-            # }
+            {
+                "id": order_sev.pk,
+                "target_territory": bla.pk,
+                "move_type": "M"
+            }
         ]
 
         response = self.client.patch(url, payload, format="json")

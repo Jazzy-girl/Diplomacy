@@ -117,7 +117,7 @@ def resolve_moves(instance=Game):
         # print(cmd)
         commands.append(cmd)
 
-        results = resolve_turn(game_map, commands)
+        player_results, order_results, resolutions = resolve_turn(game_map, commands)
         """
         Currently resolve_turn results player_results which is a dict of dicts
         player: {unit: retreat_options (None | list), unit: ....},
@@ -126,7 +126,7 @@ def resolve_moves(instance=Game):
         Should add a field in the resolve_turn func that returns the resolution data set for each of the orders / units.
         - but which is faster?
         """
-        print(results)
+    print(order_results)
 
 
                             

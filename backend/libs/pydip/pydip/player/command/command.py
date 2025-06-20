@@ -77,9 +77,12 @@ class HoldCommand(MoveCommand):
 
 
 class SupportCommand(Command):
-    """ Unit -- unit to support """
+    
     supported_unit = None
+    """ Unit -- unit to support """
 
+
+    destination = None
     """
     String -- name of territory to support into.
       * Must be adjacent to unit's current territory
@@ -87,7 +90,6 @@ class SupportCommand(Command):
       * Must be adjacent or identical to supported_unit's current territory
       * Must be legal for supported_unit to support this territory
     """
-    destination = None
 
     def __init__(self, player, unit, supported_unit, destination):
         super().__init__(player, unit)
