@@ -50,7 +50,7 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
             unit = Unit.objects.create(territory=territory, type=unit_type,
                                         country=country, coast=coast)
             order = Order.objects.create(unit=unit,country=country,origin_territory=territory,
-                                        origin_coast=coast,move_type=Order.MoveTypes.HOLD,turn=1)
+                                        origin_coast=coast,move_type=Order.MoveTypes.HOLD, turn=instance.current_turn)
             if isinstance(instance, Game):
                 unit.game = instance
                 order.game = instance

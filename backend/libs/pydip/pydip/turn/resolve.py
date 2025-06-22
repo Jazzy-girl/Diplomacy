@@ -479,7 +479,7 @@ def compute_retreats(game_map, command_map, commands, resolutions):
 
                 player_results[command.player.name][command.unit] = set(retreat_options)
 
-    return player_results, order_results, resolution_map
+    return order_results
 
 
 def _applicable_territories(game_map, territory_name):

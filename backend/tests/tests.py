@@ -67,15 +67,19 @@ class AdjudicationTest(APITestCase):
         response = self.client.patch(url, payload, format="json")
         self.assertEqual(response.status_code, 200)
 
+        resolve_moves(game)
+
+        # for order in Order.objects.filter(game=game):
+        #     print(order)
+        
         order_ank.refresh_from_db()
         order_sev.refresh_from_db()
-
         self.assertEqual(order_ank.target_territory, bla)
         self.assertEqual(order_ank.move_type, "M")
-        # self.assertEqual(order_sev.target_territory, bla)
-        # self.assertEqual(order_sev.move_type, "M")
-
-        resolve_moves(game)
+        self.assertEqual(order_ank.result, 'FAILS')
+        self.assertEqual(order_sev.target_territory, bla)
+        self.assertEqual(order_sev.move_type, "M")
+        self.assertEqual(order_sev.result, "FAILS")
 
 class BulkUpdateOrdersTest(APITestCase):
     @classmethod

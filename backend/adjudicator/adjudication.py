@@ -45,7 +45,7 @@ def resolve_moves(instance=Game):
     players = {}
     if isinstance(instance, Game):
         units = DjangoUnit.objects.filter(game=instance)
-        orders = Order.objects.filter(game=instance, turn=instance.current_turn)
+        orders = { order.origin_coast.full_name if order.origin_coast else order.origin_territory.territory_template.full_name : order for order in Order.objects.filter(game=instance, turn=instance.current_turn)}
     else:
         units = DjangoUnit.objects.filter(sandbox=instance)
         orders = Order.objects.filter(sandbox=instance, turn=instance.current_turn)
@@ -83,9 +83,9 @@ def resolve_moves(instance=Game):
     for name in player_units.keys():
         player = Player(name, game_map, starting_configuration=[], starting_units=player_units[name])
         players[name] = player
-        print(player)
+        # print(player)
 
-    for order in orders:
+    for order in orders.values():
         player = players[order.country.country_template.full_name]
         if order.origin_coast:
             unit = player.find_unit(order.origin_coast.full_name)
@@ -117,16 +117,60 @@ def resolve_moves(instance=Game):
         # print(cmd)
         commands.append(cmd)
 
-        player_results, order_results, resolutions = resolve_turn(game_map, commands)
-        """
-        Currently resolve_turn results player_results which is a dict of dicts
-        player: {unit: retreat_options (None | list), unit: ....},
-        so the only way to tell if an order was successful is if the unit's new position agrees with its order's successful outcome.
-        Sounds annoying
-        Should add a field in the resolve_turn func that returns the resolution data set for each of the orders / units.
-        - but which is faster?
-        """
-    print(order_results)
+    order_results = resolve_turn(game_map, commands)
+    # print(commands)
+    for home_territory, values in order_results.items():
+        order = orders[home_territory]
+        result = values[0]
+        new_location = values[1]
+        dislodged = True if values[2] != None else False
+        retreat_locations = values[2]
+        failure_reason = values[3]
+
+        order.result = 'SUCCEEDS' if result else 'FAILS'
+        order.dislodged = dislodged
+        order.retreat_required = True if dislodged and len(retreat_locations) > 0 else False
+        if(order.retreat_required and not instance.retreat_required):
+            instance.retreat_required = True
+            instance.save()
+        order.save()
+#     if(instance.retreat_required):
+#         # Retreats are required
+#         pass
+#     else:
+#         pass
+#         # Go to the next turn
+#         # if(instance.current_turn):
+#             # [1,2,3,4,5,6,7,8,9]
+#             # 1 4 7 = Spring
+#             # 2 5 8 = Fall
+#             # 3 6 9 = Winter
+#             # whats the math here?
+#             # what if we started at 0
+#             # 0 3 6 = Spring
+#             # 1 4 7 = Fall
+#             # 2 5 8 = Winter
+#             # math here:
+#             # if divisible by 3, its spring
+#             # if divisible by 3 with a remainder of 1, its Fall
+#             # if divisible by 3 with a remainder of 2, its Winter
+# def next_turn(instance=Game):
+#     turn = instance.current_turn
+#     match turn % 3:
+#         case 0: # Spring
+#             # Based on each order: update Unit location, disband? state; make new hold orders
+#             pass
+#         case 1: # Fall
+#             # Update owned territories / supply centers
+#             # Based on each order: update Unit location, disband? state;
+#             pass
+#         case 2: # Winter
+#             # Based on each order: make new units as necessary and disband units as necessary.
+#             # Make new default hold orders for each living unit
+#             pass
+#     instance.current_turn += 1
+        
+
 
 
                             

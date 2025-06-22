@@ -19,7 +19,8 @@ class Seasons(models.TextChoices):
     WINTER = 'winter', _('Winter')
 class Game(models.Model):
     name = models.CharField(max_length=50)
-    current_turn = models.PositiveSmallIntegerField(default=1)
+    current_turn = models.PositiveSmallIntegerField(default=0)
+    retreat_required = models.BooleanField(default=False)
     def __str__(self):
         return f"{self.id} {self.name}"
 
@@ -27,7 +28,8 @@ class Sandbox(models.Model):
     name = models.CharField(max_length=50)
     creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_date = models.DateField("date created", auto_now_add=True)
-    current_turn = models.PositiveSmallIntegerField(default=1)
+    current_turn = models.PositiveSmallIntegerField(default=0)
+    retreat_required = models.BooleanField(default=False)
     def __str__(self):
         return f"{self.id} {self.name}"
 
@@ -83,10 +85,13 @@ class Territory(models.Model):
     territory_template = models.ForeignKey(TerritoryTemplate, on_delete=models.CASCADE, null=True)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, default=None)
 
+    def __str__(self):
+        return self.territory_template.full_name
+
 class Unit(models.Model):
     
     def __str__(self):
-        return f"{self.territory} {self.type}"
+        return f"{self.type} {self.territory}"
         
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
@@ -131,7 +136,7 @@ class Order(models.Model):
     supported_coast = models.ForeignKey(CoastTemplate, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name="orders_as_supported_coast")
     convoyed_territory = models.ForeignKey(Territory, on_delete=models.CASCADE,null=True, blank=True, default=None, related_name="orders_as_convoyed_territory") # territory for convoy
     move_type = models.CharField(choices=MoveTypes.choices, max_length=1, null=True, blank=True, default=None)
-    turn = models.PositiveSmallIntegerField(default=1)
+    turn = models.PositiveSmallIntegerField(default=0)
     submitted = models.BooleanField(default=False)
     result = models.CharField(choices=OrderResult.choices, max_length=10, default='PENDING')
     fail_reason = models.ForeignKey(FailureReason, on_delete=models.SET_NULL, null=True)
@@ -142,3 +147,12 @@ class Order(models.Model):
     retreat_result = models.CharField(RetreatResult.choices, max_length=7, null=True, blank=True, default=None) # RETREAT, DISBAND
     build_territory = models.ForeignKey(Territory, on_delete=models.CASCADE,null=True, blank=True, default=None, related_name="orders_as_build_territory")
     winter_order = models.CharField(WinterMoveTypes.choices, max_length=7, null=True, blank=True, default=None)
+
+    def __str__(self):
+        match self.move_type:
+            case 'M' | 'V':
+                return f"{self.unit} {self.move_type} {self.target_coast or self.target_territory} {self.result}"
+            case 'H':
+                return f"{self.unit} {self.move_type} {self.result}"
+            case 'S':
+                return f"{self.unit} {self.move_type} {self.target_coast or self.target_territory} {self.result}"
