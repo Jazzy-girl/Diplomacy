@@ -1,0 +1,32 @@
+[
+  {
+    "model": "api.initialunitsetup",
+    "pk": 0,
+    "fields": {
+      "territory_template": 49,
+      "country_template": 2,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 1,
+    "fields": {
+      "territory_template": 12,
+      "country_template": 2,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 2,
+    "fields": {
+      "territory_template": 17,
+      "country_template": 3,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  }
+]
