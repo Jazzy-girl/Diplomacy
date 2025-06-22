@@ -134,6 +134,41 @@ def resolve_moves(instance=Game):
             instance.retreat_required = True
             instance.save()
         order.save()
+#     if(instance.retreat_required):
+#         # Retreats are required
+#         pass
+#     else:
+#         pass
+#         # Go to the next turn
+#         # if(instance.current_turn):
+#             # [1,2,3,4,5,6,7,8,9]
+#             # 1 4 7 = Spring
+#             # 2 5 8 = Fall
+#             # 3 6 9 = Winter
+#             # whats the math here?
+#             # what if we started at 0
+#             # 0 3 6 = Spring
+#             # 1 4 7 = Fall
+#             # 2 5 8 = Winter
+#             # math here:
+#             # if divisible by 3, its spring
+#             # if divisible by 3 with a remainder of 1, its Fall
+#             # if divisible by 3 with a remainder of 2, its Winter
+# def next_turn(instance=Game):
+#     turn = instance.current_turn
+#     match turn % 3:
+#         case 0: # Spring
+#             # Based on each order: update Unit location, disband? state; make new hold orders
+#             pass
+#         case 1: # Fall
+#             # Update owned territories / supply centers
+#             # Based on each order: update Unit location, disband? state;
+#             pass
+#         case 2: # Winter
+#             # Based on each order: make new units as necessary and disband units as necessary.
+#             # Make new default hold orders for each living unit
+#             pass
+#     instance.current_turn += 1
         
 
 
