@@ -12,10 +12,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.models import Game, Territory, Unit, Order, Sandbox, Country, CoastTemplate, TerritoryTemplate
 from adjudicator.adjudication import resolve_moves
 
+TEMPLATE_SETUP = 'tests/json/templates.json'
+VANILLA_UNIT_SETUP = 'tests/json/vanilla_setup.json'
 class GameInitializationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        call_command('loaddata', 'fixtures/initial_templates.json')
+        call_command('loaddata', TEMPLATE_SETUP)
+        call_command('loaddata', VANILLA_UNIT_SETUP)
 
     def test_territories_orders_coutnries_units_created(self,):
         game = Game.objects.create(name="Test Game")
@@ -31,7 +34,8 @@ class GameInitializationTest(TestCase):
 class AdjudicationTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        call_command('loaddata', 'fixtures/initial_templates.json')
+        call_command('loaddata', TEMPLATE_SETUP)
+        call_command('loaddata', VANILLA_UNIT_SETUP)
         cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
     
     def test_resolve_moves(self):
@@ -80,11 +84,32 @@ class AdjudicationTest(APITestCase):
         self.assertEqual(order_sev.target_territory, bla)
         self.assertEqual(order_sev.move_type, "M")
         self.assertEqual(order_sev.result, "FAILS")
+    
+    def test_again(self):
+        print(len(Territory.objects.all()))
+        # bla = Territory.objects.get(territory_template=TerritoryTemplate.objects.get(name="BLA"))
+        # ank = Territory.objects.get(territory_template=TerritoryTemplate.objects.get(name="Ank"))
+        # ank_coast = CoastTemplate.objects.get(name="Ank")
+        # sev = Territory.objects.get(territory_template=TerritoryTemplate.objects.get(name="Sev"))
+        # sev_coast = CoastTemplate.objects.get(name="Sev")
+        # order_ank = Order.objects.get(origin_territory=ank,origin_coast=ank_coast)
+        # order_sev = Order.objects.get(origin_territory=sev,origin_coast=sev_coast)
+        
+        # order_ank.refresh_from_db()
+        # order_sev.refresh_from_db()
+        # self.assertEqual(order_ank.target_territory, bla)
+        # self.assertEqual(order_ank.move_type, "M")
+        # self.assertEqual(order_ank.result, 'FAILS')
+        # self.assertEqual(order_sev.target_territory, bla)
+        # self.assertEqual(order_sev.move_type, "M")
+        # self.assertEqual(order_sev.result, "FAILS")
+
 
 class BulkUpdateOrdersTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        call_command('loaddata', 'fixtures/initial_templates.json')
+        call_command('loaddata', TEMPLATE_SETUP)
+        call_command('loaddata', VANILLA_UNIT_SETUP)
         cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
     
     def test_bulk_patch_orders(self):
