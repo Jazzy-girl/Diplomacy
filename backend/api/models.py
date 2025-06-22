@@ -156,3 +156,12 @@ class Order(models.Model):
                 return f"{self.unit} {self.move_type} {self.result}"
             case 'S':
                 return f"{self.unit} {self.move_type} {self.target_coast or self.target_territory} {self.result}"
+            
+class UnitRetreatOption(models.Model):
+    # unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    territory = models.ForeignKey(Territory, on_delete=models.CASCADE)
+    coast = models.ForeignKey(CoastTemplate, on_delete=models.CASCADE, default=None,null=True,blank=True)
+    turn = models.PositiveSmallIntegerField()
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
