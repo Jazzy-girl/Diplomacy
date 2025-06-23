@@ -9,7 +9,7 @@ import json
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.models import Game, Territory, Unit, Order, Sandbox, Country, CoastTemplate, TerritoryTemplate
+from api.models import Game, Territory, Unit, Order, Sandbox, Country, CoastTemplate, TerritoryTemplate, UnitRetreatOption
 from adjudicator.adjudication import resolve_moves
 
 TEMPLATE_SETUP = 'tests/json/templates.json'
@@ -157,6 +157,11 @@ class RetreatSetupTest(APITestCase):
         self.assertEqual(order.target_territory, target)
         self.assertEqual(order.move_type, move)
         self.assertEqual(order.result, result)
+
+        options = UnitRetreatOption.objects.filter(game=game,turn=game.current_turn)
+        self.assertEqual(len(options),5)
+        self.assertNotEqual(UnitRetreatOption.objects.get(game=game,turn=game.current_turn,territory=Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="Boh"))), None)
+
 
 
 class BulkUpdateOrdersTest(APITestCase):
