@@ -46,9 +46,12 @@ def resolve_moves(instance=Game):
     if isinstance(instance, Game):
         units = DjangoUnit.objects.filter(game=instance)
         orders = { order.origin_coast.full_name if order.origin_coast else order.origin_territory.territory_template.full_name : order for order in Order.objects.filter(game=instance, turn=instance.current_turn)}
+        territories = {territory.territory_template.full_name : territory for territory in Territory.objects.filter(game=instance)}
     else:
         units = DjangoUnit.objects.filter(sandbox=instance)
         orders = Order.objects.filter(sandbox=instance, turn=instance.current_turn)
+        territories = {territory.territory_template.full_name : territory for territory in Territory.objects.filter(sandbox=instance)}
+    coasts = {coast.full_name : coast for coast in CoastTemplate.objects.all()}
     player_units = defaultdict(list)
     """
     units plan
@@ -136,16 +139,18 @@ def resolve_moves(instance=Game):
                 instance.save()
             if len(retreat_locations) == 0:
                 order.retreat_result = 'D'
-            # else:
-            #     for retreat_location in retreat_locations:
-            #         coast = None
-            #         if 'Coast' in retreat_location:
-            #             coast = orders[retreat_location].origin_coast
-            #         territory = orders[retreat_location].origin_territory
-            #         if isinstance(instance, Game):
-            #             retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,game=instance,turn=instance.current_turn)
-            #         else:
-            #             retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,sandbox=instance,turn=instance.current_turn)
+            else:
+                for retreat_location in retreat_locations:
+                    coast = None
+                    if 'Coast' in retreat_location:
+                    #     coast = orders[retreat_location].origin_coast
+                        coast = coasts[retreat_location]
+                    territory = territories[retreat_location]
+                    print(f"RETREAT TERRITORY: {retreat_location}")
+                    if isinstance(instance, Game):
+                        retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,game=instance,turn=instance.current_turn)
+                    else:
+                        retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,sandbox=instance,turn=instance.current_turn)
         order.save()
         # print(order)
     if(instance.retreat_required):

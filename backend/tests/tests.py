@@ -137,7 +137,6 @@ class RetreatSetupTest(APITestCase):
         resolve_moves(game)
 
         for order in orders:
-            print(order)
             order.refresh_from_db()
             print(order)
             if order == order_ruh:
