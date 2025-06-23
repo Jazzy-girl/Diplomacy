@@ -148,9 +148,9 @@ def _resolve(game_map, command_map, command):
 def _adjudicate(game_map, command_map, command):
     global order_results
     result = None
-    if isinstance(command, HoldCommand): # I ADDED THIS
-        result = True
-    elif isinstance(command, MoveCommand):
+    # if isinstance(command, HoldCommand): # I ADDED THIS
+    #     result = True
+    if isinstance(command, MoveCommand):
         result = _adjudicate_move(game_map, command_map, command)
     elif isinstance(command, ConvoyMoveCommand):
         result = _adjudicate_convoy_move(game_map, command_map, command)
@@ -299,6 +299,7 @@ def _attack_strength(game_map, command_map, command):
         if not _has_path(game_map, command_map, command):
             return 0
     attacked_command = command_map.get_home_command(command.destination)
+    # if isinstance(command, HoldCommand): return 0 # ADDED
     supporters = command_map.get_supports(command.unit.position, command.destination)
     supporters = filter(lambda c: _resolve(game_map, command_map, c), supporters)
 
@@ -432,7 +433,9 @@ def compute_retreats(game_map, command_map, commands, resolutions):
     for command in commands:
         current_position = command.unit.position
         # order_results[current_position][0] = resolutions[current_position]
-        if resolutions[current_position]:
+        
+
+        if resolutions[current_position] and not isinstance(command, HoldCommand):
             if isinstance(command, MoveCommand) or isinstance(command, ConvoyMoveCommand):
                 order_results[current_position][1] = command.destination
                 moved_unit = Unit(command.unit.unit_type, command.destination)
@@ -440,9 +443,10 @@ def compute_retreats(game_map, command_map, commands, resolutions):
             else:
                 order_results[current_position][1] = current_position
                 player_results[command.player.name][command.unit] = None
+            
         else:
             direct_attackers = list(filter(
-                lambda c: resolutions[c.unit.position],
+                lambda c: resolutions[c.unit.position] and c != command,
                 command_map.get_attackers(current_position),
             ))
             convoy_attackers = list(filter(
@@ -450,10 +454,19 @@ def compute_retreats(game_map, command_map, commands, resolutions):
                 command_map.get_convoy_attackers(current_position),
             ))
             attackers = direct_attackers + convoy_attackers
+            # if len(attackers) <= 1 and isinstance(command, HoldCommand):
+            #     resolutions[current_position] = True
+            #     order_results[current_position][0] = resolutions[current_position]                
             if len(attackers) == 0:
                 order_results[current_position][1] = current_position
+                if(isinstance(command, HoldCommand)):
+                    resolutions[current_position] = True
+                    order_results[current_position][0] = resolutions[current_position]
                 player_results[command.player.name][command.unit] = None
             else:
+                if(isinstance(command, HoldCommand)):
+                    resolutions[current_position] = False
+                    order_results[current_position][0] = resolutions[current_position]
                 retreat_options = game_map.adjacency[current_position]
                 retreat_options = filter(
                     lambda t: t not in occupied_territories,
@@ -478,7 +491,7 @@ def compute_retreats(game_map, command_map, commands, resolutions):
                 order_results[current_position][2] = set(retreat_options)
 
                 player_results[command.player.name][command.unit] = set(retreat_options)
-
+        # print(f"{command} : {resolutions[current_position]}") # ADDED THIS
     return order_results
 
 

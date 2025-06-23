@@ -14,6 +14,7 @@ from adjudicator.adjudication import resolve_moves
 
 TEMPLATE_SETUP = 'tests/json/templates.json'
 VANILLA_UNIT_SETUP = 'tests/json/vanilla_setup.json'
+UPDATE_BULK_ORDER = '/api/update/order/bulk/'
 class GameInitializationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -31,7 +32,7 @@ class GameInitializationTest(TestCase):
         self.assertEqual(units.count(), 22)
         self.assertEqual(orders.count(), 22)
 
-class AdjudicationTest(APITestCase):
+class VanillaAdjudicationTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
         call_command('loaddata', TEMPLATE_SETUP)
@@ -54,7 +55,6 @@ class AdjudicationTest(APITestCase):
         order_sev = Order.objects.get(game=game,origin_territory=sev,origin_coast=sev_coast)
 
 
-        url = '/api/update/order/bulk/'
         payload = [
             {
                 "id": order_ank.pk,
@@ -68,7 +68,7 @@ class AdjudicationTest(APITestCase):
             }
         ]
 
-        response = self.client.patch(url, payload, format="json")
+        response = self.client.patch(UPDATE_BULK_ORDER, payload, format="json")
         self.assertEqual(response.status_code, 200)
 
         resolve_moves(game)
@@ -84,25 +84,80 @@ class AdjudicationTest(APITestCase):
         self.assertEqual(order_sev.target_territory, bla)
         self.assertEqual(order_sev.move_type, "M")
         self.assertEqual(order_sev.result, "FAILS")
-    
+
+class RetreatSetupTest(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        call_command('loaddata', TEMPLATE_SETUP)
+        call_command('loaddata', 'tests/json/retreat_setup_1.json')
+        cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
+
     def test_again(self):
-        print(len(Territory.objects.all()))
-        # bla = Territory.objects.get(territory_template=TerritoryTemplate.objects.get(name="BLA"))
-        # ank = Territory.objects.get(territory_template=TerritoryTemplate.objects.get(name="Ank"))
-        # ank_coast = CoastTemplate.objects.get(name="Ank")
-        # sev = Territory.objects.get(territory_template=TerritoryTemplate.objects.get(name="Sev"))
-        # sev_coast = CoastTemplate.objects.get(name="Sev")
-        # order_ank = Order.objects.get(origin_territory=ank,origin_coast=ank_coast)
-        # order_sev = Order.objects.get(origin_territory=sev,origin_coast=sev_coast)
+
+        """
+        France:
+            A Ruh S A Kiel - Mun
+            A Kiel - Mun
+        Germany:
+            A Mun Holds (so don't need to change anything here...)
+        """
+
+        refresh = RefreshToken.for_user(self.user)
+        access_token = str(refresh.access_token)
+
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+
+        game = Game.objects.create(name="Test Game")
+        ruh = Territory.objects.get(territory_template=TerritoryTemplate.objects.get(name="Ruh"))
+        kie = Territory.objects.get(territory_template=TerritoryTemplate.objects.get(name="Kie"))
+        mun = Territory.objects.get(territory_template=TerritoryTemplate.objects.get(name="Mun"))
+        order_ruh = Order.objects.get(origin_territory=ruh)
+        order_kie = Order.objects.get(origin_territory=kie)
+        order_mun = Order.objects.get(origin_territory=mun)
+
+        orders = [order_ruh, order_kie, order_mun]
         
-        # order_ank.refresh_from_db()
-        # order_sev.refresh_from_db()
-        # self.assertEqual(order_ank.target_territory, bla)
-        # self.assertEqual(order_ank.move_type, "M")
-        # self.assertEqual(order_ank.result, 'FAILS')
-        # self.assertEqual(order_sev.target_territory, bla)
-        # self.assertEqual(order_sev.move_type, "M")
-        # self.assertEqual(order_sev.result, "FAILS")
+        payload = [
+            {
+                "id": order_ruh.pk,
+                "target_territory": mun.pk,
+                "supported_territory": kie.pk,
+                "move_type": "S"
+            },
+            {
+                "id": order_kie.pk,
+                "target_territory": mun.pk,
+                "move_type": "M"
+            }
+        ]
+
+        response = self.client.patch(UPDATE_BULK_ORDER, payload, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        resolve_moves(game)
+
+        for order in orders:
+            print(order)
+            order.refresh_from_db()
+            print(order)
+            if order == order_ruh:
+                target = mun
+                move = "S"
+                result = "SUCCEEDS"
+            
+            elif order == order_kie:
+                target = mun
+                move = 'M'
+                result = "SUCCEEDS"
+            
+            elif order == order_mun:
+                target = None
+                move = 'H'
+                result = 'FAILS'
+
+        self.assertEqual(order.target_territory, target)
+        self.assertEqual(order.move_type, move)
+        self.assertEqual(order.result, result)
 
 
 class BulkUpdateOrdersTest(APITestCase):

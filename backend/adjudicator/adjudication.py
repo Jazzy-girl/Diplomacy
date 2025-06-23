@@ -136,17 +136,18 @@ def resolve_moves(instance=Game):
                 instance.save()
             if len(retreat_locations) == 0:
                 order.retreat_result = 'D'
-            else:
-                for retreat_location in retreat_locations:
-                    coast = None
-                    if 'Coast' in retreat_location:
-                        coast = orders[retreat_location].origin_coast
-                    territory = orders[retreat_location].origin_territory
-                    if isinstance(instance, Game):
-                        retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,game=instance,turn=instance.current_turn)
-                    else:
-                        retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,sandbox=instance,turn=instance.current_turn)
+            # else:
+            #     for retreat_location in retreat_locations:
+            #         coast = None
+            #         if 'Coast' in retreat_location:
+            #             coast = orders[retreat_location].origin_coast
+            #         territory = orders[retreat_location].origin_territory
+            #         if isinstance(instance, Game):
+            #             retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,game=instance,turn=instance.current_turn)
+            #         else:
+            #             retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,sandbox=instance,turn=instance.current_turn)
         order.save()
+        # print(order)
     if(instance.retreat_required):
         # Retreats are required; end;
         pass
@@ -166,21 +167,21 @@ def resolve_moves(instance=Game):
             # if divisible by 3, its spring
             # if divisible by 3 with a remainder of 1, its Fall
             # if divisible by 3 with a remainder of 2, its Winter
-def next_turn(instance=Game):
-    turn = instance.current_turn
-    match turn % 3:
-        case 0: # Spring
-            # Based on each order: update Unit location, disband? state; make new hold orders
-            pass
-        case 1: # Fall
-            # Update owned territories / supply centers
-            # Based on each order: update Unit location, disband? state;
-            pass
-        case 2: # Winter
-            # Based on each order: make new units as necessary and disband units as necessary.
-            # Make new default hold orders for each living unit
-            pass
-    instance.current_turn += 1
+# def next_turn(instance=Game):
+#     turn = instance.current_turn
+#     match turn % 3:
+#         case 0: # Spring
+#             # Based on each order: update Unit location, disband? state; make new hold orders
+#             pass
+#         case 1: # Fall
+#             # Update owned territories / supply centers
+#             # Based on each order: update Unit location, disband? state;
+#             pass
+#         case 2: # Winter
+#             # Based on each order: make new units as necessary and disband units as necessary.
+#             # Make new default hold orders for each living unit
+#             pass
+#     instance.current_turn += 1
         
 
 

@@ -5,13 +5,19 @@ REF_FILE = 'backend/tests/json/templates.json'
 OUTPUT_FILE = 'backend/tests/json/retreat_setup.json'
 
 
-# format
-# territory name : [unit type, country name]
+
+"""
+EDIT THIS!
+
+--Format--
+    territory name : [unit type, country name]
+"""
 TERRITORY_LIST = {
     'Ruh' : ["A", 'F'],
     'Kie' : ["A", 'F'],
     'Mun' : ["A", 'G']
 }
+
 def get_territory_fks():
     """
     Returns a dict of <territory name> : <TerritoryTemplate PK>
