@@ -91,7 +91,7 @@ class Territory(models.Model):
 class Unit(models.Model):
     
     def __str__(self):
-        return f"{self.type} {self.territory}"
+        return f"{self.type} {self.coast.full_name if self.coast else self.territory.territory_template.full_name}"
         
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
@@ -165,3 +165,6 @@ class UnitRetreatOption(models.Model):
     turn = models.PositiveSmallIntegerField()
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
+
+    def __str__(self):
+        return f"{self.order.unit} : {self.coast.full_name if self.coast else self.territory.territory_template.full_name}"

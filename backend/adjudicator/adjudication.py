@@ -143,7 +143,7 @@ def resolve_moves(instance=Game):
                 for retreat_location in retreat_locations:
                     coast = None
                     if 'Coast' in retreat_location:
-                    #     coast = orders[retreat_location].origin_coast
+                    #    coast = orders[retreat_location].origin_coast
                         coast = coasts[retreat_location]
                     territory = territories[retreat_location]
                     print(f"RETREAT TERRITORY: {retreat_location}")

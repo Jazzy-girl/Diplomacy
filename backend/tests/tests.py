@@ -15,6 +15,16 @@ from adjudicator.adjudication import resolve_moves
 TEMPLATE_SETUP = 'tests/json/templates.json'
 VANILLA_UNIT_SETUP = 'tests/json/vanilla_setup.json'
 UPDATE_BULK_ORDER = '/api/update/order/bulk/'
+
+TERRITORY_TEMPLATES = {}
+def orders_to_json(instance=Game,orders=[]):
+    """
+    Converts a list of orders to json for use with Bulk Update Orders.
+    Returns a JSON file.
+
+    :param Game / Sandbox instance:
+    :param list orders: format of each order is basic diplomacy; "A Bul - Con", "A Bul H", "F NTH C Hol - Bel", "A Con S BLA - Bul/ec"
+    """
 class GameInitializationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -92,7 +102,7 @@ class RetreatSetupTest(APITestCase):
         call_command('loaddata', 'tests/json/retreat_setup_1.json')
         cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
 
-    def test_again(self):
+    def test_hold_fail(self):
 
         """
         France:
@@ -159,6 +169,7 @@ class RetreatSetupTest(APITestCase):
         self.assertEqual(order.result, result)
 
         options = UnitRetreatOption.objects.filter(game=game,turn=game.current_turn)
+        print(options)
         self.assertEqual(len(options),5)
         self.assertNotEqual(UnitRetreatOption.objects.get(game=game,turn=game.current_turn,territory=Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="Boh"))), None)
 
