@@ -303,7 +303,6 @@ def _attack_strength(game_map, command_map, command):
         if not _has_path(game_map, command_map, command):
             return 0
     attacked_command = command_map.get_home_command(command.destination)
-    # if isinstance(command, HoldCommand): return 0 # ADDED
     supporters = command_map.get_supports(command.unit.position, command.destination)
     supporters = filter(lambda c: _resolve(game_map, command_map, c), supporters)
 
@@ -342,14 +341,12 @@ def _defend_strength(game_map, command_map, command):
 
 def _hold_strength(game_map, command_map, territory):
     home_command = command_map.get_home_command(territory)
-    print(f"HOME COMMAND: {home_command}") # ADDED
     if home_command is None:
         return 0
     if isinstance(home_command, MoveCommand) or isinstance(home_command, ConvoyMoveCommand):
         return 0 if _resolve(game_map, command_map, home_command) else 1
     supporters = command_map.get_supports(territory, territory)
     supporters = filter(lambda c: _resolve(game_map, command_map, c), supporters)
-    print(f"TRIGGERED {list(supporters)}") # ADDED
     return 1 + len(list(supporters))
 
 
@@ -462,32 +459,25 @@ def compute_retreats(game_map, command_map, commands, resolutions):
                 order_results[current_position][1] = current_position
                 player_results[command.player.name][command.unit] = None
             else:
-                print(attackers)
                 retreat_options = game_map.adjacency[current_position]
-                print(retreat_options)
                 retreat_options = filter(
                     lambda t: t not in occupied_territories,
                     retreat_options,
                 )
-                # print(list(retreat_options))
-                # retreat_options = filter(
-                #     lambda t: all(t not in _applicable_territories(game_map, attacker.unit.position)
-                #                   for attacker in direct_attackers),
-                #     retreat_options,
-                # )
-                print(list(retreat_options))
+                retreat_options = filter(
+                    lambda t: all(t not in _applicable_territories(game_map, attacker.unit.position)
+                                  for attacker in direct_attackers),
+                    retreat_options,
+                )
                 retreat_options = filter(
                     lambda t: _hold_strength(game_map, command_map, t) == 0,
                     retreat_options,
                 )
-                print(list(retreat_options))
                 retreat_options = filter(
                     lambda t: all(_prevent_strength(game_map, command_map, attacker) == 0
                                   for attacker in command_map.get_attackers(t)),
                     retreat_options,
                 )
-                print(list(retreat_options))
-
                 order_results[current_position][1] = None
                 order_results[current_position][2] = set(retreat_options)
 

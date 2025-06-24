@@ -127,17 +127,16 @@ def resolve_moves(instance=Game):
             if not instance.retreat_required:
                 instance.retreat_required = True
                 instance.save()
-            else:
-                for retreat_location in retreat_locations:
-                    coast = None
-                    if 'Coast' in retreat_location:
-                        coast = coasts[retreat_location]
-                    territory = territories[retreat_location]
-                    print(f"RETREAT TERRITORY: {retreat_location}")
-                    if isinstance(instance, Game):
-                        retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,game=instance,turn=instance.current_turn)
-                    else:
-                        retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,sandbox=instance,turn=instance.current_turn)
+            for retreat_location in retreat_locations:
+                coast = None
+                if 'Coast' in retreat_location:
+                    coast = coasts[retreat_location]
+                territory = territories[retreat_location]
+                # print(f"RETREAT TERRITORY: {retreat_location}")
+                if isinstance(instance, Game):
+                    retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,game=instance,turn=instance.current_turn)
+                else:
+                    retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,sandbox=instance,turn=instance.current_turn)
         order.save()
         # print(order)
     if(instance.retreat_required):

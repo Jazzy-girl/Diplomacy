@@ -210,7 +210,7 @@ class SupportedHoldFails(APITestCase):
         call_command('loaddata', 'tests/json/retreat_setup_1.json')
         cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
 
-    def test(self):
+    def test_hold_fail_and_retreat(self):
 
         """
         France:
@@ -293,7 +293,7 @@ class SupportedHoldFails(APITestCase):
         # Test Retreat
         retreat_command = ["A Mun R Tyr"]
 
-        data = orders_to_json(instance=game,commands=commands)
+        data = orders_to_json(instance=game,commands=retreat_command)
         
         response = self.client.patch(UPDATE_BULK_ORDER, data, format="json")
         self.assertEqual(response.status_code, 200)
@@ -301,6 +301,7 @@ class SupportedHoldFails(APITestCase):
         resolve_retreats(game)
 
         order_mun.refresh_from_db()
+        self.assertEqual(order.retreat_territory.territory_template.name, "Tyr")
         self.assertEqual(order.retreat_result, 'R')
 
 
