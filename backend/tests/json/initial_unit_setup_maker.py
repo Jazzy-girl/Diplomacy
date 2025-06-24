@@ -2,7 +2,7 @@ import json
 from collections import defaultdict
 
 REF_FILE = 'backend/tests/json/templates.json'
-OUTPUT_FILE = 'backend/tests/json/retreat_setup.json'
+OUTPUT_FILE = 'backend/tests/json/retreat_setup_1.json'
 
 
 
@@ -15,7 +15,9 @@ EDIT THIS!
 TERRITORY_LIST = {
     'Ruh' : ["A", 'F'],
     'Kie' : ["A", 'F'],
-    'Mun' : ["A", 'G']
+    'Ber' : ["A", 'F'],
+    'Mun' : ["A", 'G'],
+    'Boh' : ["A", 'G']
 }
 
 def get_territory_fks():

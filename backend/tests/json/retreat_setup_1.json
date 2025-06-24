@@ -23,7 +23,27 @@
     "model": "api.initialunitsetup",
     "pk": 2,
     "fields": {
+      "territory_template": 3,
+      "country_template": 2,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 3,
+    "fields": {
       "territory_template": 17,
+      "country_template": 3,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 4,
+    "fields": {
+      "territory_template": 38,
       "country_template": 3,
       "unit_type": "A",
       "coast_template": null

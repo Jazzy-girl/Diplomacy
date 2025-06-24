@@ -180,7 +180,7 @@ class VanillaAdjudicationTest(APITestCase):
         self.assertEqual(order_sev.move_type, "M")
         self.assertEqual(order_sev.result, "FAILS")
 
-class UnsupportedHoldFails(APITestCase):
+class SupportedHoldFails(APITestCase):
     @classmethod
     def setUpTestData(cls):
         call_command('loaddata', TEMPLATE_SETUP)
@@ -191,30 +191,36 @@ class UnsupportedHoldFails(APITestCase):
 
         """
         France:
-            A Ruh S A Kiel - Mun
-            A Kiel - Mun
+            A Ruh S Kie - Mun
+            A Kie - Mun
+            A Ber S Kie - Mun
         Germany:
             A Mun Holds (so don't need to change anything here...)
+            A Boh S Mun H
         """
-
+        # territories = {territory.territory_template.name : territory for territory in Territory.objects.filter(game=game)}
+        
         refresh = RefreshToken.for_user(self.user)
         access_token = str(refresh.access_token)
 
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
 
         game = Game.objects.create(name="Test Game")
-        ruh = Territory.objects.get(territory_template=TerritoryTemplate.objects.get(name="Ruh"))
-        kie = Territory.objects.get(territory_template=TerritoryTemplate.objects.get(name="Kie"))
-        mun = Territory.objects.get(territory_template=TerritoryTemplate.objects.get(name="Mun"))
-        order_ruh = Order.objects.get(origin_territory=ruh)
-        order_kie = Order.objects.get(origin_territory=kie)
-        order_mun = Order.objects.get(origin_territory=mun)
 
-        orders = [order_ruh, order_kie, order_mun]
+        orders = {order.origin_territory.territory_template.name : order for order in Order.objects.filter(game=game,turn=game.current_turn)}
+        order_ruh = orders["Ruh"]
+        order_kie = orders["Kie"]
+        order_mun = orders["Mun"]
+        order_boh = orders["Boh"]
+        order_ber = orders["Ber"]
+
+        orders = [order_ruh, order_kie, order_ber, order_boh, order_mun]
 
         commands = [
             "A Ruh S Kie - Mun",
-            "A Kie - Mun"
+            "A Kie - Mun",
+            "A Ber S Kie - Mun",
+            "A Boh S Mun H"
         ]
 
         data = orders_to_json(instance=game,commands=commands)
@@ -226,28 +232,40 @@ class UnsupportedHoldFails(APITestCase):
 
         for order in orders:
             order.refresh_from_db()
+            # print(order)
             if order == order_ruh:
-                target = mun
+                target = "Mun"
                 move = "S"
                 result = "SUCCEEDS"
             
             elif order == order_kie:
-                target = mun
+                target = "Mun"
                 move = 'M'
                 result = "SUCCEEDS"
+            
+            elif order == order_ber:
+                target = "Mun"
+                move = 'S'
+                result = 'SUCCEEDS'
+
+            elif order == order_boh:
+                target = "Mun"
+                move = 'S'
+                result = 'SUCCEEDS'
             
             elif order == order_mun:
                 target = None
                 move = 'H'
-                result = 'FAILS'
-
-        self.assertEqual(order.target_territory, target)
+                result = 'FAILS'    
+            
+        if order.target_territory:
+            self.assertEqual(order.target_territory.territory_template.name, target)
         self.assertEqual(order.move_type, move)
         self.assertEqual(order.result, result)
 
         options = UnitRetreatOption.objects.filter(game=game,turn=game.current_turn)
-        self.assertEqual(len(options),5)
-        self.assertNotEqual(UnitRetreatOption.objects.get(game=game,turn=game.current_turn,territory=Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="Boh"))), None)
+        self.assertEqual(len(options),3)
+        self.assertNotEqual(UnitRetreatOption.objects.get(game=game,turn=game.current_turn,territory=Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="Tyr"))), None)
 
 
 

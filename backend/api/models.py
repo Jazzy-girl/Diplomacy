@@ -155,7 +155,7 @@ class Order(models.Model):
             case 'H':
                 return f"{self.unit} {self.move_type} {self.result}"
             case 'S':
-                return f"{self.unit} {self.move_type} {self.target_coast or self.target_territory} {self.result}"
+                return f"{self.unit} {self.move_type} {self.supported_coast or self.supported_territory} - {self.target_coast or self.target_territory} {self.result}"
             
 class UnitRetreatOption(models.Model):
     # unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
