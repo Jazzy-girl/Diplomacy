@@ -146,7 +146,7 @@ def resolve_moves(instance=Game):
                     #    coast = orders[retreat_location].origin_coast
                         coast = coasts[retreat_location]
                     territory = territories[retreat_location]
-                    print(f"RETREAT TERRITORY: {retreat_location}")
+                    # print(f"RETREAT TERRITORY: {retreat_location}")
                     if isinstance(instance, Game):
                         retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,game=instance,turn=instance.current_turn)
                     else:

@@ -180,14 +180,14 @@ class VanillaAdjudicationTest(APITestCase):
         self.assertEqual(order_sev.move_type, "M")
         self.assertEqual(order_sev.result, "FAILS")
 
-class RetreatSetupTest(APITestCase):
+class UnsupportedHoldFails(APITestCase):
     @classmethod
     def setUpTestData(cls):
         call_command('loaddata', TEMPLATE_SETUP)
         call_command('loaddata', 'tests/json/retreat_setup_1.json')
         cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
 
-    def test_hold_fail(self):
+    def test(self):
 
         """
         France:
@@ -226,7 +226,6 @@ class RetreatSetupTest(APITestCase):
 
         for order in orders:
             order.refresh_from_db()
-            print(order)
             if order == order_ruh:
                 target = mun
                 move = "S"
@@ -247,7 +246,6 @@ class RetreatSetupTest(APITestCase):
         self.assertEqual(order.result, result)
 
         options = UnitRetreatOption.objects.filter(game=game,turn=game.current_turn)
-        print(options)
         self.assertEqual(len(options),5)
         self.assertNotEqual(UnitRetreatOption.objects.get(game=game,turn=game.current_turn,territory=Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="Boh"))), None)
 

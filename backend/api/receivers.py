@@ -7,7 +7,7 @@ import os
 import json
 
 def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, created, **kwargs):
-    print("signal triggered!") #Debug
+    # print("signal triggered!") #Debug
     if created:
         """
         Makes:
@@ -29,7 +29,7 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
             countries[country.country_template] = country
 
         territory_templates = TerritoryTemplate.objects.all()
-        print(f"Loaded {TerritoryTemplate.objects.count()} templates")
+        # print(f"Loaded {TerritoryTemplate.objects.count()} templates")
         territories = {}
         for template in territory_templates:
             country = countries[template.country_template]
