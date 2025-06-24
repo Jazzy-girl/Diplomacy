@@ -1,4 +1,4 @@
-from pydip.player.command.retreat_command import RetreatCommand, RetreatMoveCommand
+from pydip.player.command.retreat_command import RetreatCommand, RetreatMoveCommand, RetreatDisbandCommand
 from pydip.player.unit import Unit
 
 
@@ -41,3 +41,21 @@ def resolve_retreats(retreat_map, commands):
             result_map[command.player.name].add(Unit(command.unit.unit_type, command.destination))
 
     return result_map
+
+def altered_resolve_retreats(commands=[]):
+    """
+    Takes in a list of RetreatCommands and returns a dict of origin_territory : retreat_territory | None (disband)
+
+    :param list commands: a list of RetreatCommands
+    """
+    results = dict()
+    for command in commands:
+        if isinstance(command, RetreatDisbandCommand):
+            results[command.unit.position] = None
+        else:
+            other_commands = list(filter(lambda c: c != command and isinstance(c, RetreatMoveCommand), commands))
+            if all(command.destination != other_command.destination for other_command in other_commands):
+                results[command.unit.position] = command.destination
+            else:
+                results[command.unit.position] = None
+    return results

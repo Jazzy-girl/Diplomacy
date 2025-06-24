@@ -11,6 +11,8 @@ from pydip.player.command.command import (
     SupportCommand
 )
 
+from pydip.player.command.retreat_command import RetreatDisbandCommand, RetreatMoveCommand
+
 from pydip.player import Player
 
 from pydip.map.predefined import vanilla_dip
@@ -36,12 +38,7 @@ Needs
                   the full name of the country template of their country
 """
 def resolve_moves(instance=Game):
-    # instance is either a Game or Sandbox
-    # if isinstance(instance, Game):
-    # 1: Load Map
     game_map = vanilla_dip.generate_map()
-
-    # 2: Load Players
     players = {}
     if isinstance(instance, Game):
         units = DjangoUnit.objects.filter(game=instance)
@@ -53,22 +50,9 @@ def resolve_moves(instance=Game):
         territories = {territory.territory_template.full_name : territory for territory in Territory.objects.filter(sandbox=instance)}
     coasts = {coast.full_name : coast for coast in CoastTemplate.objects.all()}
     player_units = defaultdict(list)
-    """
-    units plan
-    - 
-    """
+
     game_units = {}
     
-    """
-    NEED:
-    - access to player full_name by country id.
-    - access to a Unit instance by the territory, options:
-        1. make a dict of territory : unit instance pairs
-        2. use the order's supported territory ID to find the order that uses that as a home territory... 
-                   and then use that order's country.country_template.full_name for the player... and then find_unit...
-    """
-    # iterate by country
-    # TURN INTO LIST COMPREHENSION LATER like so: starting_config = [dict(territory_name=u.position, unit_type=u.unit_type) for u in units]
     commands = []
 
     for unit in units:
@@ -132,21 +116,24 @@ def resolve_moves(instance=Game):
 
         order.result = 'SUCCEEDS' if result else 'FAILS'
         order.dislodged = dislodged
-        order.retreat_required = True if dislodged and len(retreat_locations) > 0 else False
+        if dislodged:
+            if len(retreat_locations) > 0:
+                order.retreat_required = True 
+            else:
+                order.retreat_required = False
+                order.retreat_result = 'D'
+            
         if(order.retreat_required):
             if not instance.retreat_required:
                 instance.retreat_required = True
                 instance.save()
-            if len(retreat_locations) == 0:
-                order.retreat_result = 'D'
             else:
                 for retreat_location in retreat_locations:
                     coast = None
                     if 'Coast' in retreat_location:
-                    #    coast = orders[retreat_location].origin_coast
                         coast = coasts[retreat_location]
                     territory = territories[retreat_location]
-                    # print(f"RETREAT TERRITORY: {retreat_location}")
+                    print(f"RETREAT TERRITORY: {retreat_location}")
                     if isinstance(instance, Game):
                         retreat_option = UnitRetreatOption.objects.create(order=order,territory=territory,coast=coast,game=instance,turn=instance.current_turn)
                     else:
@@ -189,7 +176,20 @@ def resolve_moves(instance=Game):
 #     instance.current_turn += 1
         
 
-
+def resolve_retreats(instance=Game):
+    """
+    Resolves retreats.
+    """
+    retreat_orders = Order.objects.filter(game=instance,turn=instance.current_turn,retreat_required=True)
+    for order in retreat_orders:
+        other_orders = list(filter(lambda c: c!=order, retreat_orders))
+        if all(order.retreat_territory != other_order.retreat_territory for other_order in other_orders):
+            order.retreat_result = 'R'
+        else:
+            order.retreat_result = 'D'
+        order.save()
+    instance.retreat_required = False
+    instance.save()
 
                             
 

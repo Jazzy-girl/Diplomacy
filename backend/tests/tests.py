@@ -10,7 +10,7 @@ from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.models import Game, Territory, Unit, Order, Sandbox, Country, CoastTemplate, TerritoryTemplate, UnitRetreatOption
-from adjudicator.adjudication import resolve_moves
+from adjudicator.adjudication import resolve_moves, resolve_retreats
 
 TEMPLATE_SETUP = 'tests/json/templates.json'
 VANILLA_UNIT_SETUP = 'tests/json/vanilla_setup.json'
@@ -24,7 +24,7 @@ def orders_to_json(instance=Game,commands=list()):
     Returns a JSON file.
 
     :param Game / Sandbox instance:
-    :param list orders: format of each order is basic diplomacy; - = Move, H = Hold, S = Support, C = Convoy, V = Move via Convoy; for territories, use three-letter abbrev. for non-specific coasts, use Lon/c
+    :param list commands: format of each order is basic diplomacy; - = Move, H = Hold, S = Support, C = Convoy, V = Move via Convoy; for territories, use three-letter abbrev. for non-specific coasts, use Lon/c; for Retreats, use A Ber R Mun, A Ber D (disbands)
     """
     if isinstance(instance, Game):
         territories = {territory.territory_template.name : territory.pk for territory in Territory.objects.filter(game=instance)}
@@ -69,6 +69,8 @@ def orders_to_json(instance=Game,commands=list()):
         supported_territory = None
         supported_coast = None
         convoyed_territory = None
+        retreat_territory = None
+        retreat_coast = None
         move_type = pieces[2]
         if move_type == '-':
             move_type = 'M'
@@ -93,20 +95,41 @@ def orders_to_json(instance=Game,commands=list()):
             target_territory, target_coast = get_pk(pieces[5])
         elif move_type == 'V':
             assert len(pieces) == 4 # should be A Bul - Con; 4 long
-            target_territory, target_coast = territories[pieces[3]]
+            target_territory, target_coast = get_pk(pieces[3])
+        elif move_type == 'R': # Retreat!
+            # A Bul R Con; 4 long
+            assert len(pieces) == 4
+            retreat_territory, retreat_coast = get_pk(pieces[3])
+        elif move_type == 'D': # Disband
+            # A Bul D
+            assert len(pieces) == 3
+        else: # Not a move type
+            raise ValueError(f"Not a Valid Move Type: {move_type}")
 
-        command_data = {
-            "id": id,
-            "origin_territory": origin_territory,
-            "origin_coast": origin_coast,
-            "target_territory": target_territory,
-            "target_coast": target_coast,
-            "supported_territory": supported_territory,
-            "supported_coast": supported_coast,
-            "convoyed_territory": convoyed_territory,
-            "move_type": move_type,
-            "submitted": True
-        }
+        if move_type == 'R':
+            command_data = {
+                "id": id,
+                "retreat_territory": retreat_territory,
+                "retreat_coast" : retreat_coast
+            }
+        elif move_type == 'D':
+            command_data = {
+                "id": id,
+                "retreat_result": move_type
+            }
+        else:
+            command_data = {
+                "id": id,
+                "origin_territory": origin_territory,
+                "origin_coast": origin_coast,
+                "target_territory": target_territory,
+                "target_coast": target_coast,
+                "supported_territory": supported_territory,
+                "supported_coast": supported_coast,
+                "convoyed_territory": convoyed_territory,
+                "move_type": move_type,
+                "submitted": True,
+            }
         data.append(command_data)
     return data
 
@@ -266,6 +289,19 @@ class SupportedHoldFails(APITestCase):
         options = UnitRetreatOption.objects.filter(game=game,turn=game.current_turn)
         self.assertEqual(len(options),3)
         self.assertNotEqual(UnitRetreatOption.objects.get(game=game,turn=game.current_turn,territory=Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="Tyr"))), None)
+
+        # Test Retreat
+        retreat_command = ["A Mun R Tyr"]
+
+        data = orders_to_json(instance=game,commands=commands)
+        
+        response = self.client.patch(UPDATE_BULK_ORDER, data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        resolve_retreats(game)
+
+        order_mun.refresh_from_db()
+        self.assertEqual(order.retreat_result, 'R')
 
 
 
