@@ -16,15 +16,100 @@ TEMPLATE_SETUP = 'tests/json/templates.json'
 VANILLA_UNIT_SETUP = 'tests/json/vanilla_setup.json'
 UPDATE_BULK_ORDER = '/api/update/order/bulk/'
 
-TERRITORY_TEMPLATES = {}
-def orders_to_json(instance=Game,orders=[]):
+COASTS_ABBREV = {coast.name : coast for coast in CoastTemplate.objects.all()}
+# TERRITORY_TEMPLATES = {}
+def orders_to_json(instance=Game,commands=list()):
     """
     Converts a list of orders to json for use with Bulk Update Orders.
     Returns a JSON file.
 
     :param Game / Sandbox instance:
-    :param list orders: format of each order is basic diplomacy; "A Bul - Con", "A Bul H", "F NTH C Hol - Bel", "A Con S BLA - Bul/ec"
+    :param list orders: format of each order is basic diplomacy; - = Move, H = Hold, S = Support, C = Convoy, V = Move via Convoy; for territories, use three-letter abbrev. for non-specific coasts, use Lon/c
     """
+    if isinstance(instance, Game):
+        territories = {territory.territory_template.name : territory.pk for territory in Territory.objects.filter(game=instance)}
+        orders = {order.origin_coast.pk if order.origin_coast else order.origin_territory.pk : order.pk for order in Order.objects.filter(game=instance,turn=instance.current_turn)}
+    else:
+        territories = {territory.territory_template.name : territory.pk for territory in Territory.objects.filter(sandbox=instance)}
+        orders = {order.origin_coast.pk if order.origin_coast else order.origin_territory.pk : order.pk for order in Order.objects.filter(sandbox=instance,turn=instance.current_turn)}
+    
+    def get_pk(location=str()):
+        """
+        takes the territory / coast location
+
+        :return: a tuple of the territory_pk and coast_pk if applicable, otherwise None
+        :rtype: (territory_pk, coast_pk)
+        """
+        if location in territories.keys():
+            # is a territory
+            return territories[location], None
+        else:
+            # hopefully is a coast
+            if '/c' in location:
+                location = location.replace('/c', '')
+            if location in COASTS_ABBREV.keys():
+                coast = COASTS_ABBREV[location]
+                territory = territories[coast.territory_template.name]
+                return territory, coast.pk
+            else:
+                raise ValueError(f"Incorrect Territory Input; must be THREE AND ONLY THREE letters if land/sea, or either Lon/c or Bul/ec if coastal : {location}")
+    # parsing the order; <unit type> <territory> <move type> <another order | destination territory>
+    data = []
+    # print(comma)
+    for command in commands:
+        pieces = command.split(" ")
+        unit_type = pieces[0]
+        origin_territory, origin_coast = get_pk(pieces[1])
+        if origin_coast is not None:
+            id = orders[origin_coast]
+        else:
+            id = orders[origin_territory]
+        target_territory = None
+        target_coast = None
+        supported_territory = None
+        supported_coast = None
+        convoyed_territory = None
+        move_type = pieces[2]
+        if move_type == '-':
+            move_type = 'M'
+            assert len(pieces) == 4 # should be A Bul - Con; 4 long
+            target_territory, target_coast = get_pk(pieces[3])
+        elif move_type == 'H':
+            # nothing really...
+            pass
+        elif move_type == 'S':
+            # A Con S Ank - Smy
+            # A Con S Ank H
+            assert len(pieces) == 5 or len(pieces) == 6
+            supported_territory, supported_coast = get_pk(pieces[3])
+            if len(pieces) == 6:
+                target_territory, target_coast = get_pk(pieces[5])
+            else:
+                target_territory, target_coast = supported_territory, supported_coast
+        elif move_type == 'C':
+            # F BLA C Con - Rom
+            convoyed_territory, origin_coast = get_pk(pieces[3])
+            assert len(pieces) == 6
+            target_territory, target_coast = get_pk(pieces[5])
+        elif move_type == 'V':
+            assert len(pieces) == 4 # should be A Bul - Con; 4 long
+            target_territory, target_coast = territories[pieces[3]]
+
+        command_data = {
+            "id": id,
+            "origin_territory": origin_territory,
+            "origin_coast": origin_coast,
+            "target_territory": target_territory,
+            "target_coast": target_coast,
+            "supported_territory": supported_territory,
+            "supported_coast": supported_coast,
+            "convoyed_territory": convoyed_territory,
+            "move_type": move_type,
+            "submitted": True
+        }
+        data.append(command_data)
+    return data
+
 class GameInitializationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -126,22 +211,15 @@ class RetreatSetupTest(APITestCase):
         order_mun = Order.objects.get(origin_territory=mun)
 
         orders = [order_ruh, order_kie, order_mun]
-        
-        payload = [
-            {
-                "id": order_ruh.pk,
-                "target_territory": mun.pk,
-                "supported_territory": kie.pk,
-                "move_type": "S"
-            },
-            {
-                "id": order_kie.pk,
-                "target_territory": mun.pk,
-                "move_type": "M"
-            }
+
+        commands = [
+            "A Ruh S Kie - Mun",
+            "A Kie - Mun"
         ]
 
-        response = self.client.patch(UPDATE_BULK_ORDER, payload, format="json")
+        data = orders_to_json(instance=game,commands=commands)
+        
+        response = self.client.patch(UPDATE_BULK_ORDER, data, format="json")
         self.assertEqual(response.status_code, 200)
 
         resolve_moves(game)

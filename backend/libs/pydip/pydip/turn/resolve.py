@@ -484,7 +484,7 @@ def compute_retreats(game_map, command_map, commands, resolutions):
                 order_results[current_position][2] = set(retreat_options)
 
                 player_results[command.player.name][command.unit] = set(retreat_options)
-    #     print(f"{command} : {resolutions[current_position]}") # ADDED
+        # print(f"{command} : {resolutions[current_position]}") # ADDED
     # print(order_results) # ADDED
     return order_results
 
