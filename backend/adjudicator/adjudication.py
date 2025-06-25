@@ -122,6 +122,7 @@ def resolve_moves(instance=Game):
             else:
                 order.retreat_required = False
                 order.retreat_result = 'D'
+                order.unit.disbanded = True
             
         if(order.retreat_required):
             if not instance.retreat_required:
@@ -140,7 +141,6 @@ def resolve_moves(instance=Game):
         order.save()
         # print(order)
     if(instance.retreat_required):
-        # Retreats are required; end;
         pass
     else:
         pass
@@ -158,22 +158,63 @@ def resolve_moves(instance=Game):
             # if divisible by 3, its spring
             # if divisible by 3 with a remainder of 1, its Fall
             # if divisible by 3 with a remainder of 2, its Winter
-# def next_turn(instance=Game):
-#     turn = instance.current_turn
-#     match turn % 3:
-#         case 0: # Spring
-#             # Based on each order: update Unit location, disband? state; make new hold orders
-#             pass
-#         case 1: # Fall
-#             # Update owned territories / supply centers
-#             # Based on each order: update Unit location, disband? state;
-#             pass
-#         case 2: # Winter
-#             # Based on each order: make new units as necessary and disband units as necessary.
-#             # Make new default hold orders for each living unit
-#             pass
-#     instance.current_turn += 1
-        
+
+def next_turn(instance=Game):
+    turn = instance.current_turn
+    match turn % 3:
+        case 0: # Spring
+            # Based on each order: make new hold orders for each non disbanded order, and update unit locations.
+            if isinstance(instance, Game):
+                orders = Order.objects.filter(game=instance,turn=instance.current_turn,retreat_result = 'R' or None) # Excludes Disbanded orders
+            else:
+                orders = Order.objects.filter(sandbox=instance,turn=instance.current_turn,retreat_result = 'R' or None) # Excludes Disbanded orders
+            new_turn = instance.current_turn + 1
+            for order in orders:
+                unit = order.unit
+                country = order.country
+                if order.retreat_result == 'R':
+                    origin_territory, origin_coast = order.retreat_territory, order.retreat_coast
+                elif (order.move_type == 'M' or 'V') and order.result == 'SUCCEEDS':
+                    origin_territory, origin_coast = order.target_territory, order.target_coast
+                else:
+                    origin_territory, origin_coast = order.origin_territory, order.origin_coast
+                unit.territory = origin_territory
+                unit.coast = origin_coast
+                if isinstance(instance, Game):
+                    new_order = Order.objects.create(game=instance,turn=new_turn,unit=unit,country=country,origin_territory=origin_territory,origin_coast=origin_coast,move_type='H')
+                else:
+                    new_order = Order.objects.create(sandbox=instance,turn=new_turn,unit=unit,country=country,origin_territory=origin_territory,origin_coast=origin_coast,move_type='H')
+        case 1: # Fall
+            # Update owned territories / supply centers
+            # make possible build table entries or possible disband entries (wouldnt these just be any fucking untit? that already exists in the non-disbanded orders...)
+            if isinstance(instance, Game):
+                units = DjangoUnit.objects.filter(game=instance,disbanded=False)
+                countries = {country.country_template.name : country for country in Country.objects.filter(game=instance)}
+            else:
+                units = DjangoUnit.objects.filter(sandbox=instance,disbanded=False)
+                countries = {country.country_template.name : country for country in Country.objects.filter(game=instance)}
+            for unit in units:
+                unit.territory.country = unit.country
+                unit.territory.save()
+
+            if isinstance(instance, Game):
+                scs = Territory.objects.filter(game=instance,territory_template__sc_exists=True)
+            else:
+                scs = Territory.objects.filter(sandbox=instance,territory_template__sc_exists=True)
+
+            for country in countries.values():
+                country.scs = 0
+            for sc in scs:
+                sc.country.scs += 1
+            
+
+            
+        case 2: # Winter
+            # Based on each order: make new units as necessary and disband units as necessary.
+            # Make new default hold orders for each living unit
+            pass
+    instance.current_turn += 1
+
 
 def resolve_retreats(instance=Game):
     """
@@ -184,11 +225,15 @@ def resolve_retreats(instance=Game):
         other_orders = list(filter(lambda c: c!=order, retreat_orders))
         if all(order.retreat_territory != other_order.retreat_territory for other_order in other_orders):
             order.retreat_result = 'R'
+            order.unit.territory = order.retreat_territory
+            order.unit.coast = order.retreat_coast
         else:
             order.retreat_result = 'D'
+            order.unit.disbanded = True
         order.save()
     instance.retreat_required = False
     instance.save()
+    # call a new turn!
 
                             
 
