@@ -36,7 +36,6 @@ class Sandbox(models.Model):
 class CountryTemplate(models.Model):
     name = models.CharField(max_length=3)
     full_name = models.CharField(max_length=80)
-    scs = models.PositiveSmallIntegerField(default=3)
 
     def __str__(self):
         return f"{self.full_name}"
@@ -46,6 +45,8 @@ class Country(models.Model):
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
     country_template = models.ForeignKey(CountryTemplate, on_delete=models.CASCADE)
     scs = models.IntegerField(default=0)
+    available_builds = models.PositiveSmallIntegerField(default=0)
+    needed_disbands = models.PositiveSmallIntegerField(default=0)
 
 class UnitType(models.TextChoices):
     ARMY = 'A', _('Army')
@@ -61,6 +62,7 @@ class TerritoryTemplate(models.Model):
     territory_type = models.CharField(choices=TerritoryTypes.choices)
     has_coasts = models.BooleanField(default=False)
     country_template = models.ForeignKey(CountryTemplate, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    home_center = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.full_name}"
@@ -168,3 +170,10 @@ class UnitRetreatOption(models.Model):
 
     def __str__(self):
         return f"{self.order.unit} : {self.coast.full_name if self.coast else self.territory.territory_template.full_name}"
+    
+class Phase(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    build_cache = models.JSONField(null=True,blank=True,default=None)
+    disband_cache = models.JSONField(null=True,blank=True,default=None)
+    turn = models.PositiveSmallIntegerField()

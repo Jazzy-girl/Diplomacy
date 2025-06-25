@@ -1,5 +1,5 @@
 import json
-
+FILE = 'backend/fixtures/initial_templates2.json'
 # Define templates and starting data for vanilla Diplomacy
 countries = {
     "E": {"name": "England", "scs": 3},
@@ -14,85 +14,85 @@ countries = {
 # Territories, coasts, and initial unit positions taken from Diplomacy standard setup
 territories = [
     # Supply Centers (34)
-    ("Ank", "Ankara", "L", True, True, "T"),
-    ("Bel", "Belgium", "L", True, True, None),
-    ("Ber", "Berlin", "L", True, True, "G"),
-    ("Bre", "Brest", "L", True, True, "F"),
-    ("Bud", "Budapest", "L", False, True, "A"),
-    ("Bul", "Bulgaria", "L", True, True, "T"),
-    ("Con", "Constantinople", "L", True, True, "T"),
-    ("Den", "Denmark", "L", True, True, None),
-    ("Edi", "Edinburgh", "L", True, True, "E"),
-    ("Gre", "Greece", "L", True, True, None),
-    ("Hol", "Holland", "L", True, True, None),
-    ("Kie", "Kiel", "L", True, True, "G"),
-    ("Lvp", "Liverpool", "L", True, True, "E"),
-    ("Lon", "London", "L", True, True, "E"),
-    ("Mar", "Marseilles", "L", True, True, "F"),
-    ("Mos", "Moscow", "L", False, True, "R"),
-    ("Mun", "Munich", "L", False, True, "G"),
-    ("Nap", "Naples", "L", True, True, "I"),
-    ("Nor", "Norway", "L", True, True, None),
-    ("Par", "Paris", "L", False, True, "F"),
-    ("Por", "Portugal", "L", True, True, None),
-    ("Rom", "Rome", "L", True, True, "I"),
-    ("Rum", "Rumania", "L", True, True, None),
-    ("Ser", "Serbia", "L", False, True, None),
-    ("Sev", "Sevastopol", "L", True, True, "R"),
-    ("Smy", "Smyrna", "L", True, True, "T"),
-    ("Spa", "Spain", "L", True, True, None),
-    ("Swe", "Sweden", "L", True, True, None),
-    ("Stp", "St. Petersburg", "L", True, True, "R"),
-    ("Tri", "Trieste", "L", True, True, "A"),
-    ("Tun", "Tunis", "L", True, True, None),
-    ("Ven", "Venice", "L", True, True, "I"),
-    ("Vie", "Vienna", "L", False, True, "A"),
-    ("War", "Warsaw", "L", False, True, "R"),
+    ("Ank", "Ankara", "L", True, True, "T", True),
+    ("Bel", "Belgium", "L", True, True, None, False),
+    ("Ber", "Berlin", "L", True, True, "G", True),
+    ("Bre", "Brest", "L", True, True, "F", True),
+    ("Bud", "Budapest", "L", False, True, "A", True),
+    ("Bul", "Bulgaria", "L", True, True, None, False),
+    ("Con", "Constantinople", "L", True, True, "T", True),
+    ("Den", "Denmark", "L", True, True, None, False),
+    ("Edi", "Edinburgh", "L", True, True, "E", True),
+    ("Gre", "Greece", "L", True, True, None, False),
+    ("Hol", "Holland", "L", True, True, None, False),
+    ("Kie", "Kiel", "L", True, True, "G", True),
+    ("Lvp", "Liverpool", "L", True, True, "E", True),
+    ("Lon", "London", "L", True, True, "E", True),
+    ("Mar", "Marseilles", "L", True, True, "F", True),
+    ("Mos", "Moscow", "L", False, True, "R", True),
+    ("Mun", "Munich", "L", False, True, "G", True),
+    ("Nap", "Naples", "L", True, True, "I", True),
+    ("Nor", "Norway", "L", True, True, None, False),
+    ("Par", "Paris", "L", False, True, "F", True),
+    ("Por", "Portugal", "L", True, True, None, False),
+    ("Rom", "Rome", "L", True, True, "I", True),
+    ("Rum", "Rumania", "L", True, True, None, False),
+    ("Ser", "Serbia", "L", False, True, None, False),
+    ("Sev", "Sevastopol", "L", True, True, "R", True),
+    ("Smy", "Smyrna", "L", True, True, "T", True),
+    ("Spa", "Spain", "L", True, True, None, False),
+    ("Swe", "Sweden", "L", True, True, None, False),
+    ("Stp", "St. Petersburg", "L", True, True, "R", True),
+    ("Tri", "Trieste", "L", True, True, "A", True),
+    ("Tun", "Tunis", "L", True, True, None, False),
+    ("Ven", "Venice", "L", True, True, "I", True),
+    ("Vie", "Vienna", "L", False, True, "A", True),
+    ("War", "Warsaw", "L", False, True, "R", True),
 
     # Other Land Territories (22)
-    ("Alb", "Albania", "L", True, False, None),
-    ("Apu", "Apulia", "L", True, False, None),
-    ("Arm", "Armenia", "L", True, False, None),
-    ("Boh", "Bohemia", "L", False, False, None),
-    ("Bur", "Burgundy", "L", False, False, None),
-    ("Cly", "Clyde", "L", True, False, None),
-    ("Fin", "Finland", "L", True, False, None),
-    ("Gal", "Galicia", "L", False, False, None),
-    ("Gas", "Gascony", "L", True, False, None),
-    ("Lvn", "Livonia", "L", True, False, None),
-    ("NAf", "North Africa", "L", True, False, None),
-    ("Pic", "Picardy", "L", True, False, None),
-    ("Pie", "Piedmont", "L", True, False, None),
-    ("Pru", "Prussia", "L", True, False, None),
-    ("Ruh", "Ruhr", "L", False, False, None),
-    ("Sil", "Silesia", "L", False, False, None),
-    ("Syr", "Syria", "L", True, False, None),
-    ("Tus", "Tuscany", "L", True, False, None),
-    ("Tyr", "Tyrolia", "L", False, False, None),
-    ("Ukr", "Ukraine", "L", False, False, None),
-    ("Wal", "Wales", "L", True, False, None),
-    ("Yor", "Yorkshire", "L", True, False, None),
+    ("Alb", "Albania", "L", True, False, None, False),
+    ("Apu", "Apulia", "L", True, False, None, False),
+    ("Arm", "Armenia", "L", True, False, None, False),
+    ("Boh", "Bohemia", "L", False, False, None, False),
+    ("Bur", "Burgundy", "L", False, False, None, False),
+    ("Cly", "Clyde", "L", True, False, None, False),
+    ("Fin", "Finland", "L", True, False, None, False),
+    ("Gal", "Galicia", "L", False, False, None, False),
+    ("Gas", "Gascony", "L", True, False, None, False),
+    ("Lvn", "Livonia", "L", True, False, None, False),
+    ("NAf", "North Africa", "L", True, False, None, False),
+    ("Pic", "Picardy", "L", True, False, None, False),
+    ("Pie", "Piedmont", "L", True, False, None, False),
+    ("Pru", "Prussia", "L", True, False, None, False),
+    ("Ruh", "Ruhr", "L", False, False, None, False),
+    ("Sil", "Silesia", "L", False, False, None, False),
+    ("Syr", "Syria", "L", True, False, None, False),
+    ("Tus", "Tuscany", "L", True, False, None, False),
+    ("Tyr", "Tyrolia", "L", False, False, None, False),
+    ("Ukr", "Ukraine", "L", False, False, None, False),
+    ("Wal", "Wales", "L", True, False, None, False),
+    ("Yor", "Yorkshire", "L", True, False, None, False),
 
    # Sea Territories (19)
-    ("ADR", "Adriatic Sea", "S", False, False, None),
-    ("AEG", "Aegean Sea", "S", False, False, None),
-    ("BAL", "Baltic Sea", "S", False, False, None),
-    ("BAR", "Barents Sea", "S", False, False, None),
-    ("BLA", "Black Sea", "S", False, False, None),
-    ("EAS", "Eastern Mediterranean", "S", False, False, None),
-    ("ENG", "English Channel", "S", False, False, None),
-    ("BOT", "Gulf of Bothnia", "S", False, False, None),
-    ("HEL", "Heligoland Bight", "S", False, False, None),
-    ("ION", "Ionian Sea", "S", False, False, None),
-    ("IRI", "Irish Sea", "S", False, False, None),
-    ("MAO", "Mid-Atlantic Ocean", "S", False, False, None),
-    ("NAO", "North Atlantic Ocean", "S", False, False, None),
-    ("NTH", "North Sea", "S", False, False, None),
-    ("NWG", "Norwegian Sea", "S", False, False, None),
-    ("SKA", "Skagerrak", "S", False, False, None),
-    ("TYR", "Tyrrhenian Sea", "S", False, False, None),
-    ("WES", "Western Mediterranean", "S", False, False, None),
-    ("LYO", "Gulf of Lyon", "S", False, False, None),
+    ("ADR", "Adriatic Sea", "S", False, False, None, False),
+    ("AEG", "Aegean Sea", "S", False, False, None, False),
+    ("BAL", "Baltic Sea", "S", False, False, None, False),
+    ("BAR", "Barents Sea", "S", False, False, None, False),
+    ("BLA", "Black Sea", "S", False, False, None, False),
+    ("EAS", "Eastern Mediterranean", "S", False, False, None, False),
+    ("ENG", "English Channel", "S", False, False, None, False),
+    ("BOT", "Gulf of Bothnia", "S", False, False, None, False),
+    ("HEL", "Heligoland Bight", "S", False, False, None, False),
+    ("ION", "Ionian Sea", "S", False, False, None, False),
+    ("IRI", "Irish Sea", "S", False, False, None, False),
+    ("MAO", "Mid-Atlantic Ocean", "S", False, False, None, False),
+    ("NAO", "North Atlantic Ocean", "S", False, False, None, False),
+    ("NTH", "North Sea", "S", False, False, None, False),
+    ("NWG", "Norwegian Sea", "S", False, False, None, False),
+    ("SKA", "Skagerrak", "S", False, False, None, False),
+    ("TYR", "Tyrrhenian Sea", "S", False, False, None, False),
+    ("WES", "Western Mediterranean", "S", False, False, None, False),
+    ("LYO", "Gulf of Lyon", "S", False, False, None, False),
 ]
 
 coast_mapping = {
@@ -160,7 +160,7 @@ pk_counter = 1
 territory_pk = {}
 coast_pk = {}
 # Add TerritoryTemplate
-for name, full_name, ttype, has_coasts, sc, owner in territories:
+for name, full_name, ttype, has_coasts, sc, owner, home_center in territories:
     entry = {
         "model": "api.territorytemplate",
         "pk": pk_counter,
@@ -171,6 +171,7 @@ for name, full_name, ttype, has_coasts, sc, owner in territories:
             "territory_type": ttype,
             "has_coasts": has_coasts,
             "country_template": None,
+            "home_center": home_center
         }
     }
     if owner:
@@ -180,7 +181,7 @@ for name, full_name, ttype, has_coasts, sc, owner in territories:
     pk_counter += 1
 
 # Add CoastTemplates
-for name, full_name, ttype, has_coasts, sc, owner in territories:
+for name, full_name, ttype, has_coasts, sc, owner, home_center in territories:
     if ttype != "L" or not has_coasts:
         continue
     if name in coast_mapping:
@@ -238,5 +239,5 @@ for terr, country, utype, coast in units:
 
 
 # Save JSON
-with open("initial_templates.json", "w") as f:
+with open(FILE, "w") as f:
     json.dump(data, f, indent=2)
