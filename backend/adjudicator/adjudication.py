@@ -142,10 +142,9 @@ def resolve_moves(instance=Game):
         order.save()
         # print(order)
     if(instance.retreat_required):
-        pass
+        return
     else:
-        # go to the next turn
-        pass
+        next_turn(instance)
 
 def resolve_retreats(instance=Game):
     """
@@ -166,6 +165,7 @@ def resolve_retreats(instance=Game):
     instance.retreat_required = False
     instance.save()
     # call a new turn!
+    next_turn(instance)
 
 def resolve_adjustments(instance=Game):
     """

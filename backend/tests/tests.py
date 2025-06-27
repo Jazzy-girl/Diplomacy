@@ -293,9 +293,9 @@ class SupportedHoldFails(APITestCase):
         # Test Retreat
         retreat_command = ["A Mun R Tyr"]
 
-        data = orders_to_json(instance=game,commands=retreat_command)
+        retreat_data = orders_to_json(instance=game,commands=retreat_command)
         
-        response = self.client.patch(UPDATE_BULK_ORDER, data, format="json")
+        response = self.client.patch(UPDATE_BULK_ORDER, retreat_data, format="json")
         self.assertEqual(response.status_code, 200)
 
         resolve_retreats(game)
@@ -303,6 +303,19 @@ class SupportedHoldFails(APITestCase):
         order_mun.refresh_from_db()
         self.assertEqual(order.retreat_territory.territory_template.name, "Tyr")
         self.assertEqual(order.retreat_result, 'R')
+
+        # Test next_turn after Retreat
+        self.assertEqual(game.retreat_required, False)
+        self.assertEqual(game.current_turn, 1)
+        
+        new_orders = {order.origin_territory.territory_template.name : order for order in Order.objects.filter(game=game,turn=game.current_turn)}
+        new_order_mun = new_orders["Mun"]
+        new_order_tyr = new_orders["Tyr"]
+
+        self.assertEqual(new_order_mun.origin_territory.territory_template.name, "Mun")
+        self.assertEqual(new_order_tyr.origin_territory.territory_template.name, "Tyr")
+
+
 
 
 
