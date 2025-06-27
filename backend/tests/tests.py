@@ -10,7 +10,7 @@ from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.models import Game, Territory, Unit, Order, Sandbox, Country, CoastTemplate, TerritoryTemplate, UnitRetreatOption
-from adjudicator.adjudication import resolve_moves, resolve_retreats
+from adjudicator.adjudication import resolve_moves, resolve_retreats, next_turn
 
 TEMPLATE_SETUP = 'tests/json/templates.json'
 VANILLA_UNIT_SETUP = 'tests/json/vanilla_setup.json'
@@ -310,12 +310,19 @@ class SupportedHoldFails(APITestCase):
         self.assertEqual(game.current_turn, 1)
         
         new_orders = {order.origin_territory.territory_template.name : order for order in Order.objects.filter(game=game,turn=game.current_turn)}
-        print(new_orders)
-        # new_order_mun = new_orders["Mun"]
-        # new_order_tyr = new_orders["Tyr"]
+        # print(new_orders)
+        new_order_mun = new_orders["Mun"]
+        new_order_tyr = new_orders["Tyr"]
 
-        # self.assertEqual(new_order_mun.origin_territory.territory_template.name, "Mun")
-        # self.assertEqual(new_order_tyr.origin_territory.territory_template.name, "Tyr")
+        self.assertEqual(new_order_mun.origin_territory.territory_template.name, "Mun")
+        self.assertEqual(new_order_tyr.origin_territory.territory_template.name, "Tyr")
+
+        print([o for o in Order.objects.filter(game=game,turn=game.current_turn)])
+
+        next_turn(game)
+        game.refresh_from_db()
+
+        
 
 
 

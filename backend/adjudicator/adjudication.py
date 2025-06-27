@@ -242,13 +242,14 @@ def next_turn(instance=Game):
         if isinstance(instance, Game):
             # units = DjangoUnit.objects.filter(game=instance,disbanded=False)
             countries = Country.objects.filter(game=instance)
-            orders = Order.objects.filter(game=instance,turn=instance.current_turn,retreat_result = 'R' or None) # Excludes Disbands
+            orders = Order.objects.filter(game=instance,turn=instance.current_turn,unit__disbanded=False) # Excludes Disbands
         else:
             # units = DjangoUnit.objects.filter(sandbox=instance,disbanded=False)
             countries = Country.objects.filter(sandbox=instance)
-            orders = Order.objects.filter(sandbox=instance,turn=instance.current_turn,retreat_result = 'R' or None) # Excludes Disbands
+            orders = Order.objects.filter(sandbox=instance,turn=instance.current_turn,unit__disbanded=False) # Excludes Disbands
         unit_count = defaultdict(int)
         for order in orders:
+            print(order)
             unit = order.unit
             unit.territory, unit.coast = _get_new_locations(order)
             unit.territory.country = unit.country
@@ -265,10 +266,12 @@ def next_turn(instance=Game):
         sc_count = defaultdict(int)
         
         for sc in scs:
-            sc_count[sc.country.pk] += 1
+            if sc.country:
+                sc_count[sc.country.pk] += 1
         disband_cache = defaultdict(list) # JSON
         build_cache = defaultdict(list) # JSON
         for country in countries:
+            print(f"{country.country_template.full_name} : SC COUNT = {sc_count[country.pk]}; UNIT COUNT = {unit_count[country.pk]}")
             country.scs = sc_count[country.pk]
             difference = sc_count[country.pk] - unit_count[country.pk]
             if difference < 0:
@@ -309,15 +312,13 @@ def next_turn(instance=Game):
             pass
         else: # they aint empty
             # pass to the Phase model!
+            print(build_cache)
+            print(disband_cache)
             if isinstance(instance, Game):
-                phase = Phase.objects.create(game=instance,turn=new_turn)
+                phase = Phase.objects.create(game=instance,turn=new_turn,build_cache=build_cache,disband_cache=disband_cache)
             elif isinstance(instance, Sandbox):
-                phase = Phase.objects.create(sandbox=instance,turn=new_turn)
-            # how to put json to a JSONField?
-            # phase.build_cache = json.dumps(build_cache) # is this how this works?
-            # phase.disband_cache = json.dumps(disband_cache) # is this how this works?
+                phase = Phase.objects.create(sandbox=instance,turn=new_turn,build_cache=build_cache,disband_cache=disband_cache)
             # winter has begun
-            pass
     elif season == WINTER:
         # Make new default hold orders for each living unit
         isGame = True if isinstance(instance, Game) else False

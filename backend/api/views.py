@@ -80,6 +80,26 @@ class BulkUpdateOrdersView(APIView):
             
         return Response(updated_orders, status=status.HTTP_200_OK)
 
+class BulkCreateOrders(APIView):
+    def patch(self, request, *args, **kwargs):
+        orders = request.data
+
+        if not isinstance(orders, list):
+            return Response({'error' : 'Expected a list of order updates'}, status=status.HTTP_400_BAD_REQUEST)
+
+        created_orders = []
+        for order_data in orders:
+            order_id = order_data.get('id')
+            if not order_id:
+                continue
+            order = Order.objects.create(id=order_id)
+            serializer = OrderSerializer(order, data=order_data,partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                created_orders.append(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(created_orders, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
