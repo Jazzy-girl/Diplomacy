@@ -249,7 +249,7 @@ def next_turn(instance=Game):
             orders = Order.objects.filter(sandbox=instance,turn=instance.current_turn,unit__disbanded=False) # Excludes Disbands
         unit_count = defaultdict(int)
         for order in orders:
-            print(order)
+            # print(order)
             unit = order.unit
             unit.territory, unit.coast = _get_new_locations(order)
             unit.territory.country = unit.country
