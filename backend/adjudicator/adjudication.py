@@ -11,13 +11,14 @@ from pydip.player.command.command import (
     SupportCommand
 )
 
+import json
 from pydip.player.command.retreat_command import RetreatDisbandCommand, RetreatMoveCommand
 
 from pydip.player import Player
 
 from pydip.map.predefined import vanilla_dip
 
-from api.models import Game, Sandbox, Country, Order, Territory, TerritoryTemplate, CoastTemplate, CountryTemplate, UnitType, UnitRetreatOption
+from api.models import Game, Sandbox, Country, Order, Territory, TerritoryTemplate, CoastTemplate, CountryTemplate, UnitType, UnitRetreatOption, Phase
 from api.models import Unit as DjangoUnit
 
 from collections import defaultdict
@@ -143,27 +144,65 @@ def resolve_moves(instance=Game):
     if(instance.retreat_required):
         pass
     else:
+        # go to the next turn
         pass
-        # Go to the next turn
-        # next_turn(instance)
-            # 1 4 7 = Spring
-            # 2 5 8 = Fall
-            # 3 6 9 = Winter
-            # whats the math here?
-            # what if we started at 0
-            # 0 3 6 = Spring
-            # 1 4 7 = Fall
-            # 2 5 8 = Winter
-            # math here:
-            # if divisible by 3, its spring
-            # if divisible by 3 with a remainder of 1, its Fall
-            # if divisible by 3 with a remainder of 2, its Winter
+
+def resolve_retreats(instance=Game):
+    """
+    Resolves retreats.
+    """
+    if isinstance(instance, Game):
+        retreat_orders = Order.objects.filter(game=instance,turn=instance.current_turn,retreat_required=True)
+    else:
+        retreat_orders = Order.objects.filter(sandbox=instance,turn=instance.current_turn,retreat_required=True)
+    for order in retreat_orders:
+        other_orders = list(filter(lambda c: c!=order, retreat_orders))
+        if all(order.retreat_territory != other_order.retreat_territory for other_order in other_orders):
+            order.retreat_result = 'R'
+        else:
+            order.retreat_result = 'D'
+            order.unit.disbanded = True
+        order.save()
+    instance.retreat_required = False
+    instance.save()
+    # call a new turn!
+
+def resolve_adjustments(instance=Game):
+    """
+    Resolves Winter builds and disbands.
+    """
+    # Take in build & disband orders. Create and disband units
+    isGame = True if isinstance(instance, Game) else False
+    if isGame:
+        orders = Order.objects.filter(game=instance,turn=instance.current_turn)
+    else:
+        orders = Order.objects.filter(sandbox=instance,turn=instance.current_turn)
+
+    for order in orders:
+        if order.adjustment_type == 'B': # Build: make a new unit and hold order
+            territory = order.build_territory
+            coast = order.build_coast
+            unit_type = order.build_type
+            country = order.country
+            if isGame:
+                unit = DjangoUnit.objects.create(game=instance,territory=territory,coast=coast,type=unit_type,country=country)
+            else:
+                unit = DjangoUnit.objects.create(sandbox=instance,territory=territory,coast=coast,type=unit_type,country=country)
+            order.unit = unit
+            order.save()
+        elif order.adjustment_type == 'D': # Disband
+            order.unit.disbanded = True
+            unit.save()
+    # call next_turn(instance)
+
+
 
 def next_turn(instance=Game):
     SPRING = 0
     FALL = 1
     WINTER = 2
     turn = instance.current_turn
+    new_turn = turn + 1
     season = turn % 3
 
     def _get_new_locations(order=Order):
@@ -184,7 +223,6 @@ def next_turn(instance=Game):
             orders = Order.objects.filter(game=instance,turn=instance.current_turn,retreat_result = 'R' or None) # Excludes Disbanded orders
         else:
             orders = Order.objects.filter(sandbox=instance,turn=instance.current_turn,retreat_result = 'R' or None) # Excludes Disbanded orders
-        new_turn = instance.current_turn + 1
         for order in orders:
             origin_territory, origin_coast = _get_new_locations(order)
             country = order.country
@@ -218,9 +256,11 @@ def next_turn(instance=Game):
             unit_count[order.country.pk] += 1
         if isinstance(instance, Game):
             scs = Territory.objects.filter(game=instance,territory_template__sc_exists=True)
-            occupied_territories = {}
+            occupied_territories = {unit.territory for unit in DjangoUnit.objects.filter(game=instance,disbanded=False)}
         else:
             scs = Territory.objects.filter(sandbox=instance,territory_template__sc_exists=True)
+            occupied_territories = {unit.territory for unit in DjangoUnit.objects.filter(sandbox=instance,disbanded=False)}
+        coasts = CoastTemplate.objects.all()
         sc_count = defaultdict(int)
         
         for sc in scs:
@@ -236,42 +276,60 @@ def next_turn(instance=Game):
                 # Format: <Country> : [<Unit>, <Unit>, ...]
                 disband_cache[country.pk] = [order.unit.pk for order in orders if order.unit.country==country]
             elif difference > 0:
-                country.available_builds = difference
+                # should available builds be maximized to the len of build_cache? or should be the true difference?
                 # make builds JSON list of unoccupied home centers
                 """
                 Requirements for being in the build cache:
                     - is a home center 
                     - is a home center for your country
                     - is owned by you
-                    - has no unit in it
+                    - is not occupied by a unit
+
+                What about the goddamned coasts???
+                    - is a coasttemplate whos territory_template parent is already in the list!
                 """
-                build_cache[country.pk] = [] # sc.pk for sc in scs if sc.country==country and sc.territory_template.home_center==True and sc not in units.values() (assuming units is a dict {unit : occupied_territory})
+                base_territories = [
+                    sc for sc in scs
+                    if sc.country==country and sc.territory_template.home_center==True
+                    and sc.territory_template.country_template==country.country_template
+                    and sc not in occupied_territories
+                ]
                 
+                build_cache[country.pk] = [sc.pk for sc in base_territories]
+
+                valid_terr_templates = {sc.territory_template for sc in base_territories}
+                build_cache[country.pk].extend([coast.pk for coast in coasts if coast.territory_template in valid_terr_templates])
+                country.available_builds = min(difference, len(build_cache[country.pk]))
             country.save()    
-
+        # CHECK: Are there 0 needed disbands & 0 available builds? if so skip RIGHT through winter to Spring!!!
+        if not disband_cache and not build_cache: # Empty
+            # skip right through winter to spring!
+            # current_turn += 1?
+            pass
+        else: # they aint empty
+            # pass to the Phase model!
+            if isinstance(instance, Game):
+                phase = Phase.objects.create(game=instance,turn=new_turn)
+            elif isinstance(instance, Sandbox):
+                phase = Phase.objects.create(sandbox=instance,turn=new_turn)
+            # how to put json to a JSONField?
+            # phase.build_cache = json.dumps(build_cache) # is this how this works?
+            # phase.disband_cache = json.dumps(disband_cache) # is this how this works?
+            # winter has begun
+            pass
     elif season == WINTER:
-        # Based on each order: make new units as necessary and disband units as necessary.
         # Make new default hold orders for each living unit
-        pass
-    instance.current_turn += 1
-
-
-def resolve_retreats(instance=Game):
-    """
-    Resolves retreats.
-    """
-    retreat_orders = Order.objects.filter(game=instance,turn=instance.current_turn,retreat_required=True)
-    for order in retreat_orders:
-        other_orders = list(filter(lambda c: c!=order, retreat_orders))
-        if all(order.retreat_territory != other_order.retreat_territory for other_order in other_orders):
-            order.retreat_result = 'R'
+        isGame = True if isinstance(instance, Game) else False
+        if isGame:
+            units = DjangoUnit.objects.filter(game=instance,disbanded=False)
         else:
-            order.retreat_result = 'D'
-            order.unit.disbanded = True
-        order.save()
-    instance.retreat_required = False
-    instance.save()
-    # call a new turn!
+            units = DjangoUnit.objects.filter(sandbox=instance,disbanded=False)
+        for unit in units:
+            if isGame:
+                order = Order.objects.create(game=instance,turn=new_turn,unit=unit,origin_territory=unit.territory,origin_coast=unit.coast,move_type=Order.MoveTypes.HOLD)
+            else:
+                order = Order.objects.create(game=instance,turn=new_turn,unit=unit,origin_territory=unit.territory,origin_coast=unit.coast,move_type=Order.MoveTypes.HOLD)
+    instance.current_turn += 1
 
                             
 

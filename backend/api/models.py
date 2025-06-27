@@ -122,12 +122,13 @@ class Order(models.Model):
         RETREAT = 'R', _('Retreat')
         DISBAND = 'D', _('Disband')
     
-    class WinterMoveTypes(models.TextChoices):
+    class AdjustmentTypes(models.TextChoices):
         BUILD = 'B', _('Build')
         DISBAND = 'D', _('Disband')
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    # unit_type = models.CharField(choices=UnitType, max_length=1)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="orders_as_unit", null=True, default=None)
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     origin_territory = models.ForeignKey(Territory, on_delete=models.CASCADE, related_name="orders_as_origin_territory") # start territory
@@ -148,7 +149,9 @@ class Order(models.Model):
     retreat_coast = models.ForeignKey(CoastTemplate, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name="orders_as_retreat_coast")
     retreat_result = models.CharField(RetreatResult.choices, max_length=7, null=True, blank=True, default=None) # RETREAT, DISBAND
     build_territory = models.ForeignKey(Territory, on_delete=models.CASCADE,null=True, blank=True, default=None, related_name="orders_as_build_territory")
-    winter_order = models.CharField(WinterMoveTypes.choices, max_length=7, null=True, blank=True, default=None)
+    build_coast = models.ForeignKey(CoastTemplate, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name="orders_as_build_coast")
+    build_type = models.CharField(choices=UnitType, max_length=1,null=True, blank=True, default=None)
+    adjustment_type = models.CharField(AdjustmentTypes.choices, max_length=7, null=True, blank=True, default=None)
 
     def __str__(self):
         match self.move_type:
