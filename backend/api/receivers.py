@@ -5,6 +5,7 @@ from django.conf import settings
 import os
 
 import json
+from collections import defaultdict
 
 def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, created, **kwargs):
     # print("signal triggered!") #Debug
@@ -19,8 +20,9 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
         country_templates = CountryTemplate.objects.all()
         countries = {}
         countries[None] = None
+        country_scs = defaultdict(int)
         for template in country_templates:
-            country = Country.objects.create(country_template=template, scs=template.scs)
+            country = Country.objects.create(country_template=template)
             if isinstance(instance, Game):
                 country.game = instance
             else:
@@ -40,6 +42,8 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
                 territory.sandbox = instance
             territory.save()
             territories[template] = territory
+            if template.sc_exists and template.country_template != None:
+                country_scs[template.country_template] += 1
         
         setups = InitialUnitSetup.objects.all()
         for setup in setups:
@@ -59,5 +63,8 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
                 order.sandbox = instance
             unit.save()
             order.save()
+        for template, country in countries.items():
+            if template:
+                country.scs = country_scs[template]
 post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Game)
 post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Sandbox)
