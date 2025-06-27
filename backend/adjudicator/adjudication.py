@@ -211,7 +211,7 @@ def next_turn(instance=Game):
         """
         if order.retreat_result == 'R':
             origin_territory, origin_coast = order.retreat_territory, order.retreat_coast
-        elif (order.move_type == 'M' or 'V') and order.result == 'SUCCEEDS':
+        elif (order.move_type == 'M' or order.move_type == 'V') and order.result == 'SUCCEEDS':
             origin_territory, origin_coast = order.target_territory, order.target_coast
         else:
             origin_territory, origin_coast = order.origin_territory, order.origin_coast
@@ -220,11 +220,12 @@ def next_turn(instance=Game):
     if season == SPRING:
         # Based on each order: make new hold orders for each non disbanded order, and update unit locations.
         if isinstance(instance, Game):
-            orders = Order.objects.filter(game=instance,turn=instance.current_turn,retreat_result = 'R' or None) # Excludes Disbanded orders
+            orders = Order.objects.filter(game=instance,turn=instance.current_turn,unit__disbanded=False) # Excludes Disbanded orders
         else:
-            orders = Order.objects.filter(sandbox=instance,turn=instance.current_turn,retreat_result = 'R' or None) # Excludes Disbanded orders
+            orders = Order.objects.filter(sandbox=instance,turn=instance.current_turn,unit__disbanded=False) # Excludes Disbanded orders
         for order in orders:
             origin_territory, origin_coast = _get_new_locations(order)
+            # print(f"TESTING: {origin_territory} {origin_coast}")
             country = order.country
             unit = order.unit
             unit.territory = origin_territory
@@ -330,6 +331,7 @@ def next_turn(instance=Game):
             else:
                 order = Order.objects.create(game=instance,turn=new_turn,unit=unit,origin_territory=unit.territory,origin_coast=unit.coast,move_type=Order.MoveTypes.HOLD)
     instance.current_turn += 1
+    instance.save()
 
                             
 

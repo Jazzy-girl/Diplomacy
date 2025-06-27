@@ -64,7 +64,9 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
             unit.save()
             order.save()
         for template, country in countries.items():
-            if template:
+            # print(f"{template} : {country}")
+            if template != None:
                 country.scs = country_scs[template]
+                country.save()
 post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Game)
 post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Sandbox)
