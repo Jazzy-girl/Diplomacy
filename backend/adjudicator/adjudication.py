@@ -280,18 +280,7 @@ def next_turn(instance=Game):
                 # Format: <Country> : [<Unit>, <Unit>, ...]
                 disband_cache[country.pk] = [order.unit.pk for order in orders if order.unit.country==country]
             elif difference > 0:
-                # should available builds be maximized to the len of build_cache? or should be the true difference?
                 # make builds JSON list of unoccupied home centers
-                """
-                Requirements for being in the build cache:
-                    - is a home center 
-                    - is a home center for your country
-                    - is owned by you
-                    - is not occupied by a unit
-
-                What about the goddamned coasts???
-                    - is a coasttemplate whos territory_template parent is already in the list!
-                """
                 base_territories = [
                     sc for sc in scs
                     if sc.country==country and sc.territory_template.home_center==True
@@ -333,8 +322,3 @@ def next_turn(instance=Game):
                 order = Order.objects.create(game=instance,turn=new_turn,unit=unit,origin_territory=unit.territory,origin_coast=unit.coast,move_type=Order.MoveTypes.HOLD)
     instance.current_turn += 1
     instance.save()
-
-                            
-
-
-
