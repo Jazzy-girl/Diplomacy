@@ -34,8 +34,8 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
         # print(f"Loaded {TerritoryTemplate.objects.count()} templates")
         territories = {}
         for template in territory_templates:
-            country = countries[template.country_template]
-            territory = Territory.objects.create(territory_template=template,country=country)
+            # country = countries[template.country_template]
+            territory = Territory.objects.create(territory_template=template)
             if isinstance(instance, Game):
                 territory.game = instance
             else:
@@ -63,6 +63,8 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
                 order.sandbox = instance
             unit.save()
             order.save()
+            unit.territory.country = unit.country
+            unit.territory.save()
             if unit.territory.territory_template.sc_exists:
                 country_scs[unit.country.pk] += 1
         for template, country in countries.items():

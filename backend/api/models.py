@@ -129,9 +129,9 @@ class Order(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
     # unit_type = models.CharField(choices=UnitType, max_length=1)
-    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="orders_as_unit", null=True, default=None)
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="orders_as_unit", blank=True, null=True, default=None)
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
-    origin_territory = models.ForeignKey(Territory, on_delete=models.CASCADE, related_name="orders_as_origin_territory") # start territory
+    origin_territory = models.ForeignKey(Territory, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name="orders_as_origin_territory") # start territory
     origin_coast = models.ForeignKey(CoastTemplate, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name="orders_as_origin_coast")
     target_territory = models.ForeignKey(Territory, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name="orders_as_target_territory") # target territory
     target_coast = models.ForeignKey(CoastTemplate, on_delete=models.CASCADE, null=True, blank=True, default=None, related_name="orders_as_target_coast")
@@ -142,7 +142,7 @@ class Order(models.Model):
     turn = models.PositiveSmallIntegerField(default=0)
     submitted = models.BooleanField(default=False)
     result = models.CharField(choices=OrderResult.choices, max_length=10, default='PENDING')
-    fail_reason = models.ForeignKey(FailureReason, on_delete=models.SET_NULL, null=True)
+    fail_reason = models.ForeignKey(FailureReason, on_delete=models.SET_NULL, null=True, blank=True,default=None)
     dislodged = models.BooleanField(default=False)
     retreat_required = models.BooleanField(default=False)
     retreat_territory = models.ForeignKey(Territory, on_delete=models.CASCADE,null=True, blank=True, default=None, related_name="orders_as_retreat_territory") # territory for support
@@ -174,7 +174,7 @@ class UnitRetreatOption(models.Model):
     def __str__(self):
         return f"{self.order.unit} : {self.coast.full_name if self.coast else self.territory.territory_template.full_name}"
     
-class Phase(models.Model):
+class AdjustmentCache(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
     build_cache = models.JSONField(null=True,blank=True,default=None)

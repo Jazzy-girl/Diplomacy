@@ -18,7 +18,7 @@ from pydip.player import Player
 
 from pydip.map.predefined import vanilla_dip
 
-from api.models import Game, Sandbox, Country, Order, Territory, TerritoryTemplate, CoastTemplate, CountryTemplate, UnitType, UnitRetreatOption, Phase
+from api.models import Game, Sandbox, Country, Order, Territory, TerritoryTemplate, CoastTemplate, CountryTemplate, UnitType, UnitRetreatOption, AdjustmentCache
 from api.models import Unit as DjangoUnit
 
 from collections import defaultdict
@@ -180,6 +180,9 @@ def resolve_adjustments(instance=Game):
 
     for order in orders:
         if order.adjustment_type == 'B': # Build: make a new unit and hold order
+            """
+            Need to add check to stop too many build orders
+            """
             territory = order.build_territory
             coast = order.build_coast
             unit_type = order.build_type
@@ -191,9 +194,12 @@ def resolve_adjustments(instance=Game):
             order.unit = unit
             order.save()
         elif order.adjustment_type == 'D': # Disband
+            """
+            Need to add check to stop too many disbands
+            """
             order.unit.disbanded = True
-            unit.save()
-    # call next_turn(instance)
+            order.unit.save()
+    next_turn(instance)
 
 
 
@@ -301,12 +307,12 @@ def next_turn(instance=Game):
             pass
         else: # they aint empty
             # pass to the Phase model!
-            print(build_cache)
-            print(disband_cache)
+            # print(build_cache)
+            # print(disband_cache)
             if isinstance(instance, Game):
-                phase = Phase.objects.create(game=instance,turn=new_turn,build_cache=build_cache,disband_cache=disband_cache)
+                adjustmentCache = AdjustmentCache.objects.create(game=instance,turn=new_turn,build_cache=build_cache,disband_cache=disband_cache)
             elif isinstance(instance, Sandbox):
-                phase = Phase.objects.create(sandbox=instance,turn=new_turn,build_cache=build_cache,disband_cache=disband_cache)
+                adjustmentCache = AdjustmentCache.objects.create(sandbox=instance,turn=new_turn,build_cache=build_cache,disband_cache=disband_cache)
             # winter has begun
     elif season == WINTER:
         # Make new default hold orders for each living unit
@@ -317,8 +323,8 @@ def next_turn(instance=Game):
             units = DjangoUnit.objects.filter(sandbox=instance,disbanded=False)
         for unit in units:
             if isGame:
-                order = Order.objects.create(game=instance,turn=new_turn,unit=unit,origin_territory=unit.territory,origin_coast=unit.coast,move_type=Order.MoveTypes.HOLD)
+                order = Order.objects.create(game=instance,country=unit.country,turn=new_turn,unit=unit,origin_territory=unit.territory,origin_coast=unit.coast,move_type=Order.MoveTypes.HOLD)
             else:
-                order = Order.objects.create(game=instance,turn=new_turn,unit=unit,origin_territory=unit.territory,origin_coast=unit.coast,move_type=Order.MoveTypes.HOLD)
+                order = Order.objects.create(game=instance,country=unit.country,turn=new_turn,unit=unit,origin_territory=unit.territory,origin_coast=unit.coast,move_type=Order.MoveTypes.HOLD)
     instance.current_turn += 1
     instance.save()

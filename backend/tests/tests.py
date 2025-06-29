@@ -9,8 +9,8 @@ import json
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.models import Game, Territory, Unit, Order, Sandbox, Country, CoastTemplate, TerritoryTemplate, UnitRetreatOption
-from adjudicator.adjudication import resolve_moves, resolve_retreats, next_turn
+from api.models import Game, Territory, Unit, Order, Sandbox, Country, CoastTemplate, TerritoryTemplate, UnitRetreatOption, AdjustmentCache
+from adjudicator.adjudication import resolve_moves, resolve_retreats, next_turn, resolve_adjustments
 
 TEMPLATE_SETUP = 'tests/json/templates.json'
 VANILLA_UNIT_SETUP = 'tests/json/vanilla_setup.json'
@@ -317,10 +317,31 @@ class SupportedHoldFails(APITestCase):
         self.assertEqual(new_order_mun.origin_territory.territory_template.name, "Mun")
         self.assertEqual(new_order_tyr.origin_territory.territory_template.name, "Tyr")
 
-        print([o for o in Order.objects.filter(game=game,turn=game.current_turn)])
+        # print([o for o in Order.objects.filter(game=game,turn=game.current_turn)])
 
-        next_turn(game)
+        next_turn(game) # Fall-Winter
         game.refresh_from_db()
+
+        cache = AdjustmentCache.objects.get(game=game,turn=game.current_turn)
+        germany = Country.objects.get(game=game,country_template__name='G')
+        german_units = Unit.objects.filter(game=game,country=germany)
+        disband_cache = cache.disband_cache
+        unit_tyr = Unit.objects.get(game=game,country=germany,territory__territory_template__name='Tyr')
+        print(disband_cache)
+        for german_unit in german_units:
+            assert german_unit.pk in disband_cache[f"{germany.pk}"]
+        
+        disband_order = Order.objects.create(
+            game=game,country=germany,turn=game.current_turn,unit=unit_tyr,
+            adjustment_type='D')
+        
+        resolve_adjustments(game)
+
+        unit_tyr.refresh_from_db()
+        game.refresh_from_db()
+
+        self.assertEqual(unit_tyr.disbanded, True)
+        
 
         
 
