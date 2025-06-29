@@ -327,7 +327,7 @@ class SupportedHoldFails(APITestCase):
         german_units = Unit.objects.filter(game=game,country=germany)
         disband_cache = cache.disband_cache
         unit_tyr = Unit.objects.get(game=game,country=germany,territory__territory_template__name='Tyr')
-        print(disband_cache)
+        # print(disband_cache)
         for german_unit in german_units:
             assert german_unit.pk in disband_cache[f"{germany.pk}"]
         
@@ -341,10 +341,7 @@ class SupportedHoldFails(APITestCase):
         game.refresh_from_db()
 
         self.assertEqual(unit_tyr.disbanded, True)
-        
-
-        
-
+        self.assertNotEqual(Order.objects.get(game=game,turn=game.current_turn,move_type='H',origin_territory__territory_template__name='Ber'),None)
 
 
 

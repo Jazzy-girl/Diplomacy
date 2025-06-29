@@ -30,13 +30,8 @@ THE ADJUDICATOR!
     - Loads the vanilla map (for now; later will introduce variants)
     - Loads units and orders into place
 
-How to:
-Needs
-- Player takes a name, the map, and the config of units in form of a dict of (territory_name: <territory name>, unit_type: <unit type; TROOP (0) v FLEET (1)> )
-- To get this: 
-    - need units: need the full name of the territory template of their territory, 
-                  the (potential) full name of their coasttemplate,
-                  the full name of the country template of their country
+NEED TO UPDATE:
+    - resolve_adjustments (alphabetical order for too many builds / disbands)
 """
 def resolve_moves(instance=Game):
     game_map = vanilla_dip.generate_map()
@@ -181,8 +176,11 @@ def resolve_adjustments(instance=Game):
     for order in orders:
         if order.adjustment_type == 'B': # Build: make a new unit and hold order
             """
-            Need to add check to stop too many build orders
+            NEED TO ADD: 
+                - check to stop too many build orders
+                - if too many build orders, fulfill build orders by alphabetical order 
             """
+
             territory = order.build_territory
             coast = order.build_coast
             unit_type = order.build_type
@@ -195,7 +193,9 @@ def resolve_adjustments(instance=Game):
             order.save()
         elif order.adjustment_type == 'D': # Disband
             """
-            Need to add check to stop too many disbands
+            NEED TO ADD: 
+                - check to stop too many disband orders
+                - if too many disband orders, fulfill disband orders by alphabetical order 
             """
             order.unit.disbanded = True
             order.unit.save()
@@ -277,7 +277,7 @@ def next_turn(instance=Game):
         disband_cache = defaultdict(list) # JSON
         build_cache = defaultdict(list) # JSON
         for country in countries:
-            print(f"{country.country_template.full_name} : SC COUNT = {sc_count[country.pk]}; UNIT COUNT = {unit_count[country.pk]}")
+            # print(f"{country.country_template.full_name} : SC COUNT = {sc_count[country.pk]}; UNIT COUNT = {unit_count[country.pk]}")
             country.scs = sc_count[country.pk]
             difference = sc_count[country.pk] - unit_count[country.pk]
             if difference < 0:
