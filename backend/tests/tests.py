@@ -343,8 +343,69 @@ class SupportedHoldFails(APITestCase):
         self.assertEqual(unit_tyr.disbanded, True)
         self.assertNotEqual(Order.objects.get(game=game,turn=game.current_turn,move_type='H',origin_territory__territory_template__name='Ber'),None)
 
+class GetBuilds(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        call_command('loaddata', TEMPLATE_SETUP)
+        call_command('loaddata', 'tests/json/vanilla_setup.json')
+        cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
+    
+    def test_get_builds(self):
+        """
+        Spring 1901:
+        F Ank - BLA
+        A Con - Bul
 
+        Fall 1901:
+        F BLA - Bul/ec
+        A Bul - Rum
+        """
+        refresh = RefreshToken.for_user(self.user)
+        access_token = str(refresh.access_token)
 
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+        game = Game.objects.create(name="Test Game")
+        # print(Order.objects.all())
+        # for order in Order.objects.all():
+        #     print(order)
+
+        commands = [
+            "F Ank/c - BLA",
+            "A Con - Bul"
+        ]
+
+        data = orders_to_json(instance=game,commands=commands)
+        
+        response = self.client.patch(UPDATE_BULK_ORDER, data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        resolve_moves(game)
+
+        fall_commands = [
+            "F BLA - Bul/ec",
+            "A Bul - Rum"
+        ]
+
+        fall_data = orders_to_json(instance=game,commands=fall_commands)
+
+        response = self.client.patch(UPDATE_BULK_ORDER, fall_data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        resolve_moves(game)
+
+        cache = AdjustmentCache.objects.get(game=game,turn=game.current_turn)
+        turkey = Country.objects.get(game=game,country_template__name='T')
+        self.assertEqual(turkey.available_builds, 2)
+        builds = cache.build_cache
+        build_locales = set()
+        for build in builds['19']:
+            try:
+               build_locales.add(Territory.objects.get(id=build).territory_template.full_name)
+            except:
+                build_locales.add(CoastTemplate.objects.get(id=build).full_name)
+        test_locales = {"Ankara", "Ankara Coast", "Constantinople", "Constantinople Coast"}
+        for locale in test_locales:
+            assert locale in build_locales
 
 class BulkUpdateOrdersTest(APITestCase):
     @classmethod
