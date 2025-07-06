@@ -447,7 +447,7 @@ def test_d_17__dislodgement_cuts_supports():
         'Russia': {
             Unit(UnitTypes.FLEET, 'Black Sea'): None,
             Unit(UnitTypes.FLEET, 'Constantinople Coast'): {
-                'Bulgaria North Coast',
+                'Bulgaria East Coast',
                 'Bulgaria South Coast',
                 'Aegean Sea',
             },
