@@ -29,7 +29,7 @@ Solution:
 Questions...
 How often to make new entries to the Territory & Country tables?
     - territory ownership (and thus SC count) updates upon the end of Fall turns.
-        - Thus, make new entries at the end of Spring 1901 (first turn) and then at the end of every Fall turn.
+        - Thus, make new entries at the end of every Fall turn.
         - when accessing a past turn, 
         if Fall turn, use the same turn's tables, 
         if Spring, use the same turn -2's tables, 

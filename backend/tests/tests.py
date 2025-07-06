@@ -9,7 +9,11 @@ import json
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.models import Game, Territory, Unit, Order, Sandbox, Country, CoastTemplate, TerritoryTemplate, UnitRetreatOption, AdjustmentCache
+from api.models import (
+    Game, Territory, Unit, Order, Sandbox, 
+    Country, CoastTemplate, TerritoryTemplate, UnitRetreatOption, 
+    AdjustmentCache, CountrySCCountSnapshot, TerritoryCountrySnapshot
+    )
 from adjudicator.adjudication import resolve_moves, resolve_retreats, next_turn, resolve_adjustments
 
 TEMPLATE_SETUP = 'tests/json/templates.json'
@@ -397,6 +401,8 @@ class GetBuilds(APITestCase):
         turkey = Country.objects.get(game=game,country_template__name='T')
         self.assertEqual(turkey.available_builds, 2)
         self.assertEqual(turkey.scs, 5)
+        self.assertEqual(Territory.objects.get(game=game,territory_template__name='Bul').country.country_template.name,'T')
+        self.assertEqual(CountrySCCountSnapshot.objects.get(game=game,country=turkey).scs,5)
         builds = cache.build_cache
         build_locales = set()
         for build in builds['19']:

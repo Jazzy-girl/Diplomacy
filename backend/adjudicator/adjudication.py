@@ -18,7 +18,11 @@ from pydip.player import Player
 
 from pydip.map.predefined import vanilla_dip
 
-from api.models import Game, Sandbox, Country, Order, Territory, TerritoryTemplate, CoastTemplate, CountryTemplate, UnitType, UnitRetreatOption, AdjustmentCache
+from api.models import (
+    Game, Sandbox, Country, Order, Territory, TerritoryTemplate, 
+    CoastTemplate, CountryTemplate, UnitType, UnitRetreatOption, AdjustmentCache,
+    CountrySCCountSnapshot, TerritoryCountrySnapshot
+    )
 from api.models import Unit as DjangoUnit
 
 from collections import defaultdict
@@ -225,6 +229,8 @@ def next_turn(instance=Game):
     new_turn = turn + 1
     season = turn % 3
 
+    isGame = True if isinstance(instance, Game) else False
+
     def _get_new_locations(order=Order):
         """
         Takes in an order, returns the updated origin territory and coast of a unit / new order
@@ -256,9 +262,11 @@ def next_turn(instance=Game):
             else:
                 new_order = Order.objects.create(sandbox=instance,turn=new_turn,unit=unit,country=country,origin_territory=origin_territory,origin_coast=origin_coast,move_type='H')
     elif season == FALL:
-        # Update unit locations
-        # Update owned territories / supply centers
-        # make possible build table entries or possible disband entries (wouldnt these just be any fucking untit? that already exists in the non-disbanded orders...)
+        """
+        Update unit locations, owned territories, sc counts, make available build and disband cache
+        Make new entries into the AdjustmentCache if necessary
+        Make new entries into the TerritoryCountrySnapshot & CountrySCCountSnapshot tables
+        """
         if isinstance(instance, Game):
             # units = DjangoUnit.objects.filter(game=instance,disbanded=False)
             countries = Country.objects.filter(game=instance)
@@ -276,6 +284,11 @@ def next_turn(instance=Game):
             unit.territory.save()
             unit.save()
             unit_count[order.country.pk] += 1
+            # Make entries into the TerritoryCountrySnapshot table!
+            if isGame:
+                TerritoryCountrySnapshot.objects.create(game=instance,territory=unit.territory,country=unit.country,turn=instance.current_turn)
+            else:
+                TerritoryCountrySnapshot.objects.create(sandbox=instance,territory=unit.territory,country=unit.country,turn=instance.current_turn)
         if isinstance(instance, Game):
             scs = Territory.objects.filter(game=instance,territory_template__sc_exists=True)
             occupied_territories = {unit.territory for unit in DjangoUnit.objects.filter(game=instance,disbanded=False)}
@@ -293,6 +306,11 @@ def next_turn(instance=Game):
         for country in countries:
             # print(f"{country.country_template.full_name} : SC COUNT = {sc_count[country.pk]}; UNIT COUNT = {unit_count[country.pk]}")
             country.scs = sc_count[country.pk]
+            # Make entries into the CountrySCCount table
+            if isGame:
+                CountrySCCountSnapshot.objects.create(game=instance, country=country, scs=sc_count[country.pk], turn=instance.current_turn)
+            else:
+                CountrySCCountSnapshot.objects.create(sandbox=instance, country=country, scs=sc_count[country.pk], turn=instance.current_turn)
             difference = sc_count[country.pk] - unit_count[country.pk]
             if difference < 0:
                 country.needed_disbands = (difference * -1)
@@ -330,7 +348,7 @@ def next_turn(instance=Game):
             # winter has begun
     elif season == WINTER:
         # Make new default hold orders for each living unit
-        isGame = True if isinstance(instance, Game) else False
+        
         if isGame:
             units = DjangoUnit.objects.filter(game=instance,disbanded=False)
         else:
