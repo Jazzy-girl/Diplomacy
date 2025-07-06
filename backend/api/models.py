@@ -180,3 +180,17 @@ class AdjustmentCache(models.Model):
     build_cache = models.JSONField(null=True,blank=True,default=None)
     disband_cache = models.JSONField(null=True,blank=True,default=None)
     turn = models.PositiveSmallIntegerField()
+
+class TerritoryCountrySnapshot(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    territory = models.ForeignKey(Territory, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    turn = models.PositiveSmallIntegerField()
+
+class CountrySCCountSnapshot(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)    
+    scs = models.PositiveSmallIntegerField()
+    turn = models.PositiveSmallIntegerField()
