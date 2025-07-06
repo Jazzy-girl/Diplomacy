@@ -331,20 +331,27 @@ class SupportedHoldFails(APITestCase):
         german_units = Unit.objects.filter(game=game,country=germany)
         disband_cache = cache.disband_cache
         unit_tyr = Unit.objects.get(game=game,country=germany,territory__territory_template__name='Tyr')
+        unit_boh = Unit.objects.get(game=game,country=germany,territory__territory_template__name='Boh')
         # print(disband_cache)
         for german_unit in german_units:
             assert german_unit.pk in disband_cache[f"{germany.pk}"]
         
-        disband_order = Order.objects.create(
-            game=game,country=germany,turn=game.current_turn,unit=unit_tyr,
+        # disband_order_tyr = Order.objects.create(
+        #     game=game,country=germany,turn=game.current_turn,unit=unit_tyr,
+        #     adjustment_type='D')
+        
+        disband_order_boh = Order.objects.create(
+            game=game,country=germany,turn=game.current_turn,unit=unit_boh,
             adjustment_type='D')
         
         resolve_adjustments(game)
 
         unit_tyr.refresh_from_db()
+        unit_boh.refresh_from_db()
         game.refresh_from_db()
 
-        self.assertEqual(unit_tyr.disbanded, True)
+        self.assertEqual(unit_tyr.disbanded, True) # this one made automatically
+        self.assertEqual(unit_boh.disbanded, True)
         self.assertNotEqual(Order.objects.get(game=game,turn=game.current_turn,move_type='H',origin_territory__territory_template__name='Ber'),None)
 
 class GetBuilds(APITestCase):

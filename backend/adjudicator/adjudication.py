@@ -23,6 +23,7 @@ from api.models import (
     CoastTemplate, CountryTemplate, UnitType, UnitRetreatOption, AdjustmentCache,
     CountrySCCountSnapshot, TerritoryCountrySnapshot
     )
+
 from api.models import Unit as DjangoUnit
 
 from collections import defaultdict
@@ -173,9 +174,11 @@ def resolve_adjustments(instance=Game):
     # Take in build & disband orders. Create and disband units
     isGame = True if isinstance(instance, Game) else False
     if isGame:
+        units = DjangoUnit.objects.filter(game=instance,disbanded=False,country__needed_disbands__gt=0)
         orders = Order.objects.filter(game=instance,turn=instance.current_turn) # ADD: constraint for needs disband or available builds
         countries = Country.objects.filter(game=instance)
     else:
+        units = DjangoUnit.objects.filter(sandbox=instance,disbanded=False,country__needed_disbands__gt=0)
         orders = Order.objects.filter(sandbox=instance,turn=instance.current_turn)
         countries = Country.objects.filter(sandbox=instance)
 
@@ -192,21 +195,44 @@ def resolve_adjustments(instance=Game):
     
     for country in countries:
         disbands = list()
+        
         builds = list()
         if country.needed_disbands > 0:
+            """
+            If disbands are needed:
+                - If the amount of disband orders <= needed disbands: Iterate through the disband orders
+                - If the amount of disband orders < needed disbands: After iterating, perform other needed disbands alphabetically
+                - If the amount of disband orders > needed disbands: Order alphabetically, iterate through up until reaching the needed amount of disbands. (Fail the others)
+            """
+            needed = country.needed_disbands
             disbands = disband_orders[country.country_template.name]
+            disbands.sort(key=lambda o: o.unit.coast.full_name if o.unit.coast else o.unit.territory.territory_template.full_name)
+            disband_count = 0
+            for disband in disbands: # disband = Order
+                if(disband_count < needed): # Its chill
+                    disband.unit.disbanded = True
+                    disband.result = Order.OrderResult.SUCCEEDS
+                    disband.unit.save()
+                    disband.save()
+                    disband_count += 1
+                else: # it's NOT chill
+                    disband.result = Order.OrderResult.FAILS
+                    disband.save()
+                    # TO ADD: the failure reason...
+            if len(disbands) < needed: # Do the rest!
+                to_disband = [unit for unit in units if (unit.disbanded == False and unit.country == country)]
+                to_disband.sort(key=lambda u: u.coast.full_name if u.coast else u.territory.territory_template.full_name)
+                for disbanded_unit in to_disband[0:(needed-len(disbands)+1)]:
+                    Order.objects.create(game=instance,unit=disbanded_unit, country=country,
+                                            turn=instance.current_turn,adjustment_type=Order.AdjustmentTypes.DISBAND,
+                                            result=Order.OrderResult.SUCCEEDS)
+                    disbanded_unit.disbanded = True
+                    disbanded_unit.save()
+
         if country.available_builds > 0:
             builds = build_orders[country.country_template.name]
-
-        if len(disbands) > 0:
-            assert len(builds) == 0
-            # disbands.sort(key=lambda order: order.unit.coast.full_name or order.unit.territory.territory_template.full_name) # does this work?
-            for disband in disbands:
-                order.unit.disbanded = True
-                order.unit.save()
-        elif len(builds) > 0:
-            assert len(disbands) == 0
             for build in builds:
+                print("BUILDS")
                 territory = order.build_territory
                 coast = order.build_coast
                 unit_type = order.build_type

@@ -154,13 +154,26 @@ class Order(models.Model):
     adjustment_type = models.CharField(AdjustmentTypes.choices, max_length=7, null=True, blank=True, default=None)
 
     def __str__(self):
-        match self.move_type:
-            case 'M' | 'V':
-                return f"{self.unit} {self.move_type} {self.target_coast or self.target_territory} {self.result}"
-            case 'H':
-                return f"{self.unit} {self.move_type} {self.result}"
-            case 'S':
-                return f"{self.unit} {self.move_type} {self.supported_coast or self.supported_territory} - {self.target_coast or self.target_territory} {self.result}"
+        if self.move_type:
+            match self.move_type:
+                case 'M' | 'V':
+                    return f"{self.unit} {self.move_type} {self.target_coast or self.target_territory} {self.result}"
+                case 'H':
+                    return f"{self.unit} {self.move_type} {self.result}"
+                case 'S':
+                    return f"{self.unit} {self.move_type} {self.supported_coast or self.supported_territory} - {self.target_coast or self.target_territory} {self.result}"
+                case _:
+                    return super().__str__()
+        elif self.adjustment_type:
+            match self.adjustment_type:
+                case 'B':
+                    return f"{self.build_type} BUILD {self.build_coast or self.build_territory} {self.result}"
+                case 'D':
+                    return f"{self.unit} DISBANDS {self.result}"
+                case _:
+                    return super().__str__()
+        else:
+            return super().__str__()
             
 class UnitRetreatOption(models.Model):
     # unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
@@ -187,6 +200,7 @@ class TerritoryCountrySnapshot(models.Model):
     territory = models.ForeignKey(Territory, on_delete=models.CASCADE)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True, default=None)
     turn = models.PositiveSmallIntegerField()
+    
 
 class CountrySCCountSnapshot(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
