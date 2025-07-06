@@ -230,19 +230,31 @@ def resolve_adjustments(instance=Game):
                     disbanded_unit.save()
 
         if country.available_builds > 0:
+            """
+            Order builds alphabetically
+            If more builds than available: stop and FAIL the rest
+            if fewer builds than available: continue as normal
+            """
             builds = build_orders[country.country_template.name]
+            allowed = country.available_builds
+            built = 0
+            builds.sort(key=lambda o: o.unit.coast.full_name if o.unit.coast else o.unit.territory.territory_template.full_name)
             for build in builds:
-                print("BUILDS")
-                territory = order.build_territory
-                coast = order.build_coast
-                unit_type = order.build_type
-                country = order.country
-                if isGame:
-                    unit = DjangoUnit.objects.create(game=instance,territory=territory,coast=coast,type=unit_type,country=country)
+                if(built < allowed):
+                    territory = build.build_territory
+                    coast = build.build_coast
+                    unit_type = build.build_type
+                    country = build.country
+                    if isGame:
+                        unit = DjangoUnit.objects.create(game=instance,territory=territory,coast=coast,type=unit_type,country=country)
+                    else:
+                        unit = DjangoUnit.objects.create(sandbox=instance,territory=territory,coast=coast,type=unit_type,country=country)
+                    build.unit = unit
+                    build.result = Order.OrderResult.SUCCEEDS
+                    built += 1
                 else:
-                    unit = DjangoUnit.objects.create(sandbox=instance,territory=territory,coast=coast,type=unit_type,country=country)
-                order.unit = unit
-                order.save()
+                    build.result = Order.OrderResult.FAILS
+                build.save()
     next_turn(instance)
 
 
