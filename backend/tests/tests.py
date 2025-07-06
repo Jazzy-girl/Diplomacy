@@ -401,8 +401,9 @@ class GetBuilds(APITestCase):
         turkey = Country.objects.get(game=game,country_template__name='T')
         self.assertEqual(turkey.available_builds, 2)
         self.assertEqual(turkey.scs, 5)
-        self.assertEqual(Territory.objects.get(game=game,territory_template__name='Bul').country.country_template.name,'T')
-        self.assertEqual(CountrySCCountSnapshot.objects.get(game=game,country=turkey).scs,5)
+        self.assertEqual(TerritoryCountrySnapshot.objects.get(game=game,territory__territory_template__name='Bul', turn=game.current_turn-1).country, turkey)
+        self.assertEqual(CountrySCCountSnapshot.objects.get(game=game,country=turkey, turn=game.current_turn-1).scs,5)
+
         builds = cache.build_cache
         build_locales = set()
         for build in builds['19']:
