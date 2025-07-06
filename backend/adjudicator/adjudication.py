@@ -169,36 +169,50 @@ def resolve_adjustments(instance=Game):
     # Take in build & disband orders. Create and disband units
     isGame = True if isinstance(instance, Game) else False
     if isGame:
-        orders = Order.objects.filter(game=instance,turn=instance.current_turn)
+        orders = Order.objects.filter(game=instance,turn=instance.current_turn) # ADD: constraint for needs disband or available builds
+        countries = Country.objects.filter(game=instance)
     else:
         orders = Order.objects.filter(sandbox=instance,turn=instance.current_turn)
+        countries = Country.objects.filter(sandbox=instance)
 
+    build_orders = defaultdict(list)
+    disband_orders = defaultdict(list)
     for order in orders:
-        if order.adjustment_type == 'B': # Build: make a new unit and hold order
-            """
-            NEED TO ADD: 
-                - check to stop too many build orders
-                - if too many build orders, fulfill build orders by alphabetical order 
-            """
+        country = order.country.country_template.name
+        if order.adjustment_type == 'D':
+            disband_orders[country].append(order)
+        elif order.adjustment_type == 'B':
+            build_orders[country].append(order)
+        else:
+            raise ValueError(f"Order's adjustment type is incorrect: {order.adjustment_type}")
+    
+    for country in countries:
+        disbands = list()
+        builds = list()
+        if country.needed_disbands > 0:
+            disbands = disband_orders[country.country_template.name]
+        if country.available_builds > 0:
+            builds = build_orders[country.country_template.name]
 
-            territory = order.build_territory
-            coast = order.build_coast
-            unit_type = order.build_type
-            country = order.country
-            if isGame:
-                unit = DjangoUnit.objects.create(game=instance,territory=territory,coast=coast,type=unit_type,country=country)
-            else:
-                unit = DjangoUnit.objects.create(sandbox=instance,territory=territory,coast=coast,type=unit_type,country=country)
-            order.unit = unit
-            order.save()
-        elif order.adjustment_type == 'D': # Disband
-            """
-            NEED TO ADD: 
-                - check to stop too many disband orders
-                - if too many disband orders, fulfill disband orders by alphabetical order 
-            """
-            order.unit.disbanded = True
-            order.unit.save()
+        if len(disbands) > 0:
+            assert len(builds) == 0
+            # disbands.sort(key=lambda order: order.unit.coast.full_name or order.unit.territory.territory_template.full_name) # does this work?
+            for disband in disbands:
+                order.unit.disbanded = True
+                order.unit.save()
+        elif len(builds) > 0:
+            assert len(disbands) == 0
+            for build in builds:
+                territory = order.build_territory
+                coast = order.build_coast
+                unit_type = order.build_type
+                country = order.country
+                if isGame:
+                    unit = DjangoUnit.objects.create(game=instance,territory=territory,coast=coast,type=unit_type,country=country)
+                else:
+                    unit = DjangoUnit.objects.create(sandbox=instance,territory=territory,coast=coast,type=unit_type,country=country)
+                order.unit = unit
+                order.save()
     next_turn(instance)
 
 
