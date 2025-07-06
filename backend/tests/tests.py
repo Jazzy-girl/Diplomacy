@@ -396,6 +396,7 @@ class GetBuilds(APITestCase):
         cache = AdjustmentCache.objects.get(game=game,turn=game.current_turn)
         turkey = Country.objects.get(game=game,country_template__name='T')
         self.assertEqual(turkey.available_builds, 2)
+        self.assertEqual(turkey.scs, 5)
         builds = cache.build_cache
         build_locales = set()
         for build in builds['19']:
