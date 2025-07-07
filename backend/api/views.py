@@ -4,7 +4,10 @@ from rest_framework import generics
 from .models import (
     CustomUser, Game, Territory, Unit, Sandbox, Order,
     Chain, Message, CountryChain)
-from .serializers import OrderSerializer, TerritorySerializer, UserSerializer, GameSerializer, UnitSerializer, SandboxSerializer
+from .serializers import (
+    OrderSerializer, TerritorySerializer, UserSerializer, GameSerializer, 
+    UnitSerializer, SandboxSerializer, ChainSerializer, MessageSerializer,
+    CountryChainSerializer)
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from allauth.account.views import ConfirmEmailView
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -52,6 +55,33 @@ class UnitList(generics.ListAPIView):
     queryset = Unit.objects.all()
     serializer_class = UnitSerializer
     permission_classes = [AllowAny]
+
+class CreateMessageView(APIView):
+    """
+    Takes a message in the form of a dict of the following:
+        id: <id>,
+        chain: <chain ID>,
+        country: <country ID>,
+        text: <text>,
+        date_created: <timezone.now>..
+    """
+    def patch(self, request, *args, **kwargs):
+        message_data = request.data
+
+        if not isinstance(message_data, dict):
+            return Response({'error': 'Expected a dict'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        message_id = message_data.get('id')
+        if message_id:
+            message = Message.objects.create(id=message_id)
+            serializer = MessageSerializer(message, data=message_data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'no "id" field!'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BulkUpdateOrdersView(APIView):
