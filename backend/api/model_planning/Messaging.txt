@@ -1,0 +1,28 @@
+Goal: Players sending email-like messages in-game
+Features:
+    - Ability to make a new 'thread' / email chain
+    - Ability to respond to a current chain
+    - Make header title for a chain
+    - Choose who is included in a new chain
+    - Group chains
+    - Get a notification when you receive a message
+    - Make multiple exclusive chains with the same header
+
+Solution:
+    - Chain table
+        - game FK
+        - title VARCHAR
+    - Message table
+        - chain FK
+        - country_sender FK
+        - text VARCHAR
+        - date_created (?) ; used for ordering of messages
+    - CountryChain table
+        - country FK
+        - chain FK
+        - unread BOOL ; for notification purposes
+
+Implementation:
+    - Player in a game makes a chain as a Country, addressed to # other countries;
+        all are put into the CountryChain table and a message is sent.
+        All countries except the sneder are notified of a new message and their 'unread' is set to TRUE

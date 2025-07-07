@@ -12,7 +12,7 @@ class CustomUser(AbstractUser):
     
 
     def __str__(self):
-        return self.email
+        return f"{self.username} {self.email}"
 class Seasons(models.TextChoices):
     FALL = 'fall', _('Fall')
     SPRING = 'spring', _('Spring')
@@ -21,8 +21,16 @@ class Game(models.Model):
     name = models.CharField(max_length=50)
     current_turn = models.PositiveSmallIntegerField(default=0)
     retreat_required = models.BooleanField(default=False)
+    creator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, default=None, blank=True)
+    created_date = models.DateField("date created", auto_now_add=True)
+    full = models.BooleanField(default=False)
     def __str__(self):
-        return f"{self.id} {self.name}"
+        return f"{self.creator} {self.name}"
+
+class PlayersGames(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    player = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    country = models.ForeignKey("Country", on_delete=models.CASCADE)
 
 class Sandbox(models.Model):
     name = models.CharField(max_length=50)
@@ -222,3 +230,27 @@ class UnitLocationSnapshot(models.Model):
 
     def __str__(self):
         return f"{self.unit.country} {self.unit.type} {self.coast or self.territory}"
+
+class Chain(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    title = models.TextField()
+
+    def __str__(self):
+        return self.title
+
+class Message(models.Model):
+    chain = models.ForeignKey(Chain, on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    text = models.TextField()
+    date_created = models.DateTimeField("date created", auto_now_add=True)
+
+    def __str__(self):
+        return self.text
+
+class CountryChain(models.Model):
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    chain = models.ForeignKey(Chain, on_delete=models.CASCADE)
+    unread = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.chain} : {self.country}"

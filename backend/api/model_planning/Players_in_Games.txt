@@ -1,0 +1,17 @@
+Goal: Players can make, join, play Games.
+Features:
+    - Create new games
+    - View open games
+    - Join open games
+    - Also: settings...
+    - Players can only give orders once games are started
+
+Solution:
+    - PlayersGames many-many relational table.
+        - player FK
+        - game FK
+        - country FK (what country the player is playing as)
+    - Games table updates:
+        - full BOOL (default False, True when has X amount of players)
+        - date created i guess
+
