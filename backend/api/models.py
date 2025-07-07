@@ -48,6 +48,9 @@ class Country(models.Model):
     available_builds = models.PositiveSmallIntegerField(default=0)
     needed_disbands = models.PositiveSmallIntegerField(default=0)
 
+    def __str__(self):
+        return self.country_template.__str__()
+
 class UnitType(models.TextChoices):
     ARMY = 'A', _('Army')
     FLEET = 'F', _('Fleet')
@@ -216,3 +219,6 @@ class UnitLocationSnapshot(models.Model):
     territory = models.ForeignKey(Territory, on_delete=models.CASCADE)
     coast = models.ForeignKey(CoastTemplate, on_delete=models.CASCADE,null=True,blank=True,default=None)
     turn = models.PositiveSmallIntegerField()
+
+    def __str__(self):
+        return f"{self.unit.country} {self.unit.type} {self.coast or self.territory}"

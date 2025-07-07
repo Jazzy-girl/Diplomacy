@@ -12,7 +12,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.models import (
     Game, Territory, Unit, Order, Sandbox, 
     Country, CoastTemplate, TerritoryTemplate, UnitRetreatOption, 
-    AdjustmentCache, CountrySCCountSnapshot, TerritoryCountrySnapshot
+    AdjustmentCache, CountrySCCountSnapshot, TerritoryCountrySnapshot,
+    UnitLocationSnapshot
     )
 from adjudicator.adjudication import resolve_moves, resolve_retreats, next_turn, resolve_adjustments
 
@@ -321,8 +322,6 @@ class SupportedHoldFails(APITestCase):
         self.assertEqual(new_order_mun.origin_territory.territory_template.name, "Mun")
         self.assertEqual(new_order_tyr.origin_territory.territory_template.name, "Tyr")
 
-        # print([o for o in Order.objects.filter(game=game,turn=game.current_turn)])
-
         next_turn(game) # Fall-Winter
         game.refresh_from_db()
 
@@ -421,6 +420,7 @@ class GetBuilds(APITestCase):
         test_locales = {"Ankara", "Ankara Coast", "Constantinople", "Constantinople Coast"}
         for locale in test_locales:
             assert locale in build_locales
+        self.assertNotEqual(UnitLocationSnapshot.objects.get(game=game,territory__territory_template__name='Bul',turn=game.current_turn), None)
 
 class BulkUpdateOrdersTest(APITestCase):
     @classmethod
