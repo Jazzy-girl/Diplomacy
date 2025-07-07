@@ -12,6 +12,7 @@ Solution:
     - Chain table
         - game FK
         - title VARCHAR
+        - last_updated DATETIME ; for ordering
     - Message table
         - chain FK
         - country_sender FK
@@ -21,6 +22,12 @@ Solution:
         - country FK
         - chain FK
         - unread BOOL ; for notification purposes
+    - API for messaging:
+        - Making messages for a chain
+        - Making a Chain
+        - Getting notifications
+        - Getting all chains IN ORDER OF LAST UPDATED
+        - Getting all messages from a chain IN ORDER OF FIRST-LAST sent
 
 Implementation:
     - Player in a game makes a chain as a Country, addressed to # other countries;

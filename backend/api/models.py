@@ -234,6 +234,7 @@ class UnitLocationSnapshot(models.Model):
 class Chain(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     title = models.TextField()
+    last_updated = models.DateTimeField("date created", auto_now_add=True)
 
     def __str__(self):
         return self.title
