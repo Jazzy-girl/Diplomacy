@@ -208,3 +208,11 @@ class CountrySCCountSnapshot(models.Model):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)    
     scs = models.PositiveSmallIntegerField()
     turn = models.PositiveSmallIntegerField()
+
+class UnitLocationSnapshot(models.Model):
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
+    territory = models.ForeignKey(Territory, on_delete=models.CASCADE)
+    coast = models.ForeignKey(CoastTemplate, on_delete=models.CASCADE,null=True,blank=True,default=None)
+    turn = models.PositiveSmallIntegerField()

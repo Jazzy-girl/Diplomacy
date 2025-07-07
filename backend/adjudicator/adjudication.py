@@ -21,7 +21,7 @@ from pydip.map.predefined import vanilla_dip
 from api.models import (
     Game, Sandbox, Country, Order, Territory, TerritoryTemplate, 
     CoastTemplate, CountryTemplate, UnitType, UnitRetreatOption, AdjustmentCache,
-    CountrySCCountSnapshot, TerritoryCountrySnapshot
+    CountrySCCountSnapshot, TerritoryCountrySnapshot, UnitLocationSnapshot
     )
 
 from api.models import Unit as DjangoUnit
@@ -34,9 +34,6 @@ THE ADJUDICATOR!
 
     - Loads the vanilla map (for now; later will introduce variants)
     - Loads units and orders into place
-
-NEED TO UPDATE:
-    - resolve_adjustments (alphabetical order for too many builds / disbands)
 """
 def resolve_moves(instance=Game):
     game_map = vanilla_dip.generate_map()
@@ -306,16 +303,15 @@ def next_turn(instance=Game):
         Make new entries into the TerritoryCountrySnapshot & CountrySCCountSnapshot tables
         """
         if isinstance(instance, Game):
-            # units = DjangoUnit.objects.filter(game=instance,disbanded=False)
+            units = DjangoUnit.objects.filter(game=instance,disbanded=False)
             countries = Country.objects.filter(game=instance)
             orders = Order.objects.filter(game=instance,turn=instance.current_turn,unit__disbanded=False) # Excludes Disbands
         else:
-            # units = DjangoUnit.objects.filter(sandbox=instance,disbanded=False)
+            units = DjangoUnit.objects.filter(sandbox=instance,disbanded=False)
             countries = Country.objects.filter(sandbox=instance)
             orders = Order.objects.filter(sandbox=instance,turn=instance.current_turn,unit__disbanded=False) # Excludes Disbands
         unit_count = defaultdict(int)
         for order in orders:
-            # print(order)
             unit = order.unit
             unit.territory, unit.coast = _get_new_locations(order)
             unit.territory.country = unit.country
@@ -373,12 +369,14 @@ def next_turn(instance=Game):
         # CHECK: Are there 0 needed disbands & 0 available builds? if so skip RIGHT through winter to Spring!!!
         if not disband_cache and not build_cache: # Empty
             # skip right through winter to spring!
-            # current_turn += 1?
-            pass
+            instance.current_turn += 1
         else: # they aint empty
-            # pass to the Phase model!
-            # print(build_cache)
-            # print(disband_cache)
+            for unit in units:
+                # This will make a UnitLocationSnapshot for each unit in the Winter turn excepting the newly built units.
+                if isGame:
+                    UnitLocationSnapshot.objects.create(game=instance,unit=unit,territory=unit.territory,coast=unit.coast,turn=new_turn)
+                else:
+                    UnitLocationSnapshot.objects.create(sandbox=instance,unit=unit,territory=unit.territory,coast=unit.coast,turn=new_turn)
             if isinstance(instance, Game):
                 adjustmentCache = AdjustmentCache.objects.create(game=instance,turn=new_turn,build_cache=build_cache,disband_cache=disband_cache)
             elif isinstance(instance, Sandbox):
@@ -386,7 +384,6 @@ def next_turn(instance=Game):
             # winter has begun
     elif season == WINTER:
         # Make new default hold orders for each living unit
-        
         if isGame:
             units = DjangoUnit.objects.filter(game=instance,disbanded=False)
         else:
