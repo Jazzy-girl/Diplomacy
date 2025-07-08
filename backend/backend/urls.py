@@ -21,7 +21,8 @@ from api.views import (
     BulkUpdateOrdersView, CreateUserView, ReactConfirmEmailView, 
     current_user, get_user_by_id, update_user, GameList, 
     TerritoryList, UnitList, CreateGameView, CreateSandboxView, 
-    SandboxList, get_sandbox_by_id, CreateMessageView, CreateChainView)
+    SandboxList, get_sandbox_by_id, CreateMessageView, CreateChainView,
+    CreateChainAndMessage,)
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -59,6 +60,6 @@ urlpatterns = [
 
     # Message
     path('api/create/message/', CreateMessageView.as_view(), name='create-message'),
-    path('api/create/chain/', CreateChainView.as_view(), name='create-chain'),
+    path('api/create/chain/', CreateChainAndMessage.as_view(), name='create-chain'),
     
 ]

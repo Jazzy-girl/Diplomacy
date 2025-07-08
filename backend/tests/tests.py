@@ -498,19 +498,12 @@ class TestMessages(APITestCase):
         payload = {
             'title': "Test",
             "game": game.pk,
-            "members": [england.pk, russia.pk]
+            "members": [england.pk, russia.pk],
+            "country": england.pk,
+            "text": "Hey this is a test message bitches!"
         }
 
         response = self.client.post(CREATE_CHAIN, payload, format="json")
-        self.assertEqual(response.status_code, 200)
-        
-        payload = {
-            'chain': response.data.get('id'),
-            'country': england.pk,
-            'text': 'Hey this is a test message bitches!'
-        }
-
-        response = self.client.post(CREATE_MESSAGE, payload, format="json")
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(Message.objects.get(country=england).text, 'Hey this is a test message bitches!')

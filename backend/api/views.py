@@ -71,17 +71,58 @@ class CreateMessageView(APIView):
         if serializer.is_valid():
             serializer.save()
             chain_id = request.data.get('chain')
-            sender = request.data.get('country')
+            sender_id = request.data.get('country')
             chain = Chain.objects.get(pk=chain_id)
             chain.last_updated = timezone.now
 
             for countryChain in CountryChain.objects.filter(chain=chain):
-                countryChain.unread = (sender != countryChain.country.pk)
+                countryChain.unread = (sender_id != countryChain.country.pk)
                 countryChain.save()
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class CreateChainAndMessage(APIView):
+    """
+        'title': <title>,
+        'game': <game_id>,
+        'members': [<country_ids...>]
+        'country': <country ID>,
+        'text': <text>
+    """
+    def post(self, request, format=None):
+        data = request.data
+
+        if not isinstance(data, dict):
+            return Response({'error': 'Expected a dict'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    
+        chain_title = data.get('title')
+        game_id = data.get('game')
+        sender_id = data.get('country')
+        
+        text = data.get('text')
+
+        members = data.get('members')
+
+        if not chain_title or not game_id or not sender_id or not text or not isinstance(members, list):
+            return Response({'error': 'one of the fields is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            game = get_object_or_404(Game, pk=game_id)
+            chain = Chain.objects.create(title=chain_title,game=game)
+            sender = get_object_or_404(Country, pk=sender_id)
+
+            for member_id in members:
+                country = get_object_or_404(Country, id=member_id)
+                CountryChain.objects.create(chain=chain,country=country,unread=(country != sender))
+            
+            message = Message.objects.create(chain=chain,country=sender,text=text)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"chain": ChainSerializer(chain).data,
+                         "message": MessageSerializer(message).data}, status=status.HTTP_200_OK)
 
 class CreateChainView(APIView):
     """
@@ -90,7 +131,6 @@ class CreateChainView(APIView):
         'members': [<country_ids...>]
     """
     def post(self, request, format=None):
-        user = request.user
         chain_data = request.data
 
         if not isinstance(chain_data, dict):
