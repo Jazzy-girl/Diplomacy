@@ -10,7 +10,7 @@ Solution:
     - PlayersGames many-many relational table.
         - player FK
         - game FK
-        - country FK (what country the player is playing as)
+    - Country table: add a player FK field
     - Games table updates:
         - full BOOL (default False, True when has X amount of players)
         - date created i guess

@@ -27,7 +27,6 @@ Solution:
             - POST: accepts a dict of message fields
         - Making a Chain
             - POST: accepts a dict of:
-                'id': <id>,
                 'title': <title>,
                 'game': <game_id>,
                 'members': [<country_ids...>]

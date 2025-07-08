@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 # Create your models here.
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
@@ -50,6 +51,7 @@ class CountryTemplate(models.Model):
 
 class Country(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, default=None)
     sandbox = models.ForeignKey(Sandbox, on_delete=models.CASCADE, null=True, blank=True, default=None)
     country_template = models.ForeignKey(CountryTemplate, on_delete=models.CASCADE)
     scs = models.IntegerField(default=0)
@@ -234,7 +236,7 @@ class UnitLocationSnapshot(models.Model):
 class Chain(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     title = models.TextField()
-    last_updated = models.DateTimeField("date created", auto_now_add=True)
+    last_updated = models.DateTimeField("date created", default=timezone.now())
 
     def __str__(self):
         return self.title

@@ -21,6 +21,9 @@ TEMPLATE_SETUP = 'tests/json/templates.json'
 VANILLA_UNIT_SETUP = 'tests/json/vanilla_setup.json'
 UPDATE_BULK_ORDER = '/api/update/order/bulk/'
 
+CREATE_MESSAGE = '/api/create/message/'
+CREATE_CHAIN = '/api/create/chain/'
+
 COASTS_ABBREV = {coast.name : coast for coast in CoastTemplate.objects.all()}
 # TERRITORY_TEMPLATES = {}
 def orders_to_json(instance=Game,commands=list()):
@@ -473,3 +476,26 @@ class BulkUpdateOrdersTest(APITestCase):
         self.assertEqual(order1.move_type, "M")
         self.assertEqual(order2.target_territory, arm)
         self.assertEqual(order2.move_type, "M")
+
+class TestMessages(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        call_command('loaddata', TEMPLATE_SETUP)
+        call_command('loaddata', 'tests/json/vanilla_setup.json')
+        cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
+    
+    def test_get_builds(self):
+        refresh = RefreshToken.for_user(self.user)
+        access_token = str(refresh.access_token)
+
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+        game = Game.objects.create(name="Test Game")
+
+        payload = {
+            'title': "Test",
+            "game": game.pk,
+            "members": []
+        }
+
+        response = self.client.post(CREATE_CHAIN, payload, format="json")
+        self.assertEqual(response.status_code, 200)

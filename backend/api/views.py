@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import generics
 from .models import (
     CustomUser, Game, Territory, Unit, Sandbox, Order,
-    Chain, Message, CountryChain)
+    Chain, Message, CountryChain, Country)
 from .serializers import (
     OrderSerializer, TerritorySerializer, UserSerializer, GameSerializer, 
     UnitSerializer, SandboxSerializer, ChainSerializer, MessageSerializer,
@@ -14,6 +14,8 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
+
+from django.utils import timezone
 
 # Create your views here.
 class ReactConfirmEmailView(ConfirmEmailView):
@@ -59,38 +61,56 @@ class UnitList(generics.ListAPIView):
 class CreateMessageView(APIView):
     """
     Takes a message in the form of a dict of the following:
-        id: <id>,
         chain: <chain ID>,
         country: <country ID>,
-        text: <text>,
-        date_created: <timezone.now>..
+        text: <text>
     """
-    def patch(self, request, *args, **kwargs):
-        message_data = request.data
+    def post(self, request, format=None):
+        serializer = MessageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            chain_id = request.data.get('chain')
+            chain = Chain.objects.get(pk=chain_id)
+            chain.last_updated = timezone.now()
 
-        if not isinstance(message_data, dict):
-            return Response({'error': 'Expected a dict'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        message_id = message_data.get('id')
-        if message_id:
-            message = Message.objects.create(id=message_id)
-            serializer = MessageSerializer(message, data=message_data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'no "id" field!'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class CreateChainView(APIView):
-    def patch(self, request, *args, **kwargs):
+    """
+        'title': <title>,
+        'game': <game_id>,
+        'members': [<country_ids...>]
+    """
+    def post(self, request, format=None):
+        user = request.user
         chain_data = request.data
 
         if not isinstance(chain_data, dict):
             return Response({'error': 'Expected a dict'}, status=status.HTTP_400_BAD_REQUEST)
         
-        chain_id = 
+    
+        chain_title = chain_data.get('title')
+        game_id = int(chain_data.get('game'))
+
+        chain = Chain.objects.create(title=chain_title, game=game_id)
+
+        members = chain_data.get('members')
+
+        if not chain_title or not game_id or not isinstance(members, list):
+            return Response({'error': '"members" should be a list'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            game = get_object_or_404(Game, id=game_id)
+            chain = Chain.objects.create(title=chain_title,game=game)
+
+            for member_id in members:
+                country = get_object_or_404(Country, id=member_id)
+                CountryChain.objects.create(chain=chain,country=country,unread=(country.user != user))
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            
 class BulkUpdateOrdersView(APIView):
     def patch(self, request, *args, **kwargs):
         updates = request.data
