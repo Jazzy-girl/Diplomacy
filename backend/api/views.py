@@ -123,38 +123,6 @@ class CreateChainAndMessage(APIView):
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"chain": ChainSerializer(chain).data,
                          "message": MessageSerializer(message).data}, status=status.HTTP_200_OK)
-
-class CreateChainView(APIView):
-    """
-        'title': <title>,
-        'game': <game_id>,
-        'members': [<country_ids...>]
-    """
-    def post(self, request, format=None):
-        chain_data = request.data
-
-        if not isinstance(chain_data, dict):
-            return Response({'error': 'Expected a dict'}, status=status.HTTP_400_BAD_REQUEST)
-        
-    
-        chain_title = chain_data.get('title')
-        game_id = chain_data.get('game')
-
-        members = chain_data.get('members')
-
-        if not chain_title or not game_id or not isinstance(members, list):
-            return Response({'error': '"members" should be a list'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            game = get_object_or_404(Game, pk=game_id)
-            chain = Chain.objects.create(title=chain_title,game=game)
-
-            for member_id in members:
-                country = get_object_or_404(Country, id=member_id)
-                CountryChain.objects.create(chain=chain,country=country)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(ChainSerializer(chain).data, status=status.HTTP_200_OK)
             
 class BulkUpdateOrdersView(APIView):
     def patch(self, request, *args, **kwargs):

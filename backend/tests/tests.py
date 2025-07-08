@@ -493,7 +493,6 @@ class TestMessages(APITestCase):
 
         england = Country.objects.get(game=game,country_template__name='E')
         russia = Country.objects.get(game=game,country_template__name='R')
-        england.user = self.user
 
         payload = {
             'title': "Test",
