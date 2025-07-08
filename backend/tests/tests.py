@@ -513,6 +513,6 @@ class TestMessages(APITestCase):
         response = self.client.post(CREATE_MESSAGE, payload, format="json")
         self.assertEqual(response.status_code, 200)
 
-        print(Message.objects.get(country=england))
-        for countryChain in CountryChain.objects.all():
-            print(countryChain)
+        self.assertEqual(Message.objects.get(country=england).text, 'Hey this is a test message bitches!')
+        self.assertEqual(CountryChain.objects.get(country=england).unread, False)
+        self.assertEqual(CountryChain.objects.get(country=russia).unread, True)
