@@ -17,7 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 # from requests import Response
-from api.views import BulkUpdateOrdersView, CreateUserView, ReactConfirmEmailView, current_user, get_user_by_id, update_user, GameList, TerritoryList, UnitList, CreateGameView, CreateSandboxView, SandboxList, get_sandbox_by_id
+from api.views import (
+    BulkUpdateOrdersView, CreateUserView, ReactConfirmEmailView, 
+    current_user, get_user_by_id, update_user, GameList, 
+    TerritoryList, UnitList, CreateGameView, CreateSandboxView, 
+    SandboxList, get_sandbox_by_id, CreateMessageView,
+    CreateChainAndMessage,)
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -51,6 +56,10 @@ urlpatterns = [
     path('api/create/sandbox/', CreateSandboxView.as_view(), name="create-sandbox"),
     path('api/list/territory/', TerritoryList.as_view(), name="list-territory"),
     path('api/list/unit/', UnitList.as_view(), name="list-unit"),
-    path('api/update/order/bulk/',BulkUpdateOrdersView.as_view(), name='update-orders-bulk')
+    path('api/update/order/bulk/',BulkUpdateOrdersView.as_view(), name='update-orders-bulk'),
+
+    # Message
+    path('api/create/message/', CreateMessageView.as_view(), name='create-message'),
+    path('api/create/chain/', CreateChainAndMessage.as_view(), name='create-chain'),
     
 ]

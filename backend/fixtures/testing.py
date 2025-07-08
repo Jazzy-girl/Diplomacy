@@ -202,6 +202,6 @@ territories2 = [
     ("Yor", "Yorkshire", "L", False, True, None),
 ]
 
-print(len(territories))
-print(len(territories2))
-print(len(go))
+# print(len(territories))
+# print(len(territories2))
+# print(len(go))

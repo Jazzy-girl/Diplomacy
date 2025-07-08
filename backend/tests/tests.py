@@ -9,13 +9,143 @@ import json
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.models import Game, Territory, Unit, Order, Sandbox, Country, CoastTemplate, TerritoryTemplate
-from adjudicator.adjudication import resolve_moves
+from api.models import (
+    Game, Territory, Unit, Order, Sandbox, 
+    Country, CoastTemplate, TerritoryTemplate, UnitRetreatOption, 
+    AdjustmentCache, CountrySCCountSnapshot, TerritoryCountrySnapshot,
+    UnitLocationSnapshot, Chain, Message, CountryChain
+    )
+from adjudicator.adjudication import resolve_moves, resolve_retreats, next_turn, resolve_adjustments
+
+TEMPLATE_SETUP = 'tests/json/templates.json'
+VANILLA_UNIT_SETUP = 'tests/json/vanilla_setup.json'
+UPDATE_BULK_ORDER = '/api/update/order/bulk/'
+
+CREATE_MESSAGE = '/api/create/message/'
+CREATE_CHAIN = '/api/create/chain/'
+
+COASTS_ABBREV = {coast.name : coast for coast in CoastTemplate.objects.all()}
+# TERRITORY_TEMPLATES = {}
+def orders_to_json(instance=Game,commands=list()):
+    """
+    Converts a list of orders to json for use with Bulk Update Orders.
+    Returns a JSON file.
+
+    :param Game / Sandbox instance:
+    :param list commands: format of each order is basic diplomacy; - = Move, H = Hold, S = Support, C = Convoy, V = Move via Convoy; for territories, use three-letter abbrev. for non-specific coasts, use Lon/c; for Retreats, use A Ber R Mun, A Ber D (disbands)
+    """
+    if isinstance(instance, Game):
+        territories = {territory.territory_template.name : territory.pk for territory in Territory.objects.filter(game=instance)}
+        orders = {order.origin_coast.pk if order.origin_coast else order.origin_territory.pk : order.pk for order in Order.objects.filter(game=instance,turn=instance.current_turn)}
+    else:
+        territories = {territory.territory_template.name : territory.pk for territory in Territory.objects.filter(sandbox=instance)}
+        orders = {order.origin_coast.pk if order.origin_coast else order.origin_territory.pk : order.pk for order in Order.objects.filter(sandbox=instance,turn=instance.current_turn)}
+    
+    def get_pk(location=str()):
+        """
+        takes the territory / coast location
+
+        :return: a tuple of the territory_pk and coast_pk if applicable, otherwise None
+        :rtype: (territory_pk, coast_pk)
+        """
+        if location in territories.keys():
+            # is a territory
+            return territories[location], None
+        else:
+            # hopefully is a coast
+            if '/c' in location:
+                location = location.replace('/c', '')
+            if location in COASTS_ABBREV.keys():
+                coast = COASTS_ABBREV[location]
+                territory = territories[coast.territory_template.name]
+                return territory, coast.pk
+            else:
+                raise ValueError(f"Incorrect Territory Input; must be THREE AND ONLY THREE letters if land/sea, or either Lon/c or Bul/ec if coastal : {location}")
+    # parsing the order; <unit type> <territory> <move type> <another order | destination territory>
+    data = []
+    # print(comma)
+    for command in commands:
+        pieces = command.split(" ")
+        unit_type = pieces[0]
+        origin_territory, origin_coast = get_pk(pieces[1])
+        if origin_coast is not None:
+            id = orders[origin_coast]
+        else:
+            id = orders[origin_territory]
+        target_territory = None
+        target_coast = None
+        supported_territory = None
+        supported_coast = None
+        convoyed_territory = None
+        retreat_territory = None
+        retreat_coast = None
+        move_type = pieces[2]
+        if move_type == '-':
+            move_type = 'M'
+            assert len(pieces) == 4 # should be A Bul - Con; 4 long
+            target_territory, target_coast = get_pk(pieces[3])
+        elif move_type == 'H':
+            # nothing really...
+            pass
+        elif move_type == 'S':
+            # A Con S Ank - Smy
+            # A Con S Ank H
+            assert len(pieces) == 5 or len(pieces) == 6
+            supported_territory, supported_coast = get_pk(pieces[3])
+            if len(pieces) == 6:
+                target_territory, target_coast = get_pk(pieces[5])
+            else:
+                target_territory, target_coast = supported_territory, supported_coast
+        elif move_type == 'C':
+            # F BLA C Con - Rom
+            convoyed_territory, origin_coast = get_pk(pieces[3])
+            assert len(pieces) == 6
+            target_territory, target_coast = get_pk(pieces[5])
+        elif move_type == 'V':
+            assert len(pieces) == 4 # should be A Bul - Con; 4 long
+            target_territory, target_coast = get_pk(pieces[3])
+        elif move_type == 'R': # Retreat!
+            # A Bul R Con; 4 long
+            assert len(pieces) == 4
+            retreat_territory, retreat_coast = get_pk(pieces[3])
+        elif move_type == 'D': # Disband
+            # A Bul D
+            assert len(pieces) == 3
+        else: # Not a move type
+            raise ValueError(f"Not a Valid Move Type: {move_type}")
+
+        if move_type == 'R':
+            command_data = {
+                "id": id,
+                "retreat_territory": retreat_territory,
+                "retreat_coast" : retreat_coast
+            }
+        elif move_type == 'D':
+            command_data = {
+                "id": id,
+                "retreat_result": move_type
+            }
+        else:
+            command_data = {
+                "id": id,
+                "origin_territory": origin_territory,
+                "origin_coast": origin_coast,
+                "target_territory": target_territory,
+                "target_coast": target_coast,
+                "supported_territory": supported_territory,
+                "supported_coast": supported_coast,
+                "convoyed_territory": convoyed_territory,
+                "move_type": move_type,
+                "submitted": True,
+            }
+        data.append(command_data)
+    return data
 
 class GameInitializationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        call_command('loaddata', 'fixtures/initial_templates.json')
+        call_command('loaddata', TEMPLATE_SETUP)
+        call_command('loaddata', VANILLA_UNIT_SETUP)
 
     def test_territories_orders_coutnries_units_created(self,):
         game = Game.objects.create(name="Test Game")
@@ -28,10 +158,11 @@ class GameInitializationTest(TestCase):
         self.assertEqual(units.count(), 22)
         self.assertEqual(orders.count(), 22)
 
-class AdjudicationTest(APITestCase):
+class VanillaAdjudicationTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        call_command('loaddata', 'fixtures/initial_templates.json')
+        call_command('loaddata', TEMPLATE_SETUP)
+        call_command('loaddata', VANILLA_UNIT_SETUP)
         cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
     
     def test_resolve_moves(self):
@@ -50,7 +181,6 @@ class AdjudicationTest(APITestCase):
         order_sev = Order.objects.get(game=game,origin_territory=sev,origin_coast=sev_coast)
 
 
-        url = '/api/update/order/bulk/'
         payload = [
             {
                 "id": order_ank.pk,
@@ -64,7 +194,7 @@ class AdjudicationTest(APITestCase):
             }
         ]
 
-        response = self.client.patch(url, payload, format="json")
+        response = self.client.patch(UPDATE_BULK_ORDER, payload, format="json")
         self.assertEqual(response.status_code, 200)
 
         resolve_moves(game)
@@ -81,10 +211,225 @@ class AdjudicationTest(APITestCase):
         self.assertEqual(order_sev.move_type, "M")
         self.assertEqual(order_sev.result, "FAILS")
 
+class SupportedHoldFails(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        call_command('loaddata', TEMPLATE_SETUP)
+        call_command('loaddata', 'tests/json/retreat_setup_1.json')
+        cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
+
+    def test_hold_fail_and_retreat(self):
+
+        """
+        France:
+            A Ruh S Kie - Mun
+            A Kie - Mun
+            A Ber S Kie - Mun
+        Germany:
+            A Mun Holds (so don't need to change anything here...)
+            A Boh S Mun H
+        """
+        # territories = {territory.territory_template.name : territory for territory in Territory.objects.filter(game=game)}
+        
+        refresh = RefreshToken.for_user(self.user)
+        access_token = str(refresh.access_token)
+
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+
+        game = Game.objects.create(name="Test Game")
+
+        orders = {order.origin_territory.territory_template.name : order for order in Order.objects.filter(game=game,turn=game.current_turn)}
+        order_ruh = orders["Ruh"]
+        order_kie = orders["Kie"]
+        order_mun = orders["Mun"]
+        order_boh = orders["Boh"]
+        order_ber = orders["Ber"]
+
+        orders = [order_ruh, order_kie, order_ber, order_boh, order_mun]
+
+        commands = [
+            "A Ruh S Kie - Mun",
+            "A Kie - Mun",
+            "A Ber S Kie - Mun",
+            "A Boh S Mun H"
+        ]
+
+        data = orders_to_json(instance=game,commands=commands)
+        
+        response = self.client.patch(UPDATE_BULK_ORDER, data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        resolve_moves(game)
+
+        for order in orders:
+            order.refresh_from_db()
+            # print(order)
+            if order == order_ruh:
+                target = "Mun"
+                move = "S"
+                result = "SUCCEEDS"
+            
+            elif order == order_kie:
+                target = "Mun"
+                move = 'M'
+                result = "SUCCEEDS"
+            
+            elif order == order_ber:
+                target = "Mun"
+                move = 'S'
+                result = 'SUCCEEDS'
+
+            elif order == order_boh:
+                target = "Mun"
+                move = 'S'
+                result = 'SUCCEEDS'
+            
+            elif order == order_mun:
+                target = None
+                move = 'H'
+                result = 'FAILS'    
+            
+        if order.target_territory:
+            self.assertEqual(order.target_territory.territory_template.name, target)
+        self.assertEqual(order.move_type, move)
+        self.assertEqual(order.result, result)
+
+        options = UnitRetreatOption.objects.filter(game=game,turn=game.current_turn)
+        self.assertEqual(len(options),3)
+        self.assertNotEqual(UnitRetreatOption.objects.get(game=game,turn=game.current_turn,territory=Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="Tyr"))), None)
+
+        # Test Retreat
+        retreat_command = ["A Mun R Tyr"]
+
+        retreat_data = orders_to_json(instance=game,commands=retreat_command)
+        
+        response = self.client.patch(UPDATE_BULK_ORDER, retreat_data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        resolve_retreats(game)
+
+        order_mun.refresh_from_db()
+        self.assertEqual(order.retreat_territory.territory_template.name, "Tyr")
+        self.assertEqual(order.retreat_result, 'R')
+
+        game.refresh_from_db()
+        # Test next_turn after Retreat
+        self.assertEqual(game.retreat_required, False)
+        self.assertEqual(game.current_turn, 1)
+        
+        new_orders = {order.origin_territory.territory_template.name : order for order in Order.objects.filter(game=game,turn=game.current_turn)}
+        # print(new_orders)
+        new_order_mun = new_orders["Mun"]
+        new_order_tyr = new_orders["Tyr"]
+
+        self.assertEqual(new_order_mun.origin_territory.territory_template.name, "Mun")
+        self.assertEqual(new_order_tyr.origin_territory.territory_template.name, "Tyr")
+
+        next_turn(game) # Fall-Winter
+        game.refresh_from_db()
+
+        cache = AdjustmentCache.objects.get(game=game,turn=game.current_turn)
+        germany = Country.objects.get(game=game,country_template__name='G')
+        german_units = Unit.objects.filter(game=game,country=germany)
+        disband_cache = cache.disband_cache
+        unit_tyr = Unit.objects.get(game=game,country=germany,territory__territory_template__name='Tyr')
+        unit_boh = Unit.objects.get(game=game,country=germany,territory__territory_template__name='Boh')
+        # print(disband_cache)
+        for german_unit in german_units:
+            assert german_unit.pk in disband_cache[f"{germany.pk}"]
+        
+        # disband_order_tyr = Order.objects.create(
+        #     game=game,country=germany,turn=game.current_turn,unit=unit_tyr,
+        #     adjustment_type='D')
+        
+        disband_order_boh = Order.objects.create(
+            game=game,country=germany,turn=game.current_turn,unit=unit_boh,
+            adjustment_type='D')
+        
+        resolve_adjustments(game)
+
+        unit_tyr.refresh_from_db()
+        unit_boh.refresh_from_db()
+        game.refresh_from_db()
+
+        self.assertEqual(unit_tyr.disbanded, True) # this one made automatically
+        self.assertEqual(unit_boh.disbanded, True)
+        self.assertNotEqual(Order.objects.get(game=game,turn=game.current_turn,move_type='H',origin_territory__territory_template__name='Ber'),None)
+
+class GetBuilds(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        call_command('loaddata', TEMPLATE_SETUP)
+        call_command('loaddata', 'tests/json/vanilla_setup.json')
+        cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
+    
+    def test_get_builds(self):
+        """
+        Spring 1901:
+        F Ank - BLA
+        A Con - Bul
+
+        Fall 1901:
+        F BLA - Bul/ec
+        A Bul - Rum
+        """
+        refresh = RefreshToken.for_user(self.user)
+        access_token = str(refresh.access_token)
+
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+        game = Game.objects.create(name="Test Game")
+        # print(Order.objects.all())
+        # for order in Order.objects.all():
+        #     print(order)
+
+        commands = [
+            "F Ank/c - BLA",
+            "A Con - Bul"
+        ]
+
+        data = orders_to_json(instance=game,commands=commands)
+        
+        response = self.client.patch(UPDATE_BULK_ORDER, data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        resolve_moves(game)
+
+        fall_commands = [
+            "F BLA - Bul/ec",
+            "A Bul - Rum"
+        ]
+
+        fall_data = orders_to_json(instance=game,commands=fall_commands)
+
+        response = self.client.patch(UPDATE_BULK_ORDER, fall_data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        resolve_moves(game)
+
+        cache = AdjustmentCache.objects.get(game=game,turn=game.current_turn)
+        turkey = Country.objects.get(game=game,country_template__name='T')
+        self.assertEqual(turkey.available_builds, 2)
+        self.assertEqual(turkey.scs, 5)
+        self.assertEqual(TerritoryCountrySnapshot.objects.get(game=game,territory__territory_template__name='Bul', turn=game.current_turn-1).country, turkey)
+        self.assertEqual(CountrySCCountSnapshot.objects.get(game=game,country=turkey, turn=game.current_turn-1).scs,5)
+
+        builds = cache.build_cache
+        build_locales = set()
+        for build in builds['19']:
+            try:
+               build_locales.add(Territory.objects.get(id=build).territory_template.full_name)
+            except:
+                build_locales.add(CoastTemplate.objects.get(id=build).full_name)
+        test_locales = {"Ankara", "Ankara Coast", "Constantinople", "Constantinople Coast"}
+        for locale in test_locales:
+            assert locale in build_locales
+        self.assertNotEqual(UnitLocationSnapshot.objects.get(game=game,territory__territory_template__name='Bul',turn=game.current_turn), None)
+
 class BulkUpdateOrdersTest(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        call_command('loaddata', 'fixtures/initial_templates.json')
+        call_command('loaddata', TEMPLATE_SETUP)
+        call_command('loaddata', VANILLA_UNIT_SETUP)
         cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
     
     def test_bulk_patch_orders(self):
@@ -131,3 +476,35 @@ class BulkUpdateOrdersTest(APITestCase):
         self.assertEqual(order1.move_type, "M")
         self.assertEqual(order2.target_territory, arm)
         self.assertEqual(order2.move_type, "M")
+
+class TestMessages(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        call_command('loaddata', TEMPLATE_SETUP)
+        call_command('loaddata', 'tests/json/vanilla_setup.json')
+        cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
+    
+    def test_get_builds(self):
+        refresh = RefreshToken.for_user(self.user)
+        access_token = str(refresh.access_token)
+
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+        game = Game.objects.create(name="Test Game")
+
+        england = Country.objects.get(game=game,country_template__name='E')
+        russia = Country.objects.get(game=game,country_template__name='R')
+
+        payload = {
+            'title': "Test",
+            "game": game.pk,
+            "members": [england.pk, russia.pk],
+            "country": england.pk,
+            "text": "Hey this is a test message bitches!"
+        }
+
+        response = self.client.post(CREATE_CHAIN, payload, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(Message.objects.get(country=england).text, 'Hey this is a test message bitches!')
+        self.assertEqual(CountryChain.objects.get(country=england).unread, False)
+        self.assertEqual(CountryChain.objects.get(country=russia).unread, True)

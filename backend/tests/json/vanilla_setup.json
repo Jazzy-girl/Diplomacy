@@ -1,0 +1,222 @@
+[
+  {
+    "model": "api.initialunitsetup",
+    "pk": 121,
+    "fields": {
+      "territory_template": 14,
+      "country_template": 1,
+      "unit_type": "F",
+      "coast_template": 89
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 122,
+    "fields": {
+      "territory_template": 9,
+      "country_template": 1,
+      "unit_type": "F",
+      "coast_template": 84
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 123,
+    "fields": {
+      "territory_template": 13,
+      "country_template": 1,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 124,
+    "fields": {
+      "territory_template": 4,
+      "country_template": 2,
+      "unit_type": "F",
+      "coast_template": 79
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 125,
+    "fields": {
+      "territory_template": 20,
+      "country_template": 2,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 126,
+    "fields": {
+      "territory_template": 15,
+      "country_template": 2,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 127,
+    "fields": {
+      "territory_template": 3,
+      "country_template": 3,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 128,
+    "fields": {
+      "territory_template": 17,
+      "country_template": 3,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 129,
+    "fields": {
+      "territory_template": 12,
+      "country_template": 3,
+      "unit_type": "F",
+      "coast_template": 87
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 130,
+    "fields": {
+      "territory_template": 33,
+      "country_template": 7,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 131,
+    "fields": {
+      "territory_template": 5,
+      "country_template": 7,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 132,
+    "fields": {
+      "territory_template": 30,
+      "country_template": 7,
+      "unit_type": "F",
+      "coast_template": 103
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 133,
+    "fields": {
+      "territory_template": 32,
+      "country_template": 6,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 134,
+    "fields": {
+      "territory_template": 22,
+      "country_template": 6,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 135,
+    "fields": {
+      "territory_template": 18,
+      "country_template": 6,
+      "unit_type": "F",
+      "coast_template": 91
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 136,
+    "fields": {
+      "territory_template": 16,
+      "country_template": 4,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 137,
+    "fields": {
+      "territory_template": 25,
+      "country_template": 4,
+      "unit_type": "F",
+      "coast_template": 96
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 138,
+    "fields": {
+      "territory_template": 34,
+      "country_template": 4,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 139,
+    "fields": {
+      "territory_template": 29,
+      "country_template": 4,
+      "unit_type": "F",
+      "coast_template": 102
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 140,
+    "fields": {
+      "territory_template": 7,
+      "country_template": 5,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 141,
+    "fields": {
+      "territory_template": 26,
+      "country_template": 5,
+      "unit_type": "A",
+      "coast_template": null
+    }
+  },
+  {
+    "model": "api.initialunitsetup",
+    "pk": 142,
+    "fields": {
+      "territory_template": 1,
+      "country_template": 5,
+      "unit_type": "F",
+      "coast_template": 76
+    }
+  }
+]

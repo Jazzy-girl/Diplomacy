@@ -100,7 +100,7 @@ def test_territory_adjacency_counts():
         'Rumania' : 6,
         'Rumania Coast' : 3,
         'Bulgaria' : 4,
-        'Bulgaria North Coast' : 3,
+        'Bulgaria East Coast' : 3,
         'Bulgaria South Coast' : 3,
         'Constantinople' : 3,
         'Constantinople Coast' : 6,

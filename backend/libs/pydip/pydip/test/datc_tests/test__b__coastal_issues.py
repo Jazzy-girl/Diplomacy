@@ -222,7 +222,7 @@ def test_b_12__army_movement_with_coastal_specification():
 def test_b_13__coastal_crawl_not_allowed():
     """
     TURKEY: F Bulgaria South Coast -> Constantinople
-            F Constantinople -> Bulgaria North Coast
+            F Constantinople -> Bulgaria East Coast
     """
     game_map = generate_map()
     turkey_starting_configuration = [
@@ -233,7 +233,7 @@ def test_b_13__coastal_crawl_not_allowed():
 
     commands = [
         MoveCommand(turkey, turkey.units[0], 'Constantinople Coast'),
-        MoveCommand(turkey, turkey.units[1], 'Bulgaria North Coast'),
+        MoveCommand(turkey, turkey.units[1], 'Bulgaria East Coast'),
     ]
     result = resolve_turn(game_map, commands)
     assert result == {

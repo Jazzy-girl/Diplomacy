@@ -1,0 +1,40 @@
+Goal: Allow viewing of previous turns.
+Needs:
+    - Old unit locations
+    - Old orders, success/fail, fail reasons, retreats, disbands, builds...
+    - Old territory ownership
+    - Old country SC counts
+
+Solution:
+    - Use Order table for order info AND unit info for Spring/Fall + Winter Builds/disbands
+    - Make a UnitLocationSnapshot table for non-newly built / non-disbanded units in Winter;
+        - unit_id PK
+        - territory_id PK
+        - coast_id PK OPT
+        - turn INT
+        - game_id PK OPT
+        - sandbox_id PK OPT
+    - Make a TerritoryOwnershipSnapshot table;
+        - territory_id PK
+        - country_id PK OPT
+        - turn INT
+        - game_id PK OPT
+        - sandbox_id PK OPT
+    - Make a CountrySupplyCenterCountSnapshot table;
+        - country_id PK
+        - sc_count INT
+        - game_id PK OPT
+        - sandbox_id PK OPT
+        - turn INT
+Questions...
+How often to make new entries to the Territory & Country tables?
+    - territory ownership (and thus SC count) updates upon the end of Fall turns.
+        - Thus, make new entries at the end of every Fall turn.
+        - when accessing a past turn, 
+        if Fall turn, use the same turn's tables, 
+        if Spring, use the same turn -2's tables, 
+        if Winter, use the same turn -1's tables.
+How often to make new entries to the Unit table?
+    - At the end of Winter turns, with the caveat:
+        don't make entries for newly built / newly disbanded units; those will be covered by the Order table.
+        - Or, make entries for every single unit...?

@@ -5,9 +5,10 @@ from django.conf import settings
 import os
 
 import json
+from collections import defaultdict
 
 def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, created, **kwargs):
-    print("signal triggered!") #Debug
+    # print("signal triggered!") #Debug
     if created:
         """
         Makes:
@@ -19,8 +20,9 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
         country_templates = CountryTemplate.objects.all()
         countries = {}
         countries[None] = None
+        country_scs = defaultdict(int)
         for template in country_templates:
-            country = Country.objects.create(country_template=template, scs=template.scs)
+            country = Country.objects.create(country_template=template)
             if isinstance(instance, Game):
                 country.game = instance
             else:
@@ -29,17 +31,19 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
             countries[country.country_template] = country
 
         territory_templates = TerritoryTemplate.objects.all()
-        print(f"Loaded {TerritoryTemplate.objects.count()} templates")
+        # print(f"Loaded {TerritoryTemplate.objects.count()} templates")
         territories = {}
         for template in territory_templates:
-            country = countries[template.country_template]
-            territory = Territory.objects.create(territory_template=template,country=country)
+            # country = countries[template.country_template]
+            territory = Territory.objects.create(territory_template=template)
             if isinstance(instance, Game):
                 territory.game = instance
             else:
                 territory.sandbox = instance
             territory.save()
             territories[template] = territory
+            # if template.sc_exists and template.country_template != None:
+            #     country_scs[template.country_template] += 1
         
         setups = InitialUnitSetup.objects.all()
         for setup in setups:
@@ -59,5 +63,15 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
                 order.sandbox = instance
             unit.save()
             order.save()
+            unit.territory.country = unit.country
+            unit.territory.save()
+            if unit.territory.territory_template.sc_exists:
+                country_scs[unit.country.pk] += 1
+        for template, country in countries.items():
+            # print(f"{template} : {country}")
+            if template != None:
+                # print(f"{country.country_template.full_name} : {country_scs[country.pk]}")
+                country.scs = country_scs[country.pk]
+                country.save()
 post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Game)
 post_save.connect(create_territories_units_orders_on_game_or_sandbox_save, sender=Sandbox)
