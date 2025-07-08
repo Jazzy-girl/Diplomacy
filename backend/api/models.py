@@ -236,7 +236,7 @@ class UnitLocationSnapshot(models.Model):
 class Chain(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     title = models.TextField()
-    last_updated = models.DateTimeField("date created", default=timezone.now())
+    last_updated = models.DateTimeField("date created", default=timezone.now)
 
     def __str__(self):
         return self.title
@@ -256,4 +256,4 @@ class CountryChain(models.Model):
     unread = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.chain} : {self.country}"
+        return f"{self.chain} : {self.country} {"UNREAD" if self.unread else "READ"}"

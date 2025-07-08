@@ -64,14 +64,20 @@ class CreateMessageView(APIView):
         chain: <chain ID>,
         country: <country ID>,
         text: <text>
+    
     """
     def post(self, request, format=None):
         serializer = MessageSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             chain_id = request.data.get('chain')
+            sender = request.data.get('country')
             chain = Chain.objects.get(pk=chain_id)
-            chain.last_updated = timezone.now()
+            chain.last_updated = timezone.now
+
+            for countryChain in CountryChain.objects.filter(chain=chain):
+                countryChain.unread = (sender != countryChain.country.pk)
+                countryChain.save()
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -92,9 +98,7 @@ class CreateChainView(APIView):
         
     
         chain_title = chain_data.get('title')
-        game_id = int(chain_data.get('game'))
-
-        chain = Chain.objects.create(title=chain_title, game=game_id)
+        game_id = chain_data.get('game')
 
         members = chain_data.get('members')
 
@@ -102,14 +106,15 @@ class CreateChainView(APIView):
             return Response({'error': '"members" should be a list'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            game = get_object_or_404(Game, id=game_id)
+            game = get_object_or_404(Game, pk=game_id)
             chain = Chain.objects.create(title=chain_title,game=game)
 
             for member_id in members:
                 country = get_object_or_404(Country, id=member_id)
-                CountryChain.objects.create(chain=chain,country=country,unread=(country.user != user))
+                CountryChain.objects.create(chain=chain,country=country)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(ChainSerializer(chain).data, status=status.HTTP_200_OK)
             
 class BulkUpdateOrdersView(APIView):
     def patch(self, request, *args, **kwargs):

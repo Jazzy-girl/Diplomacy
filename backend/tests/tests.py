@@ -13,7 +13,7 @@ from api.models import (
     Game, Territory, Unit, Order, Sandbox, 
     Country, CoastTemplate, TerritoryTemplate, UnitRetreatOption, 
     AdjustmentCache, CountrySCCountSnapshot, TerritoryCountrySnapshot,
-    UnitLocationSnapshot
+    UnitLocationSnapshot, Chain, Message, CountryChain
     )
 from adjudicator.adjudication import resolve_moves, resolve_retreats, next_turn, resolve_adjustments
 
@@ -491,11 +491,28 @@ class TestMessages(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         game = Game.objects.create(name="Test Game")
 
+        england = Country.objects.get(game=game,country_template__name='E')
+        russia = Country.objects.get(game=game,country_template__name='R')
+        england.user = self.user
+
         payload = {
             'title': "Test",
             "game": game.pk,
-            "members": []
+            "members": [england.pk, russia.pk]
         }
 
         response = self.client.post(CREATE_CHAIN, payload, format="json")
         self.assertEqual(response.status_code, 200)
+        
+        payload = {
+            'chain': response.data.get('id'),
+            'country': england.pk,
+            'text': 'Hey this is a test message bitches!'
+        }
+
+        response = self.client.post(CREATE_MESSAGE, payload, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        print(Message.objects.get(country=england))
+        for countryChain in CountryChain.objects.all():
+            print(countryChain)
