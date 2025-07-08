@@ -21,7 +21,7 @@ from api.views import (
     BulkUpdateOrdersView, CreateUserView, ReactConfirmEmailView, 
     current_user, get_user_by_id, update_user, GameList, 
     TerritoryList, UnitList, CreateGameView, CreateSandboxView, 
-    SandboxList, get_sandbox_by_id, CreateMessageView, CreateChainView,
+    SandboxList, get_sandbox_by_id, CreateMessageView,
     CreateChainAndMessage,)
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.views import APIView

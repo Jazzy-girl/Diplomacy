@@ -106,6 +106,9 @@ class CreateChainAndMessage(APIView):
 
         members = data.get('members')
 
+        if sender_id not in members:
+            return Response({'error': 'sender_id not in members'}, status=status.HTTP_400_BAD_REQUEST)
+
         if not chain_title or not game_id or not sender_id or not text or not isinstance(members, list):
             return Response({'error': 'one of the fields is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
         
