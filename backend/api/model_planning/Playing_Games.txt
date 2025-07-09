@@ -5,6 +5,7 @@ Features:
     - Join open games
     - Also: settings...
     - Players can only give orders once games are started
+    - Game adjudication on real-time
 
 Solution:
     - PlayersGames many-many relational table.
@@ -14,6 +15,16 @@ Solution:
     - Games table updates:
         - full BOOL (default False, True when has X amount of players)
         - date created i guess
+        - JSONfield for settings, starting with:
+            {
+                "public": BOOL,
+                "press": ENUM ("default", "always", "gunboat"),
+                "adjudication": {
+                    "type": ENUM ("minutes", "hours", "days")
+                    "spring_fall": int (hours),
+                    "winter_retreat": int (percent)
+                }
+            }
     - POST: Join Game
         - If game isn't full && (game is public || game is private and you have the code)
         - if public, randomly assigned a country that still has no user

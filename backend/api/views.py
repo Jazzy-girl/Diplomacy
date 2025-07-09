@@ -74,7 +74,7 @@ class JoinGameView(APIView):
         if Country.objects.filter(game=game, user=user).exists():
             return Response({"error":"You are already in this game"}, status=status.HTTP_400_BAD_REQUEST)
         
-        if game.public:
+        if game.settings.get('public')==Game.GameType.PUBLIC:
             """
             Get assigned a random country and join the game.
             """

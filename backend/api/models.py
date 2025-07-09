@@ -19,15 +19,53 @@ class Seasons(models.TextChoices):
     SPRING = 'spring', _('Spring')
     WINTER = 'winter', _('Winter')
 class Game(models.Model):
+    class PressOptions(models.TextChoices):
+        DEFAULT = 'default' # Allowed except for Winter & Retreats
+        ALWAYS = 'always' # Always
+        GUNBOAT = 'gunboat' # Gunboat -- no press whatsoever
+        WILSON = 'wilson' # All press is sent to everyone
+    
+    class GameType(models.TextChoices):
+        PUBLIC = 'public'
+        PRIVATE = 'private'
+    
+    class AdjudicationLength(models.TextChoices):
+        MINUTES = 'minutes'
+        HOURS = 'hours'
+        DAYS = 'days'
+    
+    class TimeZone(models.TextChoices):
+        # There's a lot of time zones....
+        US_PACIFIC = 'us_pt'
+        US_EAST = 'us_et'
+
     name = models.CharField(max_length=50)
+    description = models.TextField(max_length=200, default="")
     current_turn = models.PositiveSmallIntegerField(default=0)
     retreat_required = models.BooleanField(default=False)
     creator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, default=None, blank=True, related_name="customuser_as_creator")
     created_date = models.DateField("date created", auto_now_add=True)
     full = models.BooleanField(default=False)
     next_adjudication = models.DateField("next adjudication", null=True, blank=True, default=None)
-    public = models.BooleanField(default=True)
     gm = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, default=None, related_name="customuser_as_gm")
+
+    # DELETE THIS LATER
+    _settings_dict = {
+        "type": GameType.PUBLIC,
+        "press": PressOptions.DEFAULT,
+        "adjudication": {
+            "regular_unit": AdjudicationLength.DAYS,
+            "spring_fall": 1,
+            "winter_retreat": 50,
+            "first_unit": AdjudicationLength.DAYS,
+            "first_turn": 7,
+            "start": 12, # Hour; 00 to 24
+            "time_zone": TimeZone.US_EAST
+        }
+    }
+
+    settings = models.JSONField(default=dict(_settings_dict))
+
     def __str__(self):
         return f"{self.creator} {self.name}"
 
