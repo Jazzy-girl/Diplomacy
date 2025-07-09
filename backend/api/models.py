@@ -22,16 +22,18 @@ class Game(models.Model):
     name = models.CharField(max_length=50)
     current_turn = models.PositiveSmallIntegerField(default=0)
     retreat_required = models.BooleanField(default=False)
-    creator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, default=None, blank=True)
+    creator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, default=None, blank=True, related_name="customuser_as_creator")
     created_date = models.DateField("date created", auto_now_add=True)
     full = models.BooleanField(default=False)
+    next_adjudication = models.DateField("next adjudication", null=True, blank=True, default=None)
+    public = models.BooleanField(default=True)
+    gm = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, default=None, related_name="customuser_as_gm")
     def __str__(self):
         return f"{self.creator} {self.name}"
 
 class PlayersGames(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     player = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    country = models.ForeignKey("Country", on_delete=models.CASCADE)
 
 class Sandbox(models.Model):
     name = models.CharField(max_length=50)
@@ -57,6 +59,7 @@ class Country(models.Model):
     scs = models.IntegerField(default=0)
     available_builds = models.PositiveSmallIntegerField(default=0)
     needed_disbands = models.PositiveSmallIntegerField(default=0)
+    submitted_orders = models.BooleanField(default=False)
 
     def __str__(self):
         return self.country_template.__str__()
@@ -239,7 +242,7 @@ class Chain(models.Model):
     last_updated = models.DateTimeField("date created", default=timezone.now)
 
     def __str__(self):
-        return self.title
+        return f"{self.title}, last updated: {self.last_updated}"
 
 class Message(models.Model):
     chain = models.ForeignKey(Chain, on_delete=models.CASCADE)
@@ -248,7 +251,7 @@ class Message(models.Model):
     date_created = models.DateTimeField("date created", auto_now_add=True)
 
     def __str__(self):
-        return self.text
+        return f"{self.country}: {self.text}"
 
 class CountryChain(models.Model):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)

@@ -1,13 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model
 from rest_framework import generics
-from .models import (
-    CustomUser, Game, Territory, Unit, Sandbox, Order,
-    Chain, Message, CountryChain, Country)
-from .serializers import (
-    OrderSerializer, TerritorySerializer, UserSerializer, GameSerializer, 
-    UnitSerializer, SandboxSerializer, ChainSerializer, MessageSerializer,
-    CountryChainSerializer)
+from .models import *
+from .serializers import *
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from allauth.account.views import ConfirmEmailView
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -16,6 +11,8 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 
 from django.utils import timezone
+import random
+from django.db import transaction
 
 # Create your views here.
 class ReactConfirmEmailView(ConfirmEmailView):
@@ -57,6 +54,55 @@ class UnitList(generics.ListAPIView):
     queryset = Unit.objects.all()
     serializer_class = UnitSerializer
     permission_classes = [AllowAny]
+
+class JoinGameView(APIView):
+    """
+    Join a game. Sending:
+    {
+        'id': <game_id>
+    }
+
+    """
+    def patch(self, request, *args, **kwargs):
+        game_id = request.data.get('id')
+        user = request.user
+        game = get_object_or_404(Game, pk=game_id)
+
+        if game.full:
+            return Response({'error': 'Game already full!'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if Country.objects.filter(game=game, user=user).exists():
+            return Response({"error":"You are already in this game"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if game.public:
+            """
+            Get assigned a random country and join the game.
+            """
+            try:
+                with transaction.atomic():
+                    unassigned_countries = (
+                        Country.objects
+                        .select_for_update(skip_locked=True)
+                        .filter(game=game, user=None)
+                        )
+                    
+                    if not unassigned_countries.exists():
+                        return Response({"error":"No unasigned countries left"}, status=status.HTTP_400_BAD_REQUEST)
+
+                    if len(unassigned_countries) == 1:
+                        game.full = True
+                        game.save()
+                    
+                    chosen_country = random.choice(unassigned_countries)
+                    chosen_country.user = user
+                    chosen_country.save()
+
+                    PlayersGames.objects.create(game=game, player=user)
+                    return Response({"success":"Joined game"}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 class CreateMessageView(APIView):
     """

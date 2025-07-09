@@ -9,6 +9,7 @@ from collections import defaultdict
 
 def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, created, **kwargs):
     # print("signal triggered!") #Debug
+    isGame = isinstance(instance, Game)
     if created:
         """
         Makes:

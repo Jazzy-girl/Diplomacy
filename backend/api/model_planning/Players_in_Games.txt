@@ -14,4 +14,7 @@ Solution:
     - Games table updates:
         - full BOOL (default False, True when has X amount of players)
         - date created i guess
+    - POST: Join Game
+        - If game isn't full && (game is public || game is private and you have the code)
+        - if public, randomly assigned a country that still has no user
 
