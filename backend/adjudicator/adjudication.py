@@ -35,7 +35,24 @@ THE ADJUDICATOR!
     - Loads the vanilla map (for now; later will introduce variants)
     - Loads units and orders into place
 """
-def resolve_moves(instance=Game):
+def adjudicate(instance: Game | Sandbox):
+    """
+    Takes in an instance of either a Game or Sandbox and calls
+    the necessary functions.
+    """
+    SPRING = 0
+    FALL = 1
+    WINTER = 2
+    season = instance.current_turn % 3
+    if season == SPRING or FALL:
+        if instance.retreat_required:
+            resolve_retreats(instance)
+        else:
+            resolve_moves(instance)
+    else:
+        resolve_adjustments(instance)
+
+def resolve_moves(instance: Game):
     game_map = vanilla_dip.generate_map()
     players = {}
     if isinstance(instance, Game):
@@ -143,7 +160,7 @@ def resolve_moves(instance=Game):
     else:
         next_turn(instance)
 
-def resolve_retreats(instance=Game):
+def resolve_retreats(instance: Game):
     """
     Resolves retreats.
     """
@@ -164,7 +181,7 @@ def resolve_retreats(instance=Game):
     # call a new turn!
     next_turn(instance)
 
-def resolve_adjustments(instance=Game):
+def resolve_adjustments(instance: Game):
     """
     Resolves Winter builds and disbands.
     """
@@ -256,7 +273,7 @@ def resolve_adjustments(instance=Game):
 
 
 
-def next_turn(instance=Game):
+def next_turn(instance: Game):
     SPRING = 0
     FALL = 1
     WINTER = 2
