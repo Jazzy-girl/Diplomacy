@@ -21,6 +21,11 @@ PyJWT
 django-allauth
 dj-rest-auth
 requests
+
+# Celery redis
+redis
+celery
+
 # Already included by Django (don't need to specify unless version-pinning):
 # asgiref
 # pytz

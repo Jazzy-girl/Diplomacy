@@ -35,7 +35,7 @@ class Game(models.Model):
         DAYS = 'days'
     
     class TimeZone(models.TextChoices):
-        # There's a lot of time zones....
+        # There's a lot of time zones.... is there a better way to do this??
         US_PACIFIC = 'us_pt'
         US_EAST = 'us_et'
 

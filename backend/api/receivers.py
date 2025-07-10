@@ -18,6 +18,8 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
             - Unit for each InitialUnitSetup
             - Order for each InitialUnitSetup
         """
+        if isGame: # set adjudication
+            instance.next_adjudication
         country_templates = CountryTemplate.objects.all()
         countries = {}
         countries[None] = None

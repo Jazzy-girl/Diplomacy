@@ -35,6 +35,11 @@ Solution:
             - the chain_id keys are ordered by last_updated datetime with most recent at the front,
             - the members are ordered alphabetically, with the last one always being you
             - the messages are ordered by datetime with most recent at the end.
+            Needed info:
+                - chain id
+                - Message: text & sent date
+                - unread?
+                - Members: name
             - {
                 <chain_id>: {
                     'title': <title>, 
