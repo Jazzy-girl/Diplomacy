@@ -47,6 +47,7 @@ class Game(models.Model):
     created_date = models.DateField("date created", auto_now_add=True)
     full = models.BooleanField(default=False)
     next_adjudication = models.DateField("next adjudication", null=True, blank=True, default=None)
+    adjudicating = models.BooleanField(default=False)
     gm = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, default=None, related_name="customuser_as_gm")
 
     # DELETE THIS LATER
@@ -79,6 +80,7 @@ class Sandbox(models.Model):
     created_date = models.DateField("date created", auto_now_add=True)
     current_turn = models.PositiveSmallIntegerField(default=0)
     retreat_required = models.BooleanField(default=False)
+    adjudicating = models.BooleanField(default=False)
     def __str__(self):
         return f"{self.id} {self.name}"
 

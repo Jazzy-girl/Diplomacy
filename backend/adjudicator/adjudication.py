@@ -46,11 +46,11 @@ def adjudicate(instance: Game | Sandbox):
     season = instance.current_turn % 3
     if season == SPRING or FALL:
         if instance.retreat_required:
-            resolve_retreats(instance)
+            return resolve_retreats(instance)
         else:
-            resolve_moves(instance)
+            return resolve_moves(instance)
     else:
-        resolve_adjustments(instance)
+        return resolve_adjustments(instance)
 
 def resolve_moves(instance: Game):
     game_map = vanilla_dip.generate_map()
@@ -156,9 +156,9 @@ def resolve_moves(instance: Game):
         order.save()
         # print(order)
     if(instance.retreat_required):
-        return
+        return -1
     else:
-        next_turn(instance)
+        return next_turn(instance)
 
 def resolve_retreats(instance: Game):
     """
@@ -179,7 +179,7 @@ def resolve_retreats(instance: Game):
     instance.retreat_required = False
     instance.save()
     # call a new turn!
-    next_turn(instance)
+    return next_turn(instance)
 
 def resolve_adjustments(instance: Game):
     """
@@ -269,7 +269,7 @@ def resolve_adjustments(instance: Game):
                 else:
                     build.result = Order.OrderResult.FAILS
                 build.save()
-    next_turn(instance)
+    return next_turn(instance)
 
 
 
@@ -412,3 +412,4 @@ def next_turn(instance: Game):
                 order = Order.objects.create(game=instance,country=unit.country,turn=new_turn,unit=unit,origin_territory=unit.territory,origin_coast=unit.coast,move_type=Order.MoveTypes.HOLD)
     instance.current_turn += 1
     instance.save()
+    return instance.current_turn
