@@ -24,6 +24,7 @@ def adjudicate_game(game_id):
         else: # season == WINTER
             pass
     game.adjudicating = False
+    game.save()
     
 
 @shared_task
