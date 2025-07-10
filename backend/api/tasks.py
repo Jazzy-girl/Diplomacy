@@ -6,6 +6,7 @@ from .models import *
 def adjudicate_game(game_id):
     from adjudicator.adjudication import adjudicate
     game = Game.objects.get(pk=game_id)
+    # add check to see if game.next_adjudication is now?
     adjudicate(game)
 
 @shared_task

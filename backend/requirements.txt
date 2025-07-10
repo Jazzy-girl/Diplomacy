@@ -25,6 +25,7 @@ requests
 # Celery redis
 redis
 celery
+django-celery-beat
 
 # Already included by Django (don't need to specify unless version-pinning):
 # asgiref

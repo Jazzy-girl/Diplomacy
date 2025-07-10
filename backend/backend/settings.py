@@ -34,6 +34,9 @@ AUTH_USER_MODEL = 'api.CustomUser'
 
 ALLOWED_HOSTS = ["*"]
 
+
+
+
 # django-allauth
 SITE_ID = 1
 
@@ -179,6 +182,12 @@ USE_I18N = True
 
 USE_TZ = True
 
+# CELERY
+# CELERY!!
+
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_TIMEZONE = TIME_ZONE
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
