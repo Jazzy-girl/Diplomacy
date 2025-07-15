@@ -14,9 +14,17 @@ def adjudicate_game(game_id):
     WINTER = 2
     outcome = adjudicate(game)
     # get adjudication time - JSON; game.settings.get(...)
+    data = game.settings.get('adjudication')
+    unit = data.get('regular_unit')
+    spring_fall = data.get('spring_fall')
+    winter_retreat = data.get('winter_retreat')
+    last_adjudication = game.next_adjudication
+
+
     if outcome == -1:
         # retreats.
-        pass
+        if unit == Game.AdjudicationLength.DAYS:
+            pass
     else:
         season = game.current_turn % 3
         if season == SPRING or FALL:
