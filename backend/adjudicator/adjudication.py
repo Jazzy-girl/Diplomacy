@@ -156,7 +156,8 @@ def resolve_moves(instance: Game):
         order.save()
         # print(order)
     if(instance.retreat_required):
-        return -1
+        RETREAT = -1
+        return RETREAT
     else:
         return next_turn(instance)
 
