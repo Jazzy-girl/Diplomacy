@@ -3,6 +3,7 @@ from .models import Game, Sandbox
 from adjudicator.adjudication import adjudicate
 from django.utils import timezone
 from django.db import transaction
+from datetime import timedelta
 
 
 @shared_task
@@ -14,25 +15,34 @@ def adjudicate_game(game_id):
     WINTER = 2
     outcome = adjudicate(game)
     # get adjudication time - JSON; game.settings.get(...)
-    data = game.settings.get('adjudication')
-    unit = data.get('regular_unit')
-    spring_fall = data.get('spring_fall')
-    winter_retreat = data.get('winter_retreat')
-    last_adjudication = game.next_adjudication
 
+    def _update_adjudication_time(game:Game, winter=False):
+        data = game.settings.get('adjudication')
+        unit = data.get('regular_unit')
+        spring_fall = data.get('spring_fall')
+        winter_retreat = spring_fall / data.get('winter_retreat')
 
-    if outcome == -1:
-        # retreats.
+        # winter BOOL; true = winter/retreat, False = spring/fall
+        if winter:
+            update = winter_retreat
+        else:
+            update = spring_fall
         if unit == Game.AdjudicationLength.DAYS:
-            pass
-    else:
-        season = game.current_turn % 3
-        if season == SPRING or FALL:
-            pass
-        else: # season == WINTER
-            pass
+            delta = timedelta(days=update)
+        elif unit == Game.AdjudicationLength.HOURS:
+            delta = timedelta(hours=update)
+        elif unit == Game.AdjudicationLength.MINUTES:
+            delta = timedelta(minutes=update)
+        current = game.next_adjudication
+        new = current + delta
+        game.next_adjudication = new
+        game.save(update_fields=['next_adjudication'])
+
+    season = game.current_turn % 3
+    winter = True if (season == WINTER or outcome == -1) else False
+    _update_adjudication_time(game, winter)
     game.adjudicating = False
-    game.save()
+    game.save(update_fields=['adjudicating'])
     
 
 @shared_task
