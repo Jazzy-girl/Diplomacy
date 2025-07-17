@@ -73,7 +73,7 @@ class Game(models.Model):
     settings = models.JSONField(default=dict(_settings_dict))
 
     def __str__(self):
-        return f"{self.creator} {self.name}"
+        return f"Creator: {self.creator} Title: {self.name} Adjudicates: {self.next_adjudication}"
 
 class PlayersGames(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
