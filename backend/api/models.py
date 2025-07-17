@@ -59,12 +59,12 @@ class Game(models.Model):
         "type": GameType.PUBLIC,
         "press": PressOptions.DEFAULT,
         "adjudication": {
-            "regular_unit": AdjudicationLength.DAYS,
+            "regular_unit": AdjudicationLength.MINUTES,
             "spring_fall": 1,
             "winter_retreat": 50,
-            "first_unit": AdjudicationLength.DAYS,
-            "first_turn": 7,
-            "start": 12, # Hour; 00 to 24
+            "first_unit": AdjudicationLength.MINUTES,
+            "first_turn": 1,
+            "start": 15, # Hour; 00 to 24
             "timezone": TimeZone.US_EASTERN,
             "fast_adjudication": False,
         }

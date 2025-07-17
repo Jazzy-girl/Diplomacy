@@ -63,6 +63,7 @@ def adjudicate_sandbox(sandbox_id):
     
 @shared_task
 def check_due_games():
+    print("Checking!!!")
     now = timezone.now()
     with transaction.atomic():
 
