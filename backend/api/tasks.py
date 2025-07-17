@@ -3,8 +3,8 @@ from .models import Game, Sandbox, TimeZone
 from adjudicator.adjudication import adjudicate
 from django.utils import timezone
 from django.db import transaction
-from datetime import timedelta
-
+from datetime import timedelta, datetime
+from zoneinfo import ZoneInfo
 
 @shared_task
 def adjudicate_game(game_id):
@@ -22,6 +22,7 @@ def adjudicate_game(game_id):
     percent = data.get('winter_retreat') / 100
     winter_retreat = spring_fall * percent
     fast = data.get('fast_adjudication')
+    zone = data.get('timezone')
 
     season = game.current_turn % 3
     # winter BOOL; true = winter/retreat, False = spring/fall
@@ -39,8 +40,13 @@ def adjudicate_game(game_id):
         delta = timedelta(minutes=update)
     current = game.next_adjudication
     new = current + delta
-    if fast: # Fast adjudication
-        # T = adjudication period; R = time remaining before next scheduled adjudication. If R < T, add T to next adjudication.
+    # if fast: # Fast adjudication CHANGE: to early adjudication extra time!!!
+    #     # T = adjudication period; R = time remaining before next scheduled adjudication. If R < T, add T to next adjudication.
+    #     now = datetime.now(ZoneInfo(zone))
+    #     if now < current: # Was adjudicated early
+    #         diff = current - now
+    #         if diff < delta:
+    #             new += diff
     game.next_adjudication = new
     game.adjudicating = False
     game.save(update_fields=['adjudicating', 'next_adjudication'])
