@@ -8,6 +8,7 @@ from django.utils import timezone
 import json
 from collections import defaultdict
 from zoneinfo import ZoneInfo
+from django.utils.timezone import make_aware
 
 def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, created, **kwargs):
     # print("signal triggered!") #Debug
@@ -25,7 +26,7 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
             unit = data.get('first_unit')
             start_hour = data.get('start')
             amount = data.get('first_turn')
-            zone = data.get('timezone')
+            zone = ZoneInfo(data.get('timezone'))
             if unit == Game.AdjudicationLength.DAYS:
                 delta = timedelta(days=amount)
             elif unit == Game.AdjudicationLength.HOURS:
@@ -42,14 +43,15 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
             Method: Check the current time + delta and compare to start time on the same day; if less, put next_adjudication at start time on that day;
                     elif more, put next_adjudication at start time on the next day.
             """
-            new_time = datetime.now(ZoneInfo(zone)) + delta
+
+            new_time = datetime.now(zone) + delta
             # check if <= or > start time on that day
             month = new_time.month
             year = new_time.year
             day = new_time.day
             if new_time.hour > start_hour: # set next_adjudication to tomorrow
                 day += 1
-            date = datetime(year=year,month=month,day=day,hour=start_hour)
+            date = make_aware(datetime(year=year,month=month,day=day,hour=start_hour), timezone=zone)
             instance.next_adjudication = date
             instance.save(update_fields=['next_adjudication'])
 

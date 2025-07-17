@@ -8,7 +8,9 @@ from zoneinfo import ZoneInfo
 
 @shared_task
 def adjudicate_game(game_id):
+    
     game = Game.objects.get(pk=game_id)
+    print(f"Beginning adjudicating game {game.name}!")
     # SO FAR only handles non-Fast adjudication.
     SPRING = 0
     FALL = 1
@@ -28,6 +30,7 @@ def adjudicate_game(game_id):
     # winter BOOL; true = winter/retreat, False = spring/fall
     winter = True if (season == WINTER or outcome == RETREAT) else False
 
+    current = game.next_adjudication
     if winter:
         update = winter_retreat
     else:
@@ -38,7 +41,7 @@ def adjudicate_game(game_id):
         delta = timedelta(hours=update)
     elif unit == Game.AdjudicationLength.MINUTES:
         delta = timedelta(minutes=update)
-    current = game.next_adjudication
+    
     new = current + delta
     # if fast: # Fast adjudication CHANGE: to early adjudication extra time!!!
     #     # T = adjudication period; R = time remaining before next scheduled adjudication. If R < T, add T to next adjudication.
@@ -50,6 +53,7 @@ def adjudicate_game(game_id):
     game.next_adjudication = new
     game.adjudicating = False
     game.save(update_fields=['adjudicating', 'next_adjudication'])
+    print(f"Finished adjudicating game {game.name}!")
     
 
 @shared_task
@@ -69,4 +73,7 @@ def check_due_games():
     for game in due_games:
         game.adjudicating = True
         game.save(update_fields=['adjudicating'])
+        
         adjudicate_game.delay(game.pk)
+        
+        

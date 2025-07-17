@@ -16,6 +16,8 @@ from api.models import (
     UnitLocationSnapshot, Chain, Message, CountryChain, TimeZone
     )
 from adjudicator.adjudication import resolve_moves, resolve_retreats, next_turn, resolve_adjustments
+from api.tasks import adjudicate_game
+from datetime import timedelta
 
 TEMPLATE_SETUP = 'tests/json/templates.json'
 VANILLA_UNIT_SETUP = 'tests/json/vanilla_setup.json'
@@ -538,7 +540,15 @@ class TestAdjudicationTime(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         game = Game.objects.create(name="Test Game", settings=settings_dict)
 
-        print(game.next_adjudication)
+        x1 = game.next_adjudication
+        # print(game.next_adjudication)
+        adjudicate_game(game.pk)
+        game.refresh_from_db()
+        # print(game.next_adjudication)
+        x2 = game.next_adjudication
+        diff = x2 - x1
+        day = timedelta(days=1)
+        self.assertEqual(diff, day)
 
     def test_minute(self):
         refresh = RefreshToken.for_user(self.user)
@@ -561,6 +571,4 @@ class TestAdjudicationTime(APITestCase):
 
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         game = Game.objects.create(name="Test Game", settings=settings_dict)
-
-        print(game.next_adjudication)
 

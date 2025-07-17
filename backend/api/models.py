@@ -24,7 +24,7 @@ class TimeZone(models.TextChoices):
     US_PACIFIC = 'US/Pacific'
     US_EASTERN = 'US/Eastern'
     US_MOUNTAIN = 'US/Mountain'
-    
+
 class Game(models.Model):
     class PressOptions(models.TextChoices):
         DEFAULT = 'default' # Allowed except for Winter & Retreats
@@ -48,9 +48,9 @@ class Game(models.Model):
     current_turn = models.PositiveSmallIntegerField(default=0)
     retreat_required = models.BooleanField(default=False)
     creator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, default=None, blank=True, related_name="customuser_as_creator")
-    created_date = models.DateField("date created", auto_now_add=True)
+    created_date = models.DateTimeField("date created", auto_now_add=True)
     full = models.BooleanField(default=False)
-    next_adjudication = models.DateField("next adjudication", null=True, blank=True, default=None)
+    next_adjudication = models.DateTimeField("next adjudication", null=True, blank=True, default=None)
     adjudicating = models.BooleanField(default=False)
     gm = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, default=None, related_name="customuser_as_gm")
 
@@ -82,7 +82,7 @@ class PlayersGames(models.Model):
 class Sandbox(models.Model):
     name = models.CharField(max_length=50)
     creator = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    created_date = models.DateField("date created", auto_now_add=True)
+    created_date = models.DateTimeField("date created", auto_now_add=True)
     current_turn = models.PositiveSmallIntegerField(default=0)
     retreat_required = models.BooleanField(default=False)
     adjudicating = models.BooleanField(default=False)
