@@ -516,10 +516,10 @@ class TestAdjudicationTime(APITestCase):
         call_command('loaddata', VANILLA_UNIT_SETUP)
         cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
     
-    def test(self):
+    def test_day(self):
         refresh = RefreshToken.for_user(self.user)
         access_token = str(refresh.access_token)
-        
+
         settings_dict = {
             "type": Game.GameType.PUBLIC,
             "press": Game.PressOptions.DEFAULT,
@@ -537,6 +537,28 @@ class TestAdjudicationTime(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         game = Game.objects.create(name="Test Game", settings=settings_dict)
 
-        print(game.settings)
+        print(game.next_adjudication)
+
+    def test_minute(self):
+        refresh = RefreshToken.for_user(self.user)
+        access_token = str(refresh.access_token)
+        
+        settings_dict = {
+            "type": Game.GameType.PUBLIC,
+            "press": Game.PressOptions.DEFAULT,
+            "adjudication": {
+                "regular_unit": Game.AdjudicationLength.DAYS,
+                "spring_fall": 1,
+                "winter_retreat": 50,
+                "first_unit": Game.AdjudicationLength.MINUTES,
+                "first_turn": 10,
+                "start": 12, # Hour; 00 to 24
+                "time_zone": Game.TimeZone.US_EAST
+            }
+        }
+
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+        game = Game.objects.create(name="Test Game", settings=settings_dict)
+
         print(game.next_adjudication)
 
