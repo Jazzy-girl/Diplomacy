@@ -9,13 +9,12 @@ from datetime import timedelta
 @shared_task
 def adjudicate_game(game_id):
     game = Game.objects.get(pk=game_id)
-    # add check to see if game.next_adjudication is now?
+    # SO FAR only handles non-Fast adjudication.
     SPRING = 0
     FALL = 1
     WINTER = 2
     RETREAT = -1
     outcome = adjudicate(game)
-    # get adjudication time - JSON; game.settings.get(...)
 
     data = game.settings.get('adjudication')
     unit = data.get('regular_unit')
