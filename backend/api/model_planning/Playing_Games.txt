@@ -29,3 +29,8 @@ Solution:
         - If game isn't full && (game is public || game is private and you have the code)
         - if public, randomly assigned a country that still has no user
 
+
+Adjudication time zone issues:
+    - Make all next_adjudication fields in the same UTC time
+    - for creation:
+        

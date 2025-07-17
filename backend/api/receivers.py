@@ -4,7 +4,7 @@ from .models import Game, Territory, Unit, Order, Sandbox, TerritoryTemplate, Co
 from django.conf import settings
 import os
 from datetime import timedelta, datetime
-from django.utils import timezone
+from datetime import timezone
 import json
 from collections import defaultdict
 from zoneinfo import ZoneInfo
@@ -51,8 +51,9 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
             day = new_time.day
             if new_time.hour > start_hour: # set next_adjudication to tomorrow
                 day += 1
-            date = make_aware(datetime(year=year,month=month,day=day,hour=start_hour), timezone=zone)
-            instance.next_adjudication = date
+            local = make_aware(datetime(year=year,month=month,day=day,hour=start_hour, minute=0, microsecond=0), timezone=zone)
+            utc_date = local.astimezone(timezone.utc)
+            instance.next_adjudication = utc_date
             instance.save(update_fields=['next_adjudication'])
 
         country_templates = CountryTemplate.objects.all()

@@ -18,6 +18,7 @@ from api.models import (
 from adjudicator.adjudication import resolve_moves, resolve_retreats, next_turn, resolve_adjustments
 from api.tasks import adjudicate_game
 from datetime import timedelta
+from zoneinfo import ZoneInfo
 
 TEMPLATE_SETUP = 'tests/json/templates.json'
 VANILLA_UNIT_SETUP = 'tests/json/vanilla_setup.json'
@@ -541,7 +542,8 @@ class TestAdjudicationTime(APITestCase):
         game = Game.objects.create(name="Test Game", settings=settings_dict)
 
         x1 = game.next_adjudication
-        # print(game.next_adjudication)
+        # print("UTC:", game.next_adjudication)
+        # print("Local:", game.next_adjudication.astimezone(ZoneInfo(game.settings['adjudication']['timezone'])))
         adjudicate_game(game.pk)
         game.refresh_from_db()
         # print(game.next_adjudication)
