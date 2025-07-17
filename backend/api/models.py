@@ -23,6 +23,8 @@ class TimeZone(models.TextChoices):
     # There's a lot of time zones.... is there a better way to do this??
     US_PACIFIC = 'US/Pacific'
     US_EASTERN = 'US/Eastern'
+    US_MOUNTAIN = 'US/Mountain'
+    
 class Game(models.Model):
     class PressOptions(models.TextChoices):
         DEFAULT = 'default' # Allowed except for Winter & Retreats
