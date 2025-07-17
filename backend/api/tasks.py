@@ -1,5 +1,5 @@
 from celery import shared_task
-from .models import Game, Sandbox
+from .models import Game, Sandbox, TimeZone
 from adjudicator.adjudication import adjudicate
 from django.utils import timezone
 from django.db import transaction
@@ -21,6 +21,7 @@ def adjudicate_game(game_id):
     spring_fall = data.get('spring_fall')
     percent = data.get('winter_retreat') / 100
     winter_retreat = spring_fall * percent
+    fast = data.get('fast_adjudication')
 
     season = game.current_turn % 3
     # winter BOOL; true = winter/retreat, False = spring/fall
@@ -38,6 +39,8 @@ def adjudicate_game(game_id):
         delta = timedelta(minutes=update)
     current = game.next_adjudication
     new = current + delta
+    if fast: # Fast adjudication
+        # T = adjudication period; R = time remaining before next scheduled adjudication. If R < T, add T to next adjudication.
     game.next_adjudication = new
     game.adjudicating = False
     game.save(update_fields=['adjudicating', 'next_adjudication'])

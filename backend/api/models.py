@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from zoneinfo import ZoneInfo
 # Create your models here.
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
@@ -18,6 +19,10 @@ class Seasons(models.TextChoices):
     FALL = 'fall', _('Fall')
     SPRING = 'spring', _('Spring')
     WINTER = 'winter', _('Winter')
+class TimeZone(models.TextChoices):
+    # There's a lot of time zones.... is there a better way to do this??
+    US_PACIFIC = 'US/Pacific'
+    US_EASTERN = 'US/Eastern'
 class Game(models.Model):
     class PressOptions(models.TextChoices):
         DEFAULT = 'default' # Allowed except for Winter & Retreats
@@ -34,10 +39,7 @@ class Game(models.Model):
         HOURS = 'hours'
         DAYS = 'days'
     
-    class TimeZone(models.TextChoices):
-        # There's a lot of time zones.... is there a better way to do this??
-        US_PACIFIC = 'us_pt'
-        US_EAST = 'us_et'
+
 
     name = models.CharField(max_length=50)
     description = models.TextField(max_length=200, default="")
@@ -61,7 +63,8 @@ class Game(models.Model):
             "first_unit": AdjudicationLength.DAYS,
             "first_turn": 7,
             "start": 12, # Hour; 00 to 24
-            "time_zone": TimeZone.US_EAST
+            "timezone": TimeZone.US_EASTERN,
+            "fast_adjudication": False,
         }
     }
 

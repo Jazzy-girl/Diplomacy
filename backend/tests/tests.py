@@ -13,7 +13,7 @@ from api.models import (
     Game, Territory, Unit, Order, Sandbox, 
     Country, CoastTemplate, TerritoryTemplate, UnitRetreatOption, 
     AdjustmentCache, CountrySCCountSnapshot, TerritoryCountrySnapshot,
-    UnitLocationSnapshot, Chain, Message, CountryChain
+    UnitLocationSnapshot, Chain, Message, CountryChain, TimeZone
     )
 from adjudicator.adjudication import resolve_moves, resolve_retreats, next_turn, resolve_adjustments
 
@@ -530,7 +530,8 @@ class TestAdjudicationTime(APITestCase):
                 "first_unit": Game.AdjudicationLength.DAYS,
                 "first_turn": 1,
                 "start": 12, # Hour; 00 to 24
-                "time_zone": Game.TimeZone.US_EAST
+                "timezone": TimeZone.US_PACIFIC,
+                "fast_adjudication": False,
             }
         }
 
@@ -553,7 +554,8 @@ class TestAdjudicationTime(APITestCase):
                 "first_unit": Game.AdjudicationLength.MINUTES,
                 "first_turn": 10,
                 "start": 12, # Hour; 00 to 24
-                "time_zone": Game.TimeZone.US_EAST
+                "timezone": TimeZone.US_EASTERN,
+                "fast_adjudication": False,
             }
         }
 
