@@ -3,7 +3,9 @@ from django.dispatch import receiver
 from .models import Game, Territory, Unit, Order, Sandbox, TerritoryTemplate, CountryTemplate, Country, InitialUnitSetup
 from django.conf import settings
 import os
-
+from datetime import timedelta
+import datetime
+from django.utils import timezone
 import json
 from collections import defaultdict
 
@@ -19,7 +21,37 @@ def create_territories_units_orders_on_game_or_sandbox_save(sender, instance, cr
             - Order for each InitialUnitSetup
         """
         if isGame: # set adjudication
-            instance.next_adjudication
+            data = instance.settings.get('adjudication')
+            unit = data.get('first_unit')
+            start_hour = data.get('start')
+            amount = data.get('first_turn')
+            if unit == Game.AdjudicationLength.DAYS:
+                delta = timedelta(days=amount)
+            elif unit == Game.AdjudicationLength.HOURS:
+                delta = timedelta(hours=amount)
+            elif unit == Game.AdjudicationLength.MINUTES:
+                delta = timedelta(minutes=amount)
+            else:
+                raise ValueError(f"Incorrect unit: {unit}")
+            
+            # so far delta doesn't take into account starting at the actual start_time
+            """
+            Goal: Make the next_adjudication be at least the <delta> amount past the current time while
+                  also starting at the start_time. 
+            Method: Check the current time + delta and compare to start time on the same day; if less, put next_adjudication at start time on that day;
+                    elif more, put next_adjudication at start time on the next day.
+            """
+            new_time = timezone.now() + delta
+            # check if <= or > start time on that day
+            month = new_time.month
+            year = new_time.year
+            day = new_time.day
+            if new_time.hour > start_hour: # set next_adjudication to tomorrow
+                day += 1
+            date = datetime.datetime(year=year,month=month,day=day,hour=start_hour)
+            instance.next_adjudication = date
+            instance.save(update_fields=['next_adjudication'])
+
         country_templates = CountryTemplate.objects.all()
         countries = {}
         countries[None] = None

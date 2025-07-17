@@ -508,3 +508,35 @@ class TestMessages(APITestCase):
         self.assertEqual(Message.objects.get(country=england).text, 'Hey this is a test message bitches!')
         self.assertEqual(CountryChain.objects.get(country=england).unread, False)
         self.assertEqual(CountryChain.objects.get(country=russia).unread, True)
+
+class TestAdjudicationTime(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        call_command('loaddata', TEMPLATE_SETUP)
+        call_command('loaddata', VANILLA_UNIT_SETUP)
+        cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
+    
+    def test(self):
+        refresh = RefreshToken.for_user(self.user)
+        access_token = str(refresh.access_token)
+        
+        settings_dict = {
+            "type": Game.GameType.PUBLIC,
+            "press": Game.PressOptions.DEFAULT,
+            "adjudication": {
+                "regular_unit": Game.AdjudicationLength.DAYS,
+                "spring_fall": 1,
+                "winter_retreat": 50,
+                "first_unit": Game.AdjudicationLength.DAYS,
+                "first_turn": 1,
+                "start": 12, # Hour; 00 to 24
+                "time_zone": Game.TimeZone.US_EAST
+            }
+        }
+
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
+        game = Game.objects.create(name="Test Game", settings=settings_dict)
+
+        print(game.settings)
+        print(game.next_adjudication)
+
