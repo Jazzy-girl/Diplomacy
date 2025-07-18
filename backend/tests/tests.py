@@ -204,7 +204,10 @@ class VanillaAdjudicationTest(APITestCase):
         turkey.refresh_from_db()
         self.assertEqual(turkey.submitted_orders, True)
 
-        resolve_moves(game)
+        adjudicate_game(game.pk)
+
+        turkey.refresh_from_db()
+        self.assertEqual(turkey.submitted_orders, False)
 
         # for order in Order.objects.filter(game=game):
         #     print(order)
