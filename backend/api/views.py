@@ -189,6 +189,9 @@ class BulkUpdateOrdersView(APIView):
 
             try:
                 order = Order.objects.get(id=order_id)
+                if order.country.submitted_orders == False:
+                    order.country.submitted_orders = True
+                    order.country.save(update_fields=['submitted_orders'])
             except Order.DoesNotExist:
                 continue # something bad happened
 

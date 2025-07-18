@@ -51,6 +51,7 @@ class Game(models.Model):
     created_date = models.DateTimeField("date created", auto_now_add=True)
     full = models.BooleanField(default=False)
     next_adjudication = models.DateTimeField("next adjudication", null=True, blank=True, default=None)
+    ready_early = models.BooleanField(default=False)
     adjudicating = models.BooleanField(default=False)
     gm = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, default=None, related_name="customuser_as_gm")
 

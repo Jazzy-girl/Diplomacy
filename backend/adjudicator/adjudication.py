@@ -44,6 +44,11 @@ def adjudicate(instance: Game | Sandbox):
     FALL = 1
     WINTER = 2
     season = instance.current_turn % 3
+    if isinstance(instance, Game):
+        for country in Country.objects.filter(game=instance):
+            if country.submitted_orders: # Only make these saves if necessary
+                country.submitted_orders = False
+                country.save(update_fields=['submitted_orders'])
     if season == SPRING or FALL:
         if instance.retreat_required:
             return resolve_retreats(instance)
