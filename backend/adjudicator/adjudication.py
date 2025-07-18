@@ -16,7 +16,7 @@ from pydip.player.command.retreat_command import RetreatDisbandCommand, RetreatM
 
 from pydip.player import Player
 
-from pydip.map.predefined import vanilla_dip
+from pydip.map.predefined.vanilla_dip import generate_map
 
 from api.models import (
     Game, Sandbox, Country, Order, Territory, TerritoryTemplate, 
@@ -53,7 +53,7 @@ def adjudicate(instance: Game | Sandbox):
         return resolve_adjustments(instance)
 
 def resolve_moves(instance: Game):
-    game_map = vanilla_dip.generate_map()
+    game_map = generate_map()
     players = {}
     if isinstance(instance, Game):
         units = DjangoUnit.objects.filter(game=instance)

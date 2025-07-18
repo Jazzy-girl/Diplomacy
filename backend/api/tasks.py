@@ -71,10 +71,10 @@ def check_due_games():
             Game.objects.select_for_update().
             filter(next_adjudication__lte=now,adjudicating=False)
             )
-    for game in due_games:
-        game.adjudicating = True
-        game.save(update_fields=['adjudicating'])
-        
-        adjudicate_game.delay(game.pk)
+        for game in due_games:
+            game.adjudicating = True
+            game.save(update_fields=['adjudicating'])
+            
+            adjudicate_game.delay(game.pk)
         
         

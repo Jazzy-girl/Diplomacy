@@ -24,6 +24,7 @@ requests
 
 # Celery redis
 redis
+redis-server
 celery
 django-celery-beat
 
