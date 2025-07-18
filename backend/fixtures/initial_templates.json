@@ -64,7 +64,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 5
+      "country_template": 5,
+      "home_center": true
     }
   },
   {
@@ -76,7 +77,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -88,7 +90,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 3
+      "country_template": 3,
+      "home_center": true
     }
   },
   {
@@ -100,7 +103,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 2
+      "country_template": 2,
+      "home_center": true
     }
   },
   {
@@ -112,7 +116,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": 7
+      "country_template": 7,
+      "home_center": true
     }
   },
   {
@@ -124,7 +129,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 5
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -136,7 +142,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 5
+      "country_template": 5,
+      "home_center": true
     }
   },
   {
@@ -148,7 +155,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -160,7 +168,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 1
+      "country_template": 1,
+      "home_center": true
     }
   },
   {
@@ -172,7 +181,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -184,7 +194,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -196,7 +207,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 3
+      "country_template": 3,
+      "home_center": true
     }
   },
   {
@@ -208,7 +220,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 1
+      "country_template": 1,
+      "home_center": true
     }
   },
   {
@@ -220,7 +233,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 1
+      "country_template": 1,
+      "home_center": true
     }
   },
   {
@@ -232,7 +246,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 2
+      "country_template": 2,
+      "home_center": true
     }
   },
   {
@@ -244,7 +259,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": 4
+      "country_template": 4,
+      "home_center": true
     }
   },
   {
@@ -256,7 +272,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": 3
+      "country_template": 3,
+      "home_center": true
     }
   },
   {
@@ -268,7 +285,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 6
+      "country_template": 6,
+      "home_center": true
     }
   },
   {
@@ -280,7 +298,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -292,7 +311,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": 2
+      "country_template": 2,
+      "home_center": true
     }
   },
   {
@@ -304,7 +324,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -316,7 +337,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 6
+      "country_template": 6,
+      "home_center": true
     }
   },
   {
@@ -328,7 +350,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -340,7 +363,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -352,7 +376,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 4
+      "country_template": 4,
+      "home_center": true
     }
   },
   {
@@ -364,7 +389,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 5
+      "country_template": 5,
+      "home_center": true
     }
   },
   {
@@ -376,7 +402,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -388,7 +415,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -400,7 +428,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 4
+      "country_template": 4,
+      "home_center": true
     }
   },
   {
@@ -412,7 +441,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 7
+      "country_template": 7,
+      "home_center": true
     }
   },
   {
@@ -424,7 +454,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -436,7 +467,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": 6
+      "country_template": 6,
+      "home_center": true
     }
   },
   {
@@ -448,7 +480,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": 7
+      "country_template": 7,
+      "home_center": true
     }
   },
   {
@@ -460,7 +493,8 @@
       "sc_exists": true,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": 4
+      "country_template": 4,
+      "home_center": true
     }
   },
   {
@@ -472,7 +506,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -484,7 +519,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -496,7 +532,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -508,7 +545,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -520,7 +558,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -532,7 +571,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -544,7 +584,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -556,7 +597,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -568,7 +610,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -580,7 +623,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -592,7 +636,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -604,7 +649,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -616,7 +662,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -628,7 +675,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -640,7 +688,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -652,7 +701,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -664,7 +714,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -676,7 +727,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -688,7 +740,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -700,7 +753,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -712,7 +766,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -724,7 +779,8 @@
       "sc_exists": false,
       "territory_type": "L",
       "has_coasts": true,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -736,7 +792,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -748,7 +805,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -760,7 +818,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -772,7 +831,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -784,7 +844,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -796,7 +857,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -808,7 +870,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -820,7 +883,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -832,7 +896,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -844,7 +909,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -856,7 +922,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -868,7 +935,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -880,7 +948,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -892,7 +961,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -904,7 +974,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -916,7 +987,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -928,7 +1000,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -940,7 +1013,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
@@ -952,7 +1026,8 @@
       "sc_exists": false,
       "territory_type": "S",
       "has_coasts": false,
-      "country_template": null
+      "country_template": null,
+      "home_center": false
     }
   },
   {
