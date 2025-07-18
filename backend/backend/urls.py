@@ -17,12 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 # from requests import Response
-from api.views import (
-    BulkUpdateOrdersView, CreateUserView, ReactConfirmEmailView, 
-    current_user, get_user_by_id, update_user, GameList, 
-    TerritoryList, UnitList, CreateGameView, CreateSandboxView, 
-    SandboxList, get_sandbox_by_id, CreateMessageView,
-    CreateChainAndMessage,)
+from api.views import *
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -48,9 +43,15 @@ urlpatterns = [
     path('api/user/', current_user, name='current_user'),
     path('api/user/update/', update_user, name='update_user'),
     path('api/user/<int:pk>/', get_user_by_id, name='get_user_by_id'),
-    # Game related
+
+
+    # Game Lists
     path('api/list/game/', GameList.as_view(), name="list-game"),
+    path('api/list/game/open/public', OpenPublicGameList.as_view(), name='list-game-open-public'),
+    path('api/list/game/full/public', FullPublicGameList.as_view(), name='list-game-full-public'),
+
     path('api/create/game/', CreateGameView.as_view(), name="create-game"),
+
     path('api/list/sandbox/', SandboxList.as_view(), name="list-sandbox"),
     path('api/list/sandbox/<int:pk>/', get_sandbox_by_id, name="get_sandbox_by_id"),
     path('api/create/sandbox/', CreateSandboxView.as_view(), name="create-sandbox"),

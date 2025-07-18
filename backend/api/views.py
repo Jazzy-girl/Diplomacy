@@ -36,6 +36,16 @@ class GameList(generics.ListAPIView):
     serializer_class = GameSerializer
     permission_classes = [AllowAny]
 
+class OpenPublicGameList(generics.ListAPIView):
+    queryset = Game.objects.filter(full=False,settings__type=Game.GameType.PUBLIC)
+    serializer_class = GameSerializer
+    permission_classes = [AllowAny]
+
+class FullPublicGameList(generics.ListAPIView):
+    queryset = Game.objects.filter(full=True,settings__type=Game.GameType.PUBLIC)
+    serializer_class = GameSerializer
+    permission_classes = [AllowAny]
+
 class CreateSandboxView(generics.CreateAPIView):
     queryset = Sandbox.objects.all()
     serializer_class=SandboxSerializer
