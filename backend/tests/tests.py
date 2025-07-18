@@ -175,6 +175,7 @@ class VanillaAdjudicationTest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
 
         game = Game.objects.create(name="Test Game")
+        turkey = Country.objects.get(game=game,country_template__name='T')
         bla = Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="BLA"))
         ank = Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="Ank"))
         ank_coast = CoastTemplate.objects.get(name="Ank")
@@ -183,6 +184,7 @@ class VanillaAdjudicationTest(APITestCase):
         order_ank = Order.objects.get(game=game,origin_territory=ank,origin_coast=ank_coast)
         order_sev = Order.objects.get(game=game,origin_territory=sev,origin_coast=sev_coast)
 
+        self.assertEqual(turkey.submitted_orders, False)
 
         payload = [
             {
@@ -199,6 +201,8 @@ class VanillaAdjudicationTest(APITestCase):
 
         response = self.client.patch(UPDATE_BULK_ORDER, payload, format="json")
         self.assertEqual(response.status_code, 200)
+        turkey.refresh_from_db()
+        self.assertEqual(turkey.submitted_orders, True)
 
         resolve_moves(game)
 
