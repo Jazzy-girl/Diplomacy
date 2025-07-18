@@ -128,7 +128,7 @@ class CreateMessageView(APIView):
             serializer.save()
             chain_id = request.data.get('chain')
             sender_id = request.data.get('country')
-            chain = Chain.objects.get(pk=chain_id)
+            chain = get_object_or_404(Chain, pk=chain_id)
             chain.last_updated = timezone.now
 
             for countryChain in CountryChain.objects.filter(chain=chain):
@@ -170,6 +170,10 @@ class CreateChainAndMessage(APIView):
         
         try:
             game = get_object_or_404(Game, pk=game_id)
+
+            if game.started == False:
+                return Response({'errors':'game has not yet started!'}, status=status.HTTP_403_FORBIDDEN)
+            
             chain = Chain.objects.create(title=chain_title,game=game)
             sender = get_object_or_404(Country, pk=sender_id)
 
