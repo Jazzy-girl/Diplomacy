@@ -199,6 +199,8 @@ class BulkUpdateOrdersView(APIView):
 
             try:
                 order = Order.objects.get(id=order_id)
+                if order.game and order.game.started == False:
+                    return Response({'errors':'game has not yet started!'}, status=status.HTTP_403_FORBIDDEN)
                 if order.country.submitted_orders == False:
                     order.country.submitted_orders = True
                     order.country.save(update_fields=['submitted_orders'])

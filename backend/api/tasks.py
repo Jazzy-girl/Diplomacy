@@ -69,7 +69,7 @@ def check_due_games():
 
         due_games = (
             Game.objects.select_for_update().
-            filter(next_adjudication__lte=now,adjudicating=False)
+            filter(next_adjudication__lte=now,adjudicating=False,started=True)
             )
         for game in due_games:
             game.adjudicating = True

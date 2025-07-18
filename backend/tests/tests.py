@@ -464,8 +464,7 @@ class BulkUpdateOrdersTest(APITestCase):
         game = Game.objects.create(name="Test Game 2")
 
         game.started = True
-        game.save(update_fields=['started'])
-        game.refresh_from_db()
+
 
         smyTemp = TerritoryTemplate.objects.get(name="Smy")
         syrTemp = TerritoryTemplate.objects.get(name="Syr")
@@ -494,6 +493,13 @@ class BulkUpdateOrdersTest(APITestCase):
                 "move_type": "M"
             }
         ]
+
+        response = self.client.patch(url, payload, format="json")
+        self.assertEqual(response.status_code, 403)
+        
+
+        game.save(update_fields=['started'])
+        game.refresh_from_db()
 
         response = self.client.patch(url, payload, format="json")
         self.assertEqual(response.status_code, 200)
