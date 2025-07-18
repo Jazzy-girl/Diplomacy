@@ -47,6 +47,7 @@ class Game(models.Model):
     description = models.TextField(max_length=200, default="")
     current_turn = models.PositiveSmallIntegerField(default=0)
     retreat_required = models.BooleanField(default=False)
+    started = models.BooleanField(default=False)
     creator = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, default=None, blank=True, related_name="customuser_as_creator")
     created_date = models.DateTimeField("date created", auto_now_add=True)
     full = models.BooleanField(default=False)

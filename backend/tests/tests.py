@@ -175,6 +175,11 @@ class VanillaAdjudicationTest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
 
         game = Game.objects.create(name="Test Game")
+        
+        game.started = True
+        game.save(update_fields=['started'])
+        game.refresh_from_db()
+
         turkey = Country.objects.get(game=game,country_template__name='T')
         bla = Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="BLA"))
         ank = Territory.objects.get(game=game,territory_template=TerritoryTemplate.objects.get(name="Ank"))
@@ -247,6 +252,10 @@ class SupportedHoldFails(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
 
         game = Game.objects.create(name="Test Game")
+
+        game.started = True
+        game.save(update_fields=['started'])
+        game.refresh_from_db()
 
         orders = {order.origin_territory.territory_template.name : order for order in Order.objects.filter(game=game,turn=game.current_turn)}
         order_ruh = orders["Ruh"]
@@ -388,6 +397,11 @@ class GetBuilds(APITestCase):
 
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         game = Game.objects.create(name="Test Game")
+
+        game.started = True
+        game.save(update_fields=['started'])
+        game.refresh_from_db()
+
         # print(Order.objects.all())
         # for order in Order.objects.all():
         #     print(order)
@@ -449,6 +463,10 @@ class BulkUpdateOrdersTest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         game = Game.objects.create(name="Test Game 2")
 
+        game.started = True
+        game.save(update_fields=['started'])
+        game.refresh_from_db()
+
         smyTemp = TerritoryTemplate.objects.get(name="Smy")
         syrTemp = TerritoryTemplate.objects.get(name="Syr")
         ankTemp = TerritoryTemplate.objects.get(name="Ank")
@@ -501,6 +519,10 @@ class TestMessages(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         game = Game.objects.create(name="Test Game")
 
+        game.started = True
+        game.save(update_fields=['started'])
+        game.refresh_from_db()
+
         england = Country.objects.get(game=game,country_template__name='E')
         russia = Country.objects.get(game=game,country_template__name='R')
 
@@ -547,7 +569,13 @@ class TestAdjudicationTime(APITestCase):
 
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
         game = Game.objects.create(name="Test Game", settings=settings_dict)
+        game.started = True
+        game.save(update_fields=['started'])
+        game.refresh_from_db()
 
+        game.started = True
+        game.save(update_fields=['started'])
+        game.refresh_from_db()
         x1 = game.next_adjudication
         # print("UTC:", game.next_adjudication)
         # print("Local:", game.next_adjudication.astimezone(ZoneInfo(game.settings['adjudication']['timezone'])))
