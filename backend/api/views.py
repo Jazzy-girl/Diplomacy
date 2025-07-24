@@ -116,22 +116,22 @@ class JoinGameView(APIView):
 def can_send_press(game: Game, chain: Chain | None, members : list | None):
     if game.started == False:
         return Response({'error':'game has not yet started!'}, status=status.HTTP_403_FORBIDDEN)
-    press_type = game.settings.get['press']
+    press_type = game.settings.get('press')
     retreat = game.retreat_required
-    season = game.current_turn % 3
+    season = Seasons(game.current_turn % 3)
     if press_type == PressOptions.DEFAULT:
-        if retreat == False and (season == Seasons.FALL or season == Seasons.SPRING):
+        if not retreat and season in {Seasons.FALL, Seasons.SPRING}:
             return True
         else:
-            Response({'error': 'cannot send press during winter / retreat with default press'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'cannot send press during winter / retreat with default press'}, status=status.HTTP_400_BAD_REQUEST)
     elif press_type == PressOptions.ALWAYS:
         return True
     elif press_type == PressOptions.GUNBOAT:
         return Response({'error': 'gunboat'}, status=status.HTTP_400_BAD_REQUEST)
     elif press_type == PressOptions.GLOBAL:
-        countries = set(country.pk for country in Country.objects.filter(game=game))
+        countries = {country.pk for country in Country.objects.filter(game=game)}
         if isinstance(chain, Chain): # pre-existing chain object
-            chain_members = set(chain.country.pk for chain in CountryChain.objects.filter(chain=chain))
+            chain_members = {chain.country.pk for chain in CountryChain.objects.filter(chain=chain)}
         elif isinstance(members, list): # new chain not yet made
             chain_members = set(members)
         else:

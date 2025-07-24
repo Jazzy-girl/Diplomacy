@@ -513,7 +513,7 @@ class TestMessages(APITestCase):
         call_command('loaddata', 'tests/json/vanilla_setup.json')
         cls.user = get_user_model().objects.create_user(username="testuser",password="testpass")
     
-    def test_get_builds(self):
+    def test_messages_global_fails(self):
         refresh = RefreshToken.for_user(self.user)
         access_token = str(refresh.access_token)
 
@@ -521,7 +521,8 @@ class TestMessages(APITestCase):
         game = Game.objects.create(name="Test Game")
 
         game.started = True
-        game.save(update_fields=['started'])
+        game.settings['press'] = PressOptions.GLOBAL
+        game.save(update_fields=['started', 'settings'])
         game.refresh_from_db()
 
         england = Country.objects.get(game=game,country_template__name='E')
@@ -535,6 +536,11 @@ class TestMessages(APITestCase):
             "text": "Hey this is a test message bitches!"
         }
 
+        response = self.client.post(CREATE_CHAIN, payload, format="json")
+        self.assertEqual(response.status_code, 400)
+
+        game.settings['press'] = PressOptions.DEFAULT
+        game.save(update_fields=['settings'])
         response = self.client.post(CREATE_CHAIN, payload, format="json")
         self.assertEqual(response.status_code, 200)
 

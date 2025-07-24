@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from zoneinfo import ZoneInfo
+from enum import Enum
 # Create your models here.
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
@@ -15,7 +16,7 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return f"{self.username} {self.email}"
-class Seasons(models.TextChoices):
+class Seasons(Enum):
     FALL = 0
     SPRING = 1
     WINTER = 2
