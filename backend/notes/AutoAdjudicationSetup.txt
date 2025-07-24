@@ -1,0 +1,10 @@
+Run these commands in separate terminals to start auto-adjudication. Utilizes the /api/tasks.py functions.
+
+Redis terminal: (?)
+sudo service redis-server start
+
+Celery worker terminal:
+celery -A your_project worker --loglevel=info
+
+Celery Beat terminal:
+celery -A your_project beat --loglevel=info
