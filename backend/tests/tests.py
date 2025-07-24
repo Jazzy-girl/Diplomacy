@@ -9,12 +9,7 @@ import json
 from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.models import (
-    Game, Territory, Unit, Order, Sandbox, 
-    Country, CoastTemplate, TerritoryTemplate, UnitRetreatOption, 
-    AdjustmentCache, CountrySCCountSnapshot, TerritoryCountrySnapshot,
-    UnitLocationSnapshot, Chain, Message, CountryChain, TimeZone
-    )
+from api.models import *
 from adjudicator.adjudication import resolve_moves, resolve_retreats, next_turn, resolve_adjustments
 from api.tasks import adjudicate_game
 from datetime import timedelta
@@ -559,8 +554,8 @@ class TestAdjudicationTime(APITestCase):
         access_token = str(refresh.access_token)
 
         settings_dict = {
-            "type": Game.GameType.PUBLIC,
-            "press": Game.PressOptions.DEFAULT,
+            "type": GameType.PUBLIC,
+            "press": PressOptions.DEFAULT,
             "adjudication": {
                 "regular_unit": Game.AdjudicationLength.DAYS,
                 "spring_fall": 1,
@@ -598,8 +593,8 @@ class TestAdjudicationTime(APITestCase):
         access_token = str(refresh.access_token)
         
         settings_dict = {
-            "type": Game.GameType.PUBLIC,
-            "press": Game.PressOptions.DEFAULT,
+            "type": GameType.PUBLIC,
+            "press": PressOptions.DEFAULT,
             "adjudication": {
                 "regular_unit": Game.AdjudicationLength.DAYS,
                 "spring_fall": 1,

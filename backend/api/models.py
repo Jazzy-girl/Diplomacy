@@ -16,25 +16,29 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return f"{self.username} {self.email}"
 class Seasons(models.TextChoices):
-    FALL = 'fall', _('Fall')
-    SPRING = 'spring', _('Spring')
-    WINTER = 'winter', _('Winter')
+    FALL = 0
+    SPRING = 1
+    WINTER = 2
 class TimeZone(models.TextChoices):
     # There's a lot of time zones.... is there a better way to do this??
     US_PACIFIC = 'US/Pacific'
     US_EASTERN = 'US/Eastern'
     US_MOUNTAIN = 'US/Mountain'
 
+class GameType(models.TextChoices):
+    PUBLIC = 'public'
+    PRIVATE = 'private'
+
+class PressOptions(models.TextChoices):
+    DEFAULT = 'default' # Allowed except for Winter & Retreats
+    ALWAYS = 'always' # Always
+    GUNBOAT = 'gunboat' # Gunboat -- no press whatsoever
+    GLOBAL = 'global' # All press is sent to everyone
+
 class Game(models.Model):
-    class PressOptions(models.TextChoices):
-        DEFAULT = 'default' # Allowed except for Winter & Retreats
-        ALWAYS = 'always' # Always
-        GUNBOAT = 'gunboat' # Gunboat -- no press whatsoever
-        WILSON = 'wilson' # All press is sent to everyone
+
     
-    class GameType(models.TextChoices):
-        PUBLIC = 'public'
-        PRIVATE = 'private'
+
     
     class AdjudicationLength(models.TextChoices):
         MINUTES = 'minutes'

@@ -37,12 +37,12 @@ class GameList(generics.ListAPIView):
     permission_classes = [AllowAny]
 
 class OpenPublicGameList(generics.ListAPIView):
-    queryset = Game.objects.filter(full=False,settings__type=Game.GameType.PUBLIC)
+    queryset = Game.objects.filter(full=False,settings__type=GameType.PUBLIC)
     serializer_class = GameSerializer
     permission_classes = [AllowAny]
 
 class FullPublicGameList(generics.ListAPIView):
-    queryset = Game.objects.filter(full=True,settings__type=Game.GameType.PUBLIC)
+    queryset = Game.objects.filter(full=True,settings__type=GameType.PUBLIC)
     serializer_class = GameSerializer
     permission_classes = [AllowAny]
 
@@ -84,7 +84,7 @@ class JoinGameView(APIView):
         if Country.objects.filter(game=game, user=user).exists():
             return Response({"error":"You are already in this game"}, status=status.HTTP_400_BAD_REQUEST)
         
-        if game.settings.get('public')==Game.GameType.PUBLIC:
+        if game.settings.get('public')==GameType.PUBLIC:
             """
             Get assigned a random country and join the game.
             """
@@ -113,6 +113,37 @@ class JoinGameView(APIView):
                 return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+def can_send_press(game: Game, chain: Chain | None, members : list | None):
+    if game.started == False:
+        return Response({'error':'game has not yet started!'}, status=status.HTTP_403_FORBIDDEN)
+    press_type = game.settings.get['press']
+    retreat = game.retreat_required
+    season = game.current_turn % 3
+    if press_type == PressOptions.DEFAULT:
+        if retreat == False and (season == Seasons.FALL or season == Seasons.SPRING):
+            return True
+        else:
+            Response({'error': 'cannot send press during winter / retreat with default press'}, status=status.HTTP_400_BAD_REQUEST)
+    elif press_type == PressOptions.ALWAYS:
+        return True
+    elif press_type == PressOptions.GUNBOAT:
+        return Response({'error': 'gunboat'}, status=status.HTTP_400_BAD_REQUEST)
+    elif press_type == PressOptions.GLOBAL:
+        countries = set(country.pk for country in Country.objects.filter(game=game))
+        if isinstance(chain, Chain): # pre-existing chain object
+            chain_members = set(chain.country.pk for chain in CountryChain.objects.filter(chain=chain))
+        elif isinstance(members, list): # new chain not yet made
+            chain_members = set(members)
+        else:
+            return Response({'error': 'neither chain nor members provided'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if countries == chain_members:
+            return True
+        else:
+            return Response({'error': 'not all members included in global type'}, status=status.HTTP_400_BAD_REQUEST)
+        
+    else:
+        return Response({'error': 'incompatible press type'}, status=status.HTTP_400_BAD_REQUEST)
 
 class CreateMessageView(APIView):
     """
@@ -129,6 +160,13 @@ class CreateMessageView(APIView):
             chain_id = request.data.get('chain')
             sender_id = request.data.get('country')
             chain = get_object_or_404(Chain, pk=chain_id)
+
+            game = chain.game
+            valid = can_send_press(game=game, chain=chain, members=None)
+
+            if valid != True:
+                return valid # will be a Response
+            
             chain.last_updated = timezone.now
 
             for countryChain in CountryChain.objects.filter(chain=chain):
@@ -146,13 +184,14 @@ class CreateChainAndMessage(APIView):
         'members': [<country_ids...>]
         'country': <country ID>,
         'text': <text>
+
+        
     """
     def post(self, request, format=None):
         data = request.data
 
         if not isinstance(data, dict):
             return Response({'error': 'Expected a dict'}, status=status.HTTP_400_BAD_REQUEST)
-        
     
         chain_title = data.get('title')
         game_id = data.get('game')
@@ -171,9 +210,11 @@ class CreateChainAndMessage(APIView):
         try:
             game = get_object_or_404(Game, pk=game_id)
 
-            if game.started == False:
-                return Response({'errors':'game has not yet started!'}, status=status.HTTP_403_FORBIDDEN)
-            
+            valid = can_send_press(game=game, chain=None, members=members)
+
+            if valid != True:
+                return valid # will be a Response
+
             chain = Chain.objects.create(title=chain_title,game=game)
             sender = get_object_or_404(Country, pk=sender_id)
 
