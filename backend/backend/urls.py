@@ -49,6 +49,7 @@ urlpatterns = [
     path('api/list/game/', GameList.as_view(), name="list-game"),
     path('api/list/game/open/public', OpenPublicGameList.as_view(), name='list-game-open-public'),
     path('api/list/game/full/public', FullPublicGameList.as_view(), name='list-game-full-public'),
+    path('api/list/game/private/<str:password>', ByPasswordGameList.as_view(), name='list-game-password'),
 
     path('api/create/game/', CreateGameView.as_view(), name="create-game"),
 

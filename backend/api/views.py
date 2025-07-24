@@ -41,6 +41,14 @@ class OpenPublicGameList(generics.ListAPIView):
     serializer_class = GameSerializer
     permission_classes = [AllowAny]
 
+class ByPasswordGameList(generics.ListAPIView):
+    serializer_class = GameSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        password = self.kwargs.get('password')
+        return Game.objects.filter(password=password, settings__type=GameType.PRIVATE)
+
 class FullPublicGameList(generics.ListAPIView):
     queryset = Game.objects.filter(full=True,settings__type=GameType.PUBLIC)
     serializer_class = GameSerializer
