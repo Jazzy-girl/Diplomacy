@@ -65,6 +65,34 @@ class UnitList(generics.ListAPIView):
     serializer_class = UnitSerializer
     permission_classes = [AllowAny]
 
+def _assign_random_country(game: Game, user):
+    try:
+        with transaction.atomic():
+            game = Game.objects.select_for_update().get(pk=game.pk)
+            unassigned_countries = (
+                Country.objects
+                .select_for_update(skip_locked=True)
+                .filter(game=game, user=None)
+                )
+            
+            if not unassigned_countries.exists():
+                return Response({"error":"No unasigned countries left"}, status=status.HTTP_400_BAD_REQUEST)
+
+            game.num_players += 1
+            if game.num_players >= game.max_players:
+                game.full = True
+                game.save(update_fields=['save', 'num_players'])
+            else:
+                game.save(update_fields=['num_players'])
+            
+            chosen_country = random.choice(unassigned_countries)
+            chosen_country.user = user
+            chosen_country.save()
+
+            PlayersGames.objects.create(game=game, player=user)
+            return Response({"success":"Joined game"}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 class JoinGameView(APIView):
     """
     Join a game. Sending:
@@ -73,8 +101,13 @@ class JoinGameView(APIView):
     }
 
     """
+
+
     def patch(self, request, *args, **kwargs):
-        game_id = request.data.get('id')
+        try:
+            game_id = request.data.get('id')
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         user = request.user
         game = get_object_or_404(Game, pk=game_id)
 
@@ -84,36 +117,46 @@ class JoinGameView(APIView):
         if Country.objects.filter(game=game, user=user).exists():
             return Response({"error":"You are already in this game"}, status=status.HTTP_400_BAD_REQUEST)
         
-        if game.settings.get('public')==GameType.PUBLIC:
+        if game.settings.get('type')==GameType.PUBLIC:
             """
             Get assigned a random country and join the game.
             """
-            try:
-                with transaction.atomic():
-                    unassigned_countries = (
-                        Country.objects
-                        .select_for_update(skip_locked=True)
-                        .filter(game=game, user=None)
-                        )
-                    
-                    if not unassigned_countries.exists():
-                        return Response({"error":"No unasigned countries left"}, status=status.HTTP_400_BAD_REQUEST)
+            return _assign_random_country(game, user)
 
-                    if len(unassigned_countries) == 1:
-                        game.full = True
-                        game.save()
-                    
-                    chosen_country = random.choice(unassigned_countries)
-                    chosen_country.user = user
-                    chosen_country.save()
-
-                    PlayersGames.objects.create(game=game, player=user)
-                    return Response({"success":"Joined game"}, status=status.HTTP_200_OK)
-            except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        elif game.settings.get('type') == GameType.PRIVATE:
+            # """
+            # Password validate...
+            # """
+            # try:
+            #     password = request.data.get('password')
+            # except Exception as e:
+            #     return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # if password != game.password:
+            #     return Response({'error', 'password incorrect'}, status=status.HTTP)
+            
+            if game.gm == None: # Will be assigned randomly...
+                return _assign_random_country(game, user)
+            else: # May be assigned by the GM...
+                try:
+                    with transaction.atomic():
+                        game = Game.objects.select_for_update().get(pk=game.pk)
+                        game.num_players += 1
+                        if game.num_players >= game.max_players:
+                            game.full = True
+                            game.save(update_fields=['save', 'num_players'])
+                        else:
+                            game.save(update_fields=['num_players'])
+                        PlayersGames.objects.create(game=game, player=user)
+                        return Response({"success":"Joined game"}, status=status.HTTP_200_OK)
+                except Exception as e:
+                    return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def can_send_press(game: Game, chain: Chain | None, members : list | None):
+    """
+    Handles whether or not press can be sent based on the game's press type and current situation.
+    Returns either True or a Response.
+    """
     if game.started == False:
         return Response({'error':'game has not yet started!'}, status=status.HTTP_403_FORBIDDEN)
     press_type = game.settings.get('press')

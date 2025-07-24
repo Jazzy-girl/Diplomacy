@@ -60,6 +60,8 @@ class Game(models.Model):
     ready_early = models.BooleanField(default=False)
     adjudicating = models.BooleanField(default=False)
     gm = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, default=None, related_name="customuser_as_gm")
+    max_players = models.PositiveSmallIntegerField(default=7)
+    num_players = models.PositiveSmallIntegerField(default=0)
     password = models.CharField(max_length=20, null=True, default=None, blank=True)
 
     # DELETE THIS LATER
