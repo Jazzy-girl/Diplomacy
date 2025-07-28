@@ -37,7 +37,7 @@ class GameList(generics.ListAPIView):
     permission_classes = [AllowAny]
 
 class OpenPublicGameList(generics.ListAPIView):
-    queryset = Game.objects.filter(full=False,settings__type=GameType.PUBLIC)
+    queryset = Game.objects.filter(full=False,game_type=GameType.PUBLIC)
     serializer_class = GameSerializer
     permission_classes = [AllowAny]
 
@@ -47,10 +47,10 @@ class ByPasswordGameList(generics.ListAPIView):
 
     def get_queryset(self):
         password = self.kwargs.get('password')
-        return Game.objects.filter(password=password, settings__type=GameType.PRIVATE)
+        return Game.objects.filter(password=password, game_type=GameType.PRIVATE)
 
 class FullPublicGameList(generics.ListAPIView):
-    queryset = Game.objects.filter(full=True,settings__type=GameType.PUBLIC)
+    queryset = Game.objects.filter(full=True,game_type=GameType.PUBLIC)
     serializer_class = GameSerializer
     permission_classes = [AllowAny]
 
@@ -124,13 +124,13 @@ class JoinGameView(APIView):
         if Country.objects.filter(game=game, user=user).exists():
             return Response({"error":"You are already in this game"}, status=status.HTTP_400_BAD_REQUEST)
         
-        if game.settings.get('type')==GameType.PUBLIC:
+        if game.game_type==GameType.PUBLIC:
             """
             Get assigned a random country and join the game.
             """
             return _assign_random_country(game, user)
 
-        elif game.settings.get('type') == GameType.PRIVATE:
+        elif game.game_type == GameType.PRIVATE:
             """
             Password validate...
             """
@@ -165,7 +165,7 @@ def can_send_press(game: Game, chain: Chain | None, members : list | None):
     """
     if game.started == False:
         return Response({'error':'game has not yet started!'}, status=status.HTTP_403_FORBIDDEN)
-    press_type = game.settings.get('press')
+    press_type = game.press
     retreat = game.retreat_required
     season = Seasons(game.current_turn % 3)
     if press_type == PressOptions.DEFAULT:

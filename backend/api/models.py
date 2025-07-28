@@ -64,24 +64,37 @@ class Game(models.Model):
     num_players = models.PositiveSmallIntegerField(default=0)
     password = models.CharField(max_length=20, null=True, default=None, blank=True)
 
-    # DELETE THIS LATER
-    _settings_dict = {
-        "type": GameType.PUBLIC,
-        "press": PressOptions.DEFAULT,
-        "adjudication": {
-            "regular_unit": AdjudicationLength.MINUTES,
-            "spring_fall": 1,
-            "winter_retreat": 50,
-            "first_unit": AdjudicationLength.MINUTES,
-            "first_turn": 1,
-            "start": 15, # Hour; 00 to 24
-            "timezone": TimeZone.US_EASTERN,
-            "fast_adjudication": False,
-        },
-        # 'end_year': None,
-    }
+    game_type = models.CharField(choices=GameType.choices, default=GameType.PUBLIC)
 
-    settings = models.JSONField(default=dict(_settings_dict))
+    press = models.CharField(choices=PressOptions.choices, default=PressOptions.DEFAULT)
+
+    # adjudication
+    start_hour = models.PositiveSmallIntegerField(default=12) # an hour; 24-hour time
+    spring_fall = models.PositiveSmallIntegerField(default=60) # minutes
+    winter_retreat = models.PositiveSmallIntegerField(default=50) # percent
+    first_turn = models.PositiveSmallIntegerField(default=60)
+    timezone = models.CharField(choices=TimeZone.choices, default=TimeZone.US_EASTERN)
+
+    fast_adjudication = models.BooleanField(default=False)
+
+    # # DELETE THIS LATER
+    # _settings_dict = {
+    #     "type": GameType.PUBLIC,
+    #     "press": PressOptions.DEFAULT,
+    #     "adjudication": {
+    #         "regular_unit": AdjudicationLength.MINUTES,
+    #         "spring_fall": 1,
+    #         "winter_retreat": 50,
+    #         "first_unit": AdjudicationLength.MINUTES,
+    #         "first_turn": 1,
+    #         "start": 15, # Hour; 00 to 24
+    #         "timezone": TimeZone.US_EASTERN,
+    #         "fast_adjudication": False,
+    #     },
+    #     # 'end_year': None,
+    # }
+
+    # settings = models.JSONField(default=dict(_settings_dict))
 
     def __str__(self):
         return f"Creator: {self.creator} Title: {self.name} Adjudicates: {self.next_adjudication}"

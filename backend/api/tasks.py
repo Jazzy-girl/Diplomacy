@@ -18,13 +18,9 @@ def adjudicate_game(game_id):
     RETREAT = -1
     outcome = adjudicate(game)
 
-    data = game.settings.get('adjudication')
-    unit = data.get('regular_unit')
-    spring_fall = data.get('spring_fall')
-    percent = data.get('winter_retreat') / 100
+    spring_fall = game.spring_fall
+    percent = game.winter_retreat / 100
     winter_retreat = spring_fall * percent
-    fast = data.get('fast_adjudication')
-    zone = data.get('timezone')
 
     season = game.current_turn % 3
     # winter BOOL; true = winter/retreat, False = spring/fall
@@ -35,12 +31,7 @@ def adjudicate_game(game_id):
         update = winter_retreat
     else:
         update = spring_fall
-    if unit == Game.AdjudicationLength.DAYS:
-        delta = timedelta(days=update)
-    elif unit == Game.AdjudicationLength.HOURS:
-        delta = timedelta(hours=update)
-    elif unit == Game.AdjudicationLength.MINUTES:
-        delta = timedelta(minutes=update)
+    delta = timedelta(minutes=update)
     
     new = current + delta
     # if fast: # Fast adjudication CHANGE: to early adjudication extra time!!!

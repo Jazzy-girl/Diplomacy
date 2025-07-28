@@ -13,20 +13,11 @@ from django.utils.timezone import make_aware
 def game_or_sandbox_save(sender, instance: Game | Sandbox, created, **kwargs):
     # print("signal triggered!") #Debug
     isGame = isinstance(instance, Game)
-    def _first_adjudication(instance):
-        data = instance.settings.get('adjudication')
-        unit = data.get('first_unit')
-        start_hour = data.get('start')
-        amount = data.get('first_turn')
-        zone = ZoneInfo(data.get('timezone'))
-        if unit == Game.AdjudicationLength.DAYS:
-            delta = timedelta(days=amount)
-        elif unit == Game.AdjudicationLength.HOURS:
-            delta = timedelta(hours=amount)
-        elif unit == Game.AdjudicationLength.MINUTES:
-            delta = timedelta(minutes=amount)
-        else:
-            raise ValueError(f"Incorrect unit: {unit}")
+    def _first_adjudication(game: Game):
+        start_hour = game.start_hour
+        amount = game.first_turn
+        zone = ZoneInfo(game.timezone)
+        delta = timedelta(minutes=amount)
         
         # so far delta doesn't take into account starting at the actual start_time
         """
@@ -45,8 +36,8 @@ def game_or_sandbox_save(sender, instance: Game | Sandbox, created, **kwargs):
             day += 1
         local = make_aware(datetime(year=year,month=month,day=day,hour=start_hour, minute=0, microsecond=0), timezone=zone)
         utc_date = local.astimezone(timezone.utc)
-        instance.next_adjudication = utc_date
-        instance.save(update_fields=['next_adjudication'])
+        game.next_adjudication = utc_date
+        game.save(update_fields=['next_adjudication'])
     if created:
         """
         Makes:

@@ -521,8 +521,8 @@ class TestMessages(APITestCase):
         game = Game.objects.create(name="Test Game")
 
         game.started = True
-        game.settings['press'] = PressOptions.GLOBAL
-        game.save(update_fields=['started', 'settings'])
+        game.press = PressOptions.GLOBAL
+        game.save(update_fields=['started', 'press'])
         game.refresh_from_db()
 
         england = Country.objects.get(game=game,country_template__name='E')
@@ -539,8 +539,8 @@ class TestMessages(APITestCase):
         response = self.client.post(CREATE_CHAIN, payload, format="json")
         self.assertEqual(response.status_code, 400)
 
-        game.settings['press'] = PressOptions.DEFAULT
-        game.save(update_fields=['settings'])
+        game.press = PressOptions.DEFAULT
+        game.save(update_fields=['press'])
         response = self.client.post(CREATE_CHAIN, payload, format="json")
         self.assertEqual(response.status_code, 200)
 
@@ -558,24 +558,8 @@ class TestAdjudicationTime(APITestCase):
     def test_day(self):
         refresh = RefreshToken.for_user(self.user)
         access_token = str(refresh.access_token)
-
-        settings_dict = {
-            "type": GameType.PUBLIC,
-            "press": PressOptions.DEFAULT,
-            "adjudication": {
-                "regular_unit": Game.AdjudicationLength.DAYS,
-                "spring_fall": 1,
-                "winter_retreat": 50,
-                "first_unit": Game.AdjudicationLength.DAYS,
-                "first_turn": 1,
-                "start": 12, # Hour; 00 to 24
-                "timezone": TimeZone.US_PACIFIC,
-                "fast_adjudication": False,
-            }
-        }
-
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
-        game = Game.objects.create(name="Test Game", settings=settings_dict)
+        game = Game.objects.create(name="Test Game", spring_fall=1440)
         game.started = True
         game.save(update_fields=['started'])
         game.refresh_from_db()
@@ -585,7 +569,7 @@ class TestAdjudicationTime(APITestCase):
         game.refresh_from_db()
         x1 = game.next_adjudication
         # print("UTC:", game.next_adjudication)
-        # print("Local:", game.next_adjudication.astimezone(ZoneInfo(game.settings['adjudication']['timezone'])))
+        # print("Local:", game.next_adjudication.astimezone(ZoneInfo(game.timezone)))
         adjudicate_game(game.pk)
         game.refresh_from_db()
         # print(game.next_adjudication)
@@ -593,26 +577,4 @@ class TestAdjudicationTime(APITestCase):
         diff = x2 - x1
         day = timedelta(days=1)
         self.assertEqual(diff, day)
-
-    def test_minute(self):
-        refresh = RefreshToken.for_user(self.user)
-        access_token = str(refresh.access_token)
-        
-        settings_dict = {
-            "type": GameType.PUBLIC,
-            "press": PressOptions.DEFAULT,
-            "adjudication": {
-                "regular_unit": Game.AdjudicationLength.DAYS,
-                "spring_fall": 1,
-                "winter_retreat": 50,
-                "first_unit": Game.AdjudicationLength.MINUTES,
-                "first_turn": 10,
-                "start": 12, # Hour; 00 to 24
-                "timezone": TimeZone.US_EASTERN,
-                "fast_adjudication": False,
-            }
-        }
-
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_token)
-        game = Game.objects.create(name="Test Game", settings=settings_dict)
 
