@@ -77,7 +77,8 @@ class Game(models.Model):
             "start": 15, # Hour; 00 to 24
             "timezone": TimeZone.US_EASTERN,
             "fast_adjudication": False,
-        }
+        },
+        # 'end_year': None,
     }
 
     settings = models.JSONField(default=dict(_settings_dict))

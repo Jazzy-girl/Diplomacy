@@ -110,7 +110,6 @@ class JoinGameView(APIView):
 
     """
 
-
     def patch(self, request, *args, **kwargs):
         try:
             game_id = request.data.get('id')
@@ -132,16 +131,15 @@ class JoinGameView(APIView):
             return _assign_random_country(game, user)
 
         elif game.settings.get('type') == GameType.PRIVATE:
-            # """
-            # Password validate...
-            # """
-            # try:
-            #     password = request.data.get('password')
-            # except Exception as e:
-            #     return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-            
-            # if password != game.password:
-            #     return Response({'error', 'password incorrect'}, status=status.HTTP)
+            """
+            Password validate...
+            """
+            try:
+                password = request.data.get('password')
+                if password != game.password:
+                    return Response({'error', 'password incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
             
             if game.gm == None: # Will be assigned randomly...
                 return _assign_random_country(game, user)

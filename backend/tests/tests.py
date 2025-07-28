@@ -434,7 +434,7 @@ class GetBuilds(APITestCase):
 
         builds = cache.build_cache
         build_locales = set()
-        for build in builds['19']:
+        for build in builds[f'{turkey.pk}']:
             try:
                build_locales.add(Territory.objects.get(id=build).territory_template.full_name)
             except:
